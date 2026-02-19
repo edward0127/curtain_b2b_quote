@@ -1,0 +1,86 @@
+<% return_to_dashboard = local_assigns.fetch(:return_to_dashboard, false) %>
+<% dashboard_compact = local_assigns.fetch(:dashboard_compact, false) %>
+
+<% if app_setting.errors.any? %>
+  <div class="flash flash--alert">
+    <strong><%= pluralize(app_setting.errors.count, "error") %> prevented saving:</strong>
+    <ul>
+      <% app_setting.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<%= form_with model: app_setting, url: admin_settings_path, method: :patch do |form| %>
+  <% if return_to_dashboard %>
+    <%= hidden_field_tag :return_to, "dashboard" %>
+    <% if dashboard_compact %>
+      <%= hidden_field_tag :compact, "1" %>
+    <% end %>
+  <% end %>
+
+  <h3>Mailgun SMTP</h3>
+  <div class="form-grid">
+    <div class="field">
+      <%= form.label :mailgun_domain %>
+      <%= form.text_field :mailgun_domain, required: true %>
+    </div>
+
+    <div class="field">
+      <%= form.label :mailgun_smtp_username %>
+      <%= form.text_field :mailgun_smtp_username, required: true %>
+    </div>
+
+    <div class="field">
+      <%= form.label :mailgun_smtp_password %>
+      <%= form.password_field :mailgun_smtp_password %>
+    </div>
+
+    <div class="field">
+      <%= form.label :mailgun_smtp_address %>
+      <%= form.text_field :mailgun_smtp_address, required: true %>
+    </div>
+
+    <div class="field">
+      <%= form.label :mailgun_smtp_port %>
+      <%= form.number_field :mailgun_smtp_port, min: 1, required: true %>
+    </div>
+  </div>
+  <p class="muted">Leave SMTP password blank to keep the current value.</p>
+
+  <h3>Email Routing</h3>
+  <div class="form-grid">
+    <div class="field">
+      <%= form.label :mail_from_email %>
+      <%= form.email_field :mail_from_email, required: true %>
+    </div>
+
+    <div class="field">
+      <%= form.label :quote_receiver_email %>
+      <%= form.email_field :quote_receiver_email, required: true %>
+    </div>
+  </div>
+
+  <h3>Application URL</h3>
+  <div class="form-grid">
+    <div class="field">
+      <%= form.label :app_host %>
+      <%= form.text_field :app_host, required: true %>
+    </div>
+
+    <div class="field">
+      <%= form.label :app_port %>
+      <%= form.number_field :app_port, min: 1, required: true %>
+    </div>
+
+    <div class="field">
+      <%= form.label :app_protocol %>
+      <%= form.select :app_protocol, options_for_select([ "http", "https" ], app_setting.app_protocol), required: true %>
+    </div>
+  </div>
+
+  <div class="actions">
+    <%= form.submit "Save settings", class: "button button--primary" %>
+  </div>
+<% end %>

@@ -1,0 +1,17 @@
+New curtain quote request received.
+
+Quote ID: <%= @quote_request.id %>
+Submitted at: <%= l(@quote_request.created_at, format: :long) %>
+Customer: <%= @customer.email %>
+
+Measurements
+- Width: <%= @quote_request.width %> cm
+- Height: <%= @quote_request.height %> cm
+- Quantity: <%= @quote_request.quantity %>
+- Status: <%= @quote_request.status.humanize %>
+
+Notes
+<%= @quote_request.notes.presence || "No additional notes provided." %>
+
+Dashboard
+<%= dashboard_url %>

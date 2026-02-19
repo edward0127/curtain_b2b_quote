@@ -1,0 +1,32 @@
+<h2 style="margin: 0 0 6px; font-size: 24px; line-height: 1.25; color: #123447;">Quote Request #<%= @quote_request.id %></h2>
+<p class="muted" style="margin: 0 0 18px; font-size: 14px;">
+  Submitted by <strong style="color: #123447;"><%= @customer.email %></strong> on <%= l(@quote_request.created_at, format: :long) %>.
+</p>
+
+<table role="presentation" width="100%" style="border: 1px solid #d9e5ec; border-radius: 10px; margin-bottom: 16px; background-color: #f9fcfe;">
+  <tr>
+    <td style="padding: 12px 14px; border-bottom: 1px solid #d9e5ec; width: 45%; color: #4d6575; font-size: 13px;">Width</td>
+    <td style="padding: 12px 14px; border-bottom: 1px solid #d9e5ec; font-size: 14px; color: #123447;"><strong><%= @quote_request.width %> cm</strong></td>
+  </tr>
+  <tr>
+    <td style="padding: 12px 14px; border-bottom: 1px solid #d9e5ec; color: #4d6575; font-size: 13px;">Height</td>
+    <td style="padding: 12px 14px; border-bottom: 1px solid #d9e5ec; font-size: 14px; color: #123447;"><strong><%= @quote_request.height %> cm</strong></td>
+  </tr>
+  <tr>
+    <td style="padding: 12px 14px; border-bottom: 1px solid #d9e5ec; color: #4d6575; font-size: 13px;">Quantity</td>
+    <td style="padding: 12px 14px; border-bottom: 1px solid #d9e5ec; font-size: 14px; color: #123447;"><strong><%= @quote_request.quantity %></strong></td>
+  </tr>
+  <tr>
+    <td style="padding: 12px 14px; color: #4d6575; font-size: 13px;">Status</td>
+    <td style="padding: 12px 14px; font-size: 14px; color: #123447;"><strong><%= @quote_request.status.humanize %></strong></td>
+  </tr>
+</table>
+
+<p style="margin: 0 0 8px; font-size: 13px; color: #4d6575; text-transform: uppercase; letter-spacing: 0.05em;"><strong>Notes</strong></p>
+<div style="padding: 12px 14px; border-radius: 10px; border: 1px solid #d9e5ec; background-color: #ffffff; color: #123447; font-size: 14px; line-height: 1.45;">
+  <%= simple_format(@quote_request.notes.presence || "No additional notes provided.") %>
+</div>
+
+<p style="margin: 20px 0 0;">
+  <%= link_to "Open Dashboard", dashboard_url, style: "display:inline-block; padding:10px 16px; border-radius:999px; background:#0b84b3; color:#ffffff; font-weight:600; text-decoration:none; font-size:13px;" %>
+</p>

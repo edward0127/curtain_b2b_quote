@@ -1,0 +1,34 @@
+<section class="hero hero--compact">
+  <div>
+    <p class="eyebrow">Admin</p>
+    <h2>B2B Customer Credentials</h2>
+    <p class="lead">Create and maintain login accounts for customer teams submitting quote requests.</p>
+  </div>
+  <%= link_to "Create B2B Customer", new_admin_b2b_customer_path, class: "button button--primary" %>
+</section>
+
+<section class="panel">
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Email</th>
+          <th>Created</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @b2b_customers.each do |customer| %>
+          <tr>
+            <td><%= customer.email %></td>
+            <td><%= l(customer.created_at, format: :short) %></td>
+            <td class="table-actions">
+              <%= link_to "Edit", edit_admin_b2b_customer_path(customer), class: "button button--secondary button--small" %>
+              <%= button_to "Delete", admin_b2b_customer_path(customer), method: :delete, data: { turbo_confirm: "Delete this customer?" }, class: "button button--danger button--small", form: { class: "inline-form" } %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</section>

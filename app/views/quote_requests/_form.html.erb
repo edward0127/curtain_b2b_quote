@@ -1,0 +1,42 @@
+<% if quote_request.errors.any? %>
+  <div class="flash flash--alert">
+    <strong><%= pluralize(quote_request.errors.count, "error") %> prevented submission:</strong>
+    <ul>
+      <% quote_request.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<%= form_with model: quote_request, data: { controller: "submit-state", action: "turbo:submit-start->submit-state#start turbo:submit-end->submit-state#end", turbo_frame: "_top" } do |form| %>
+  <div class="form-grid">
+    <div class="field">
+      <%= form.label :width, "Width (cm)" %>
+      <%= form.number_field :width, step: 0.01, min: 0.01, required: true %>
+    </div>
+
+    <div class="field">
+      <%= form.label :height, "Height (cm)" %>
+      <%= form.number_field :height, step: 0.01, min: 0.01, required: true %>
+    </div>
+
+    <div class="field">
+      <%= form.label :quantity %>
+      <%= form.number_field :quantity, min: 1, required: true %>
+    </div>
+
+    <div class="field field--full">
+      <%= form.label :notes, "Additional details" %>
+      <%= form.text_area :notes, rows: 5 %>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button type="submit" class="button button--primary button--with-spinner" data-submit-state-target="button">
+      <span data-submit-state-target="label">Submit quote request</span>
+      <span class="button__spinner" data-submit-state-target="spinner" hidden></span>
+    </button>
+    <p class="form-status" data-submit-state-target="message" role="status" aria-live="polite"></p>
+  </div>
+<% end %>

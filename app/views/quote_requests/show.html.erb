@@ -1,0 +1,23 @@
+<section class="hero hero--compact">
+  <div>
+    <p class="eyebrow">Quote Detail</p>
+    <h2>Quote Request #<%= @quote_request.id %></h2>
+    <p class="lead">Submitted on <%= l(@quote_request.created_at, format: :long) %>.</p>
+  </div>
+  <span class="status-pill status-pill--<%= @quote_request.status %>"><%= @quote_request.status.humanize %></span>
+</section>
+
+<section class="detail-grid">
+  <article class="detail-card">
+    <h3>Dimensions</h3>
+    <p><strong>Width</strong> <span><%= @quote_request.width %> cm</span></p>
+    <p><strong>Height</strong> <span><%= @quote_request.height %> cm</span></p>
+    <p><strong>Quantity</strong> <span><%= @quote_request.quantity %></span></p>
+  </article>
+  <article class="detail-card">
+    <h3>Notes</h3>
+    <p><%= @quote_request.notes.presence || "No additional notes provided." %></p>
+  </article>
+</section>
+
+<p class="section-link"><%= link_to "Back to my quotes", quote_requests_path %></p>

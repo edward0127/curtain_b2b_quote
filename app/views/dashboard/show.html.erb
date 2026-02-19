@@ -1,0 +1,71 @@
+<section class="hero">
+  <div>
+    <p class="eyebrow">Dashboard</p>
+    <h2><%= current_user.admin? ? "Admin Control Center" : "Quote Overview" %></h2>
+    <p class="lead">
+      <% if current_user.admin? %>
+        Manage customer access and monitor incoming quote activity in one place.
+      <% else %>
+        Track your quote requests and submit new curtain specifications quickly.
+      <% end %>
+    </p>
+  </div>
+</section>
+
+<% if current_user.admin? %>
+  <% unless @admin_compact %>
+    <section class="metric-grid">
+      <article class="metric">
+        <p class="metric__label">Latest Customers</p>
+        <p class="metric__value"><%= @customers.size %></p>
+      </article>
+      <article class="metric">
+        <p class="metric__label">Recent Quotes</p>
+        <p class="metric__value"><%= @recent_quotes.size %></p>
+      </article>
+    </section>
+
+    <section class="panel">
+      <h3>Recent Quote Requests</h3>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Customer</th>
+              <th>Size (W x H)</th>
+              <th>Qty</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @recent_quotes.each do |quote| %>
+              <tr>
+                <td><%= quote.id %></td>
+                <td><%= quote.user.email %></td>
+                <td><%= quote.width %> x <%= quote.height %> cm</td>
+                <td><%= quote.quantity %></td>
+                <td><span class="status-pill status-pill--<%= quote.status %>"><%= quote.status.humanize %></span></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  <% end %>
+
+  <%= render "admin_tabs" %>
+<% else %>
+  <section class="metric-grid">
+    <article class="metric">
+      <p class="metric__label">Total Quotes</p>
+      <p class="metric__value"><%= @quote_history.size %></p>
+    </article>
+    <article class="metric">
+      <p class="metric__label">Recent Quotes</p>
+      <p class="metric__value"><%= @recent_quotes.size %></p>
+    </article>
+  </section>
+
+  <%= render "customer_tabs" %>
+<% end %>

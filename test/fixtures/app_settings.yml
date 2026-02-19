@@ -1,0 +1,11 @@
+default:
+  mailgun_domain: email.tudouke.com
+  mailgun_smtp_username: postmaster@email.tudouke.com
+  mailgun_smtp_password: smtp-password
+  mailgun_smtp_address: smtp.mailgun.org
+  mailgun_smtp_port: 587
+  mail_from_email: no-reply@example.com
+  quote_receiver_email: quotes@example.com
+  app_host: localhost
+  app_port: 3000
+  app_protocol: http

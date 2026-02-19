@@ -1,0 +1,37 @@
+<section class="hero hero--compact">
+  <div>
+    <p class="eyebrow">Quotes</p>
+    <h2>My Quote Requests</h2>
+    <p class="lead">Review submitted measurements and track current processing status.</p>
+  </div>
+  <%= link_to "Submit Another Quote", new_quote_request_path, class: "button button--primary" %>
+</section>
+
+<section class="panel">
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Width</th>
+          <th>Height</th>
+          <th>Qty</th>
+          <th>Status</th>
+          <th>Created</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @quote_requests.each do |quote| %>
+          <tr>
+            <td><%= link_to quote.id, quote_request_path(quote) %></td>
+            <td><%= quote.width %> cm</td>
+            <td><%= quote.height %> cm</td>
+            <td><%= quote.quantity %></td>
+            <td><span class="status-pill status-pill--<%= quote.status %>"><%= quote.status.humanize %></span></td>
+            <td><%= l(quote.created_at, format: :short) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</section>

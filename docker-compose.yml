@@ -1,0 +1,17 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: curtain_b2b_quote:latest
+    container_name: curtain_b2b_quote
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT_BIND:-3012}:80"
+    env_file:
+      - .env.prod
+    volumes:
+      - curtain_storage:/rails/storage
+
+volumes:
+  curtain_storage:

@@ -1,0 +1,13 @@
+<section class="hero hero--compact">
+  <div>
+    <p class="eyebrow">Admin</p>
+    <h2>Edit B2B Customer</h2>
+    <p class="lead">Update access credentials while preserving existing account history.</p>
+  </div>
+</section>
+
+<section class="panel">
+  <%= render "form", b2b_customer: @b2b_customer %>
+</section>
+
+<p class="section-link"><%= link_to "Back to customer list", admin_b2b_customers_path %></p>

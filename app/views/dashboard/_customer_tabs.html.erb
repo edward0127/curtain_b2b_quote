@@ -1,0 +1,44 @@
+<%= turbo_frame_tag "customer_dashboard_tabs" do %>
+  <section class="tabs">
+    <%= link_to "Submit a New Quote", dashboard_path(tab: :new_quote), data: { turbo_frame: "customer_dashboard_tabs" }, class: [ "tab", (@customer_tab == "new_quote" ? "tab--active" : nil) ].compact.join(" ") %>
+    <%= link_to "View Full Quote History", dashboard_path(tab: :history), data: { turbo_frame: "customer_dashboard_tabs" }, class: [ "tab", (@customer_tab == "history" ? "tab--active" : nil) ].compact.join(" ") %>
+  </section>
+
+  <% if @customer_tab == "new_quote" %>
+    <section class="panel tab-panel">
+      <h3>Submit Curtain Quote Request</h3>
+      <p class="muted">Enter measurements in centimeters and include any installation notes.</p>
+      <%= render "quote_requests/form", quote_request: @quote_request %>
+    </section>
+  <% else %>
+    <section class="panel tab-panel">
+      <h3>Full Quote History</h3>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Width</th>
+              <th>Height</th>
+              <th>Qty</th>
+              <th>Status</th>
+              <th>Created</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @quote_history.each do |quote| %>
+              <tr>
+                <td><%= link_to quote.id, quote_request_path(quote) %></td>
+                <td><%= quote.width %> cm</td>
+                <td><%= quote.height %> cm</td>
+                <td><%= quote.quantity %></td>
+                <td><span class="status-pill status-pill--<%= quote.status %>"><%= quote.status.humanize %></span></td>
+                <td><%= l(quote.created_at, format: :short) %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  <% end %>
+<% end %>

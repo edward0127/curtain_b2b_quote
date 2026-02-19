@@ -1,0 +1,13 @@
+<section class="hero hero--compact">
+  <div>
+    <p class="eyebrow">Admin</p>
+    <h2>Create B2B Customer</h2>
+    <p class="lead">Add a new customer account with secure login credentials.</p>
+  </div>
+</section>
+
+<section class="panel">
+  <%= render "form", b2b_customer: @b2b_customer %>
+</section>
+
+<p class="section-link"><%= link_to "Back to customer list", admin_b2b_customers_path %></p>

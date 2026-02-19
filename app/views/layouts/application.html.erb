@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= content_for(:title) || "Curtain B2b Quote" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Curtain B2b Quote">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
+    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
+
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <%# Includes all stylesheet files in app/assets/stylesheets %>
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body>
+    <main class="app-shell">
+      <header class="topbar card card--blur">
+        <div>
+          <p class="eyebrow">Operations Workspace</p>
+          <h1 class="topbar__title">Curtain B2B Quote Portal</h1>
+        </div>
+
+        <% if user_signed_in? %>
+          <div class="topbar__right">
+            <p class="user-chip">
+              <strong><%= current_user.email %></strong>
+              <span><%= current_user.role.humanize %></span>
+            </p>
+
+            <nav class="topbar__nav">
+              <%= link_to "Dashboard", dashboard_path %>
+              <% if current_user.admin? %>
+                <%= link_to "Manage Customers", dashboard_path(tab: :customers, compact: 1) %>
+                <%= link_to "Open System Settings", dashboard_path(tab: :settings, compact: 1) %>
+              <% else %>
+                <%= link_to "Submit a New Quote", dashboard_path(tab: :new_quote) %>
+                <%= link_to "View Full Quote History", dashboard_path(tab: :history) %>
+              <% end %>
+              <%= button_to "Sign out", destroy_user_session_path, method: :delete, class: "button button--ghost", form: { class: "inline-form" } %>
+            </nav>
+          </div>
+        <% end %>
+      </header>
+
+      <div class="flash-stack">
+        <% if notice.present? %>
+          <p class="flash flash--notice"><%= notice %></p>
+        <% end %>
+        <% if alert.present? %>
+          <p class="flash flash--alert"><%= alert %></p>
+        <% end %>
+      </div>
+
+      <section class="content card card--content">
+        <%= yield %>
+      </section>
+    </main>
+  </body>
+</html>

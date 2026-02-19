@@ -1,0 +1,32 @@
+# Bundler
+/.bundle
+/vendor/bundle
+
+# Environment files
+/.env
+/.env.*
+!/.env.example
+!/.env.prod.example
+
+# Logs and temp files
+/log/*
+/tmp/*
+!/log/.keep
+!/tmp/.keep
+
+# PID files
+/tmp/pids/*
+
+# Storage/db/runtime
+/storage/*.sqlite3
+/storage/*.sqlite3-*
+/storage/*
+!/storage/.keep
+
+# Node / asset artifacts
+/node_modules
+/public/assets
+
+# Editor/OS
+.DS_Store
+Thumbs.db

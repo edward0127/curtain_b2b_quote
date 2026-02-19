@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: #eef4f7;
+        font-family: "Segoe UI", Arial, sans-serif;
+        color: #183245;
+      }
+
+      table {
+        border-spacing: 0;
+      }
+
+      .email-shell {
+        width: 100%;
+        background-color: #eef4f7;
+        padding: 24px 12px;
+      }
+
+      .email-card {
+        width: 100%;
+        max-width: 640px;
+        margin: 0 auto;
+        background-color: #ffffff;
+        border: 1px solid #d7e2e9;
+        border-radius: 12px;
+      }
+
+      .email-header {
+        padding: 20px 24px;
+        background: linear-gradient(135deg, #0b84b3, #046b93);
+        border-radius: 12px 12px 0 0;
+        color: #ffffff;
+      }
+
+      .email-header h1 {
+        margin: 0;
+        font-size: 20px;
+        line-height: 1.25;
+      }
+
+      .email-header p {
+        margin: 6px 0 0;
+        font-size: 13px;
+        opacity: 0.9;
+      }
+
+      .email-body {
+        padding: 24px;
+      }
+
+      .email-footer {
+        padding: 14px 24px 22px;
+        color: #5b7383;
+        font-size: 12px;
+      }
+
+      .muted {
+        color: #5b7383;
+      }
+
+      @media only screen and (max-width: 640px) {
+        .email-header,
+        .email-body,
+        .email-footer {
+          padding-left: 16px;
+          padding-right: 16px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <table role="presentation" class="email-shell" width="100%">
+      <tr>
+        <td align="center">
+          <table role="presentation" class="email-card" width="100%">
+            <tr>
+              <td class="email-header">
+                <h1>Curtain B2B Quote Portal</h1>
+                <p>New quote request notification</p>
+              </td>
+            </tr>
+            <tr>
+              <td class="email-body">
+                <%= yield %>
+              </td>
+            </tr>
+            <tr>
+              <td class="email-footer">
+                <p style="margin: 0;">This message was generated automatically by the Curtain B2B Quote Portal.</p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

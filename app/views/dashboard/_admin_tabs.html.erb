@@ -1,0 +1,46 @@
+<%= turbo_frame_tag "admin_dashboard_tabs" do %>
+  <% admin_tab_params = @admin_compact ? { compact: 1 } : {} %>
+  <section class="tabs">
+    <%= link_to "Manage Customers", dashboard_path({ tab: :customers }.merge(admin_tab_params)), data: { turbo_frame: "admin_dashboard_tabs" }, class: [ "tab", (@admin_tab == "customers" ? "tab--active" : nil) ].compact.join(" ") %>
+    <%= link_to "Open System Settings", dashboard_path({ tab: :settings }.merge(admin_tab_params)), data: { turbo_frame: "admin_dashboard_tabs" }, class: [ "tab", (@admin_tab == "settings" ? "tab--active" : nil) ].compact.join(" ") %>
+  </section>
+
+  <% if @admin_tab == "customers" %>
+    <section class="panel">
+      <div class="panel-head">
+        <h3>B2B Customers</h3>
+        <%= link_to "Create B2B Customer", new_admin_b2b_customer_path, class: "button button--primary button--small" %>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @customers.each do |customer| %>
+              <tr>
+                <td><%= customer.email %></td>
+                <td><%= l(customer.created_at, format: :short) %></td>
+                <td class="table-actions">
+                  <%= link_to "Edit", edit_admin_b2b_customer_path(customer), class: "button button--secondary button--small" %>
+                  <%= button_to "Delete", admin_b2b_customer_path(customer), method: :delete, data: { turbo_confirm: "Delete this customer?" }, class: "button button--danger button--small", form: { class: "inline-form" } %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  <% else %>
+    <section class="panel tab-panel">
+      <div class="panel-head">
+        <h3>System Settings</h3>
+      </div>
+      <%= render "admin/settings/form", app_setting: @app_setting, return_to_dashboard: true, dashboard_compact: @admin_compact %>
+    </section>
+  <% end %>
+<% end %>

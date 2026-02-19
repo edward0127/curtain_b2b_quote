@@ -1,0 +1,40 @@
+<% if b2b_customer.errors.any? %>
+  <div class="flash flash--alert">
+    <strong><%= pluralize(b2b_customer.errors.count, "error") %> prevented saving:</strong>
+    <ul>
+      <% b2b_customer.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<% form_url = b2b_customer.new_record? ? admin_b2b_customers_path : admin_b2b_customer_path(b2b_customer) %>
+<% form_method = b2b_customer.new_record? ? :post : :patch %>
+
+<%= form_with model: b2b_customer, url: form_url, method: form_method do |form| %>
+  <div class="form-grid">
+    <div class="field field--full">
+      <%= form.label :email %>
+      <%= form.email_field :email, required: true %>
+    </div>
+
+    <div class="field">
+      <%= form.label :password %>
+      <%= form.password_field :password, autocomplete: "new-password", required: b2b_customer.new_record? %>
+    </div>
+
+    <div class="field">
+      <%= form.label :password_confirmation %>
+      <%= form.password_field :password_confirmation, autocomplete: "new-password", required: b2b_customer.new_record? %>
+    </div>
+  </div>
+
+  <% unless b2b_customer.new_record? %>
+    <p class="muted">Leave password fields empty to keep the current password.</p>
+  <% end %>
+
+  <div class="actions">
+    <%= form.submit class: "button button--primary" %>
+  </div>
+<% end %>
