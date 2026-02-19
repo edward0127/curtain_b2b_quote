@@ -26,10 +26,8 @@ FROM base AS build
 # Install application gems
 COPY Gemfile Gemfile.lock vendor ./
 
-RUN BUNDLE_DEPLOYMENT=0 bundle lock --add-platform x86_64-linux && \
-    bundle install -j 1 && \
+RUN bundle install -j 1 && \
     rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git && \
-    # -j 1 disable parallel compilation to avoid a QEMU bug: https://github.com/rails/bootsnap/issues/495
     bundle exec bootsnap precompile -j 1 --gemfile
 
 # Copy application code
