@@ -1,6 +1,8 @@
 services:
   web:
     image: ghcr.io/edward0127/curtain_b2b_quote:latest
+    security_opt:
+      - seccomp=unconfined
     container_name: curtain_b2b_quote
     restart: unless-stopped
     ports:
