@@ -1,9 +1,6 @@
 services:
   web:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: curtain_b2b_quote:latest
+    image: ghcr.io/edward0127/curtain_b2b_quote:latest
     container_name: curtain_b2b_quote
     restart: unless-stopped
     ports:
@@ -12,6 +9,8 @@ services:
       - .env.prod
     volumes:
       - curtain_storage:/rails/storage
+      - curtain_db:/rails/db   # <-- IMPORTANT for SQLite persistence
 
 volumes:
   curtain_storage:
+  curtain_db:

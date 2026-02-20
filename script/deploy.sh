@@ -7,12 +7,13 @@ APP_SERVICE="${APP_SERVICE:-web}"
 usage() {
   cat <<'EOF'
 Usage:
-  script/deploy.sh bootstrap   # First deploy: build, migrate, seed, up
-  script/deploy.sh deploy      # Update deploy: build, migrate, up
+  script/deploy.sh bootstrap   # First deploy: pull, migrate, seed, up
+  script/deploy.sh deploy      # Update deploy: pull, migrate, up
   script/deploy.sh migrate     # Run db:prepare
   script/deploy.sh logs        # Tail app logs
   script/deploy.sh status      # Show compose status
   script/deploy.sh down        # Stop app stack
+  script/deploy.sh pull        # Pull latest image
 
 Environment overrides:
   COMPOSE_FILE=docker-compose.yml
@@ -46,16 +47,33 @@ compose() {
   docker compose -f "$COMPOSE_FILE" "$@"
 }
 
-build() {
-  compose build "$APP_SERVICE"
+pull() {
+  set +e
+  compose pull "$APP_SERVICE"
+  status=$?
+  set -e
+
+  if [[ $status -ne 0 ]]; then
+    cat <<'EOF'
+ERROR: docker compose pull failed.
+
+If your GHCR image is private, you must login on the server first, e.g.
+  echo "$GHCR_TOKEN" | docker login ghcr.io -u <your_github_username> --password-stdin
+
+Then re-run:
+  script/deploy.sh deploy
+EOF
+    exit $status
+  fi
 }
 
 migrate() {
-  compose run --rm "$APP_SERVICE" bin/rails db:prepare
+  # --no-deps avoids starting other services during one-off tasks
+  compose run --rm --no-deps "$APP_SERVICE" bin/rails db:prepare
 }
 
 seed() {
-  compose run --rm "$APP_SERVICE" bin/rails db:seed
+  compose run --rm --no-deps "$APP_SERVICE" bin/rails db:seed
 }
 
 up() {
@@ -67,15 +85,18 @@ ensure_prerequisites
 
 case "$command" in
   bootstrap)
-    build
+    pull
     migrate
     seed
     up
     ;;
   deploy)
-    build
+    pull
     migrate
     up
+    ;;
+  pull)
+    pull
     ;;
   migrate)
     migrate
