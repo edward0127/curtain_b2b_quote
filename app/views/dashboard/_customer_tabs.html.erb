@@ -28,7 +28,7 @@
           <tbody>
             <% @quote_history.each do |quote| %>
               <tr>
-                <td><%= link_to quote.id, quote_request_path(quote) %></td>
+                <td><%= link_to quote.id, quote_request_path(quote), data: { turbo_frame: "_top" } %></td>
                 <td><%= quote.width %> cm</td>
                 <td><%= quote.height %> cm</td>
                 <td><%= quote.quantity %></td>

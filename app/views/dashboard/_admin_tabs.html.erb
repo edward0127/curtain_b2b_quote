@@ -9,7 +9,7 @@
     <section class="panel">
       <div class="panel-head">
         <h3>B2B Customers</h3>
-        <%= link_to "Create B2B Customer", new_admin_b2b_customer_path, class: "button button--primary button--small" %>
+        <%= link_to "Create B2B Customer", new_admin_b2b_customer_path, class: "button button--primary button--small", data: { turbo_frame: "_top" } %>
       </div>
       <div class="table-wrap">
         <table class="data-table">
@@ -26,8 +26,8 @@
                 <td><%= customer.email %></td>
                 <td><%= l(customer.created_at, format: :short) %></td>
                 <td class="table-actions">
-                  <%= link_to "Edit", edit_admin_b2b_customer_path(customer), class: "button button--secondary button--small" %>
-                  <%= button_to "Delete", admin_b2b_customer_path(customer), method: :delete, data: { turbo_confirm: "Delete this customer?" }, class: "button button--danger button--small", form: { class: "inline-form" } %>
+                  <%= link_to "Edit", edit_admin_b2b_customer_path(customer), class: "button button--secondary button--small", data: { turbo_frame: "_top" } %>
+                  <%= button_to "Delete", admin_b2b_customer_path(customer), method: :delete, data: { turbo_confirm: "Delete this customer?" }, class: "button button--danger button--small", form: { class: "inline-form", data: { turbo_frame: "_top" } } %>
                 </td>
               </tr>
             <% end %>

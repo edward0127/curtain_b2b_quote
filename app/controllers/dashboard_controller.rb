@@ -9,7 +9,7 @@ class DashboardController < ApplicationController
       @recent_quotes = QuoteRequest.includes(:user).order(created_at: :desc).limit(10)
       @app_setting = AppSetting.current if @admin_tab == "settings"
 
-      if turbo_frame_request?
+      if turbo_frame_request_for?("admin_dashboard_tabs")
         render partial: "dashboard/admin_tabs"
       end
     else
@@ -18,9 +18,15 @@ class DashboardController < ApplicationController
       @recent_quotes = @quote_history.limit(10)
       @quote_request = current_user.quote_requests.new if @customer_tab == "new_quote"
 
-      if turbo_frame_request?
+      if turbo_frame_request_for?("customer_dashboard_tabs")
         render partial: "dashboard/customer_tabs"
       end
     end
+  end
+
+  private
+
+  def turbo_frame_request_for?(frame_id)
+    turbo_frame_request? && request.headers["Turbo-Frame"] == frame_id
   end
 end
