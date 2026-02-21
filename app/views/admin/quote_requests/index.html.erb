@@ -1,0 +1,45 @@
+<section class="hero hero--compact">
+  <div>
+    <p class="eyebrow">Admin</p>
+    <h2>Quote Workflow</h2>
+    <p class="lead">Manage pipeline status, templates, and job conversion.</p>
+  </div>
+</section>
+
+<section class="tabs">
+  <%= link_to "All", admin_quote_requests_path, class: [ "tab", (@status_filter.blank? ? "tab--active" : nil) ].compact.join(" ") %>
+  <% QuoteRequest.statuses.keys.each do |status_key| %>
+    <%= link_to status_key.humanize, admin_quote_requests_path(status: status_key), class: [ "tab", (@status_filter == status_key ? "tab--active" : nil) ].compact.join(" ") %>
+  <% end %>
+</section>
+
+<section class="panel">
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Quote #</th>
+          <th>Customer</th>
+          <th>Items</th>
+          <th>Total</th>
+          <th>Status</th>
+          <th>Job</th>
+          <th>Created</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @quote_requests.each do |quote| %>
+          <tr>
+            <td><%= link_to quote.quote_number, admin_quote_request_path(quote) %></td>
+            <td><%= quote.user.email %></td>
+            <td><%= quote.line_items_count %></td>
+            <td><%= number_to_currency(quote.total, unit: "#{quote.currency} ") %></td>
+            <td><span class="status-pill status-pill--<%= quote.status %>"><%= quote.status.humanize %></span></td>
+            <td><%= quote.job&.job_number || "-" %></td>
+            <td><%= l(quote.created_at, format: :short) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</section>

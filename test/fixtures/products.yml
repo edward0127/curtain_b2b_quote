@@ -1,0 +1,15 @@
+sheer_panel:
+  name: Sheer Curtain Panel
+  sku: SHEER-001
+  description: Lightweight sheer panel
+  base_price: 45.00
+  pricing_mode: 0
+  active: true
+
+blackout_panel:
+  name: Blackout Curtain Panel
+  sku: BLK-100
+  description: Blackout fabric panel
+  base_price: 70.00
+  pricing_mode: 0
+  active: true

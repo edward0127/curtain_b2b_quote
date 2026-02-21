@@ -26,6 +26,7 @@
                 <td><%= customer.email %></td>
                 <td><%= l(customer.created_at, format: :short) %></td>
                 <td class="table-actions">
+                  <%= button_to "Login as", impersonate_admin_b2b_customer_path(customer), method: :post, class: "button button--ghost button--small", data: { turbo_confirm: "Log in as #{customer.email}?" }, form: { class: "inline-form", data: { turbo_frame: "_top" } } %>
                   <%= link_to "Edit", edit_admin_b2b_customer_path(customer), class: "button button--secondary button--small", data: { turbo_frame: "_top" } %>
                   <%= button_to "Delete", admin_b2b_customer_path(customer), method: :delete, data: { turbo_confirm: "Delete this customer?" }, class: "button button--danger button--small", form: { class: "inline-form", data: { turbo_frame: "_top" } } %>
                 </td>

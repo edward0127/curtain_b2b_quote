@@ -35,17 +35,29 @@
           <div class="topbar__right">
             <p class="user-chip">
               <strong><%= current_user.email %></strong>
-              <span><%= current_user.role.humanize %></span>
+              <span>
+                <%= current_user.role.humanize %>
+                <% if impersonating? && impersonator_admin_user.present? %>
+                  (Impersonated by <%= impersonator_admin_user.email %>)
+                <% end %>
+              </span>
             </p>
 
             <nav class="topbar__nav">
               <%= link_to "Dashboard", dashboard_path, data: { turbo_frame: "_top" } %>
               <% if current_user.admin? %>
                 <%= link_to "Manage Customers", dashboard_path(tab: :customers, compact: 1), data: { turbo_frame: "_top" } %>
+                <%= link_to "Quotes Workflow", admin_quote_requests_path, data: { turbo_frame: "_top" } %>
+                <%= link_to "Products", admin_products_path, data: { turbo_frame: "_top" } %>
+                <%= link_to "Templates", admin_quote_templates_path, data: { turbo_frame: "_top" } %>
+                <%= link_to "Jobs", admin_jobs_path, data: { turbo_frame: "_top" } %>
                 <%= link_to "Open System Settings", dashboard_path(tab: :settings, compact: 1), data: { turbo_frame: "_top" } %>
               <% else %>
                 <%= link_to "Submit a New Quote", dashboard_path(tab: :new_quote), data: { turbo_frame: "_top" } %>
                 <%= link_to "View Full Quote History", dashboard_path(tab: :history), data: { turbo_frame: "_top" } %>
+                <% if impersonating? && impersonator_admin_user.present? %>
+                  <%= button_to "Return to Admin", impersonation_path, method: :delete, class: "button button--secondary", form: { class: "inline-form" } %>
+                <% end %>
               <% end %>
               <%= button_to "Sign out", destroy_user_session_path, method: :delete, class: "button button--ghost", form: { class: "inline-form" } %>
             </nav>
@@ -65,6 +77,12 @@
       <section class="content card card--content">
         <%= yield %>
       </section>
+
+      <footer class="legal-footer">
+        <%= link_to "Terms of Service", terms_path %>
+        <span>|</span>
+        <%= link_to "Privacy Policy", privacy_path %>
+      </footer>
     </main>
   </body>
 </html>

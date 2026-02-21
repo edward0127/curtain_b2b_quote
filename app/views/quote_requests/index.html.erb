@@ -2,9 +2,9 @@
   <div>
     <p class="eyebrow">Quotes</p>
     <h2>My Quote Requests</h2>
-    <p class="lead">Review submitted measurements and track current processing status.</p>
+    <p class="lead">Track quote workflow status, totals, and generated quote documents.</p>
   </div>
-  <%= link_to "Submit Another Quote", new_quote_request_path, class: "button button--primary" %>
+  <%= link_to "Build New Quote", new_quote_request_path, class: "button button--primary" %>
 </section>
 
 <section class="panel">
@@ -13,10 +13,11 @@
       <thead>
         <tr>
           <th>ID</th>
-          <th>Width</th>
-          <th>Height</th>
-          <th>Qty</th>
+          <th>Quote #</th>
+          <th>Items</th>
+          <th>Total</th>
           <th>Status</th>
+          <th>Template</th>
           <th>Created</th>
         </tr>
       </thead>
@@ -24,10 +25,11 @@
         <% @quote_requests.each do |quote| %>
           <tr>
             <td><%= link_to quote.id, quote_request_path(quote) %></td>
-            <td><%= quote.width %> cm</td>
-            <td><%= quote.height %> cm</td>
-            <td><%= quote.quantity %></td>
+            <td><%= quote.quote_number %></td>
+            <td><%= quote.line_items_count %></td>
+            <td><%= number_to_currency(quote.total, unit: "#{quote.currency} ") %></td>
             <td><span class="status-pill status-pill--<%= quote.status %>"><%= quote.status.humanize %></span></td>
+            <td><%= quote.quote_template.heading %></td>
             <td><%= l(quote.created_at, format: :short) %></td>
           </tr>
         <% end %>

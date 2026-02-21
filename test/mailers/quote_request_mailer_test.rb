@@ -10,6 +10,7 @@ class QuoteRequestMailerTest < ActionMailer::TestCase
     assert_equal [ app_setting.quote_receiver_email ], mail.to
     assert_equal [ "no-reply@example.com" ], mail.from
     assert_match quote_request.user.email, mail.body.encoded
+    assert_match quote_request.quote_number, mail.body.encoded
     assert_equal app_setting.mailgun_smtp_address, mail.delivery_method.settings[:address]
   end
 end

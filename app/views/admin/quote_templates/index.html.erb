@@ -1,0 +1,38 @@
+<section class="hero hero--compact">
+  <div>
+    <p class="eyebrow">Templates</p>
+    <h2>Quote Document Templates</h2>
+    <p class="lead">Control headings, terms, and default template assignment.</p>
+  </div>
+  <%= link_to "New Template", new_admin_quote_template_path, class: "button button--primary" %>
+</section>
+
+<section class="panel">
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Heading</th>
+          <th>Default</th>
+          <th>Quotes Using</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @quote_templates.each do |template| %>
+          <tr>
+            <td><%= template.name %></td>
+            <td><%= template.heading %></td>
+            <td><%= template.default_template? ? "Yes" : "No" %></td>
+            <td><%= template.quote_requests.count %></td>
+            <td class="table-actions">
+              <%= link_to "Edit", edit_admin_quote_template_path(template), class: "button button--secondary button--small" %>
+              <%= button_to "Delete", admin_quote_template_path(template), method: :delete, class: "button button--danger button--small", form: { class: "inline-form", data: { turbo_confirm: "Delete this template?" } } %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</section>

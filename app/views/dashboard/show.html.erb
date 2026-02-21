@@ -23,6 +23,14 @@
         <p class="metric__label">Recent Quotes</p>
         <p class="metric__value"><%= @recent_quotes.size %></p>
       </article>
+      <article class="metric">
+        <p class="metric__label">Active Products</p>
+        <p class="metric__value"><%= @active_products_count %></p>
+      </article>
+      <article class="metric">
+        <p class="metric__label">Open Jobs</p>
+        <p class="metric__value"><%= @active_jobs_count %></p>
+      </article>
     </section>
 
     <section class="panel">
@@ -32,9 +40,10 @@
           <thead>
             <tr>
               <th>ID</th>
+              <th>Quote #</th>
               <th>Customer</th>
-              <th>Size (W x H)</th>
-              <th>Qty</th>
+              <th>Items</th>
+              <th>Total</th>
               <th>Status</th>
             </tr>
           </thead>
@@ -42,9 +51,10 @@
             <% @recent_quotes.each do |quote| %>
               <tr>
                 <td><%= quote.id %></td>
+                <td><%= quote.quote_number %></td>
                 <td><%= quote.user.email %></td>
-                <td><%= quote.width %> x <%= quote.height %> cm</td>
-                <td><%= quote.quantity %></td>
+                <td><%= quote.line_items_count %></td>
+                <td><%= number_to_currency(quote.total, unit: "#{quote.currency} ") %></td>
                 <td><span class="status-pill status-pill--<%= quote.status %>"><%= quote.status.humanize %></span></td>
               </tr>
             <% end %>
@@ -64,6 +74,12 @@
     <article class="metric">
       <p class="metric__label">Recent Quotes</p>
       <p class="metric__value"><%= @recent_quotes.size %></p>
+    </article>
+    <article class="metric">
+      <p class="metric__label">Last Total</p>
+      <p class="metric__value metric__value--small">
+        <%= @recent_quotes.first.present? ? number_to_currency(@recent_quotes.first.total, unit: "#{@recent_quotes.first.currency} ") : "N/A" %>
+      </p>
     </article>
   </section>
 

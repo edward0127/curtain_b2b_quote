@@ -1,0 +1,100 @@
+<section class="hero hero--compact">
+  <div>
+    <p class="eyebrow">Admin Quote</p>
+    <h2><%= @quote_request.quote_number %></h2>
+    <p class="lead">Submitted by <strong><%= @quote_request.user.email %></strong> on <%= l(@quote_request.created_at, format: :long) %>.</p>
+  </div>
+  <span class="status-pill status-pill--<%= @quote_request.status %>"><%= @quote_request.status.humanize %></span>
+</section>
+
+<section class="panel">
+  <div class="panel-head">
+    <h3>Quote Metadata</h3>
+    <div class="table-actions">
+      <%= link_to "Printable", document_admin_quote_request_path(@quote_request), class: "button button--secondary" %>
+      <%= link_to "PDF", document_admin_quote_request_path(@quote_request, format: :pdf), class: "button button--primary" %>
+    </div>
+  </div>
+
+  <%= form_with model: [ :admin, @quote_request ], class: "form-grid" do |form| %>
+    <div class="field">
+      <%= form.label :customer_reference, "Customer reference" %>
+      <%= form.text_field :customer_reference %>
+    </div>
+    <div class="field">
+      <%= form.label :valid_until %>
+      <%= form.date_field :valid_until %>
+    </div>
+    <div class="field field--full">
+      <%= form.label :quote_template_id, "Quote template" %>
+      <%= form.collection_select :quote_template_id, @quote_templates, :id, :heading %>
+    </div>
+    <div class="field field--full">
+      <%= form.label :notes %>
+      <%= form.text_area :notes, rows: 4 %>
+    </div>
+    <div class="actions field--full">
+      <%= form.submit "Update Quote Details", class: "button button--secondary" %>
+    </div>
+  <% end %>
+</section>
+
+<section class="panel">
+  <h3>Workflow Actions</h3>
+  <div class="actions">
+    <% QuoteRequest::STATUS_TRANSITIONS.fetch(@quote_request.status, []).each do |target| %>
+      <%= button_to target.humanize, update_status_admin_quote_request_path(@quote_request, status: target), method: :patch, class: "button button--primary" %>
+    <% end %>
+    <% if @quote_request.approved? && @quote_request.job.blank? %>
+      <%= button_to "Convert to Job", convert_to_job_admin_quote_request_path(@quote_request), method: :post, class: "button button--danger" %>
+    <% end %>
+    <% if @quote_request.job.present? %>
+      <%= link_to "Open Job #{@quote_request.job.job_number}", admin_job_path(@quote_request.job), class: "button button--secondary" %>
+    <% end %>
+  </div>
+</section>
+
+<section class="panel">
+  <h3>Quote Line Items</h3>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Product</th>
+          <th>Dimensions</th>
+          <th>Qty</th>
+          <th>Unit</th>
+          <th>Total</th>
+          <th>Pricing Rules</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @quote_request.quote_items.each do |item| %>
+          <tr>
+            <td><%= item.line_position %></td>
+            <td><%= item.product.name %></td>
+            <td>
+              <% if item.product.per_square_meter? %>
+                <%= item.width %> x <%= item.height %> cm
+              <% else %>
+                Unit priced
+              <% end %>
+            </td>
+            <td><%= item.quantity %></td>
+            <td><%= number_to_currency(item.unit_price, unit: "#{@quote_request.currency} ") %></td>
+            <td><%= number_to_currency(item.line_total, unit: "#{@quote_request.currency} ") %></td>
+            <td><%= item.applied_rule_names.presence || "Base price only" %></td>
+          </tr>
+        <% end %>
+      </tbody>
+      <tfoot>
+        <tr>
+          <th colspan="5">Quote Total</th>
+          <th><%= number_to_currency(@quote_request.total, unit: "#{@quote_request.currency} ") %></th>
+          <th></th>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</section>

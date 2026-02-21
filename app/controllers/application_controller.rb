@@ -5,6 +5,8 @@ class ApplicationController < ActionController::Base
   # Changes to the importmap will invalidate the etag for HTML responses
   stale_when_importmap_changes
 
+  helper_method :impersonating?, :impersonator_admin_user
+
   protected
 
   def require_admin!
@@ -21,5 +23,15 @@ class ApplicationController < ActionController::Base
 
   def after_sign_in_path_for(_resource)
     dashboard_path
+  end
+
+  def impersonating?
+    session[:impersonator_admin_user_id].present?
+  end
+
+  def impersonator_admin_user
+    return nil unless impersonating?
+
+    @impersonator_admin_user ||= User.admin.find_by(id: session[:impersonator_admin_user_id])
   end
 end

@@ -1,7 +1,7 @@
 <section class="hero hero--compact">
   <div>
     <p class="eyebrow">Quote Detail</p>
-    <h2>Quote Request #<%= @quote_request.id %></h2>
+    <h2><%= @quote_request.quote_number %></h2>
     <p class="lead">Submitted on <%= l(@quote_request.created_at, format: :long) %>.</p>
   </div>
   <span class="status-pill status-pill--<%= @quote_request.status %>"><%= @quote_request.status.humanize %></span>
@@ -9,15 +9,62 @@
 
 <section class="detail-grid">
   <article class="detail-card">
-    <h3>Dimensions</h3>
-    <p><strong>Width</strong> <span><%= @quote_request.width %> cm</span></p>
-    <p><strong>Height</strong> <span><%= @quote_request.height %> cm</span></p>
-    <p><strong>Quantity</strong> <span><%= @quote_request.quantity %></span></p>
+    <h3>Quote Summary</h3>
+    <p><strong>Reference</strong> <span><%= @quote_request.customer_reference.presence || "Not provided" %></span></p>
+    <p><strong>Template</strong> <span><%= @quote_request.quote_template.heading %></span></p>
+    <p><strong>Valid Until</strong> <span><%= l(@quote_request.valid_until, format: :long) %></span></p>
+    <p><strong>Total</strong> <span><%= number_to_currency(@quote_request.total, unit: "#{@quote_request.currency} ") %></span></p>
+    <% if @quote_request.job.present? %>
+      <p><strong>Job</strong> <span><%= @quote_request.job.job_number %></span></p>
+    <% end %>
   </article>
   <article class="detail-card">
     <h3>Notes</h3>
     <p><%= @quote_request.notes.presence || "No additional notes provided." %></p>
   </article>
 </section>
+
+<section class="panel">
+  <h3>Line Items</h3>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Product</th>
+          <th>Dimensions</th>
+          <th>Qty</th>
+          <th>Unit Price</th>
+          <th>Line Total</th>
+          <th>Rule Match</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @quote_request.quote_items.each do |item| %>
+          <tr>
+            <td><%= item.line_position %></td>
+            <td><%= item.product.name %></td>
+            <td>
+              <% if item.product.per_square_meter? %>
+                <%= item.width %> x <%= item.height %> cm (<%= item.area_sqm %> sqm)
+              <% else %>
+                Unit priced product
+              <% end %>
+            </td>
+            <td><%= item.quantity %></td>
+            <td><%= number_to_currency(item.unit_price, unit: "#{@quote_request.currency} ") %></td>
+            <td><%= number_to_currency(item.line_total, unit: "#{@quote_request.currency} ") %></td>
+            <td><%= item.applied_rule_names.presence || "Base price only" %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<div class="actions">
+  <%= link_to "Open Printable Quote", document_quote_request_path(@quote_request), class: "button button--secondary" %>
+  <%= link_to "Download PDF", document_quote_request_path(@quote_request, format: :pdf), class: "button button--primary" %>
+</div>
 
 <p class="section-link"><%= link_to "Back to my quotes", quote_requests_path %></p>

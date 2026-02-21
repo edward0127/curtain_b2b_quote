@@ -1,0 +1,71 @@
+<section class="hero hero--compact">
+  <div>
+    <p class="eyebrow">Catalog</p>
+    <h2><%= @product.name %></h2>
+    <p class="lead"><%= @product.description.presence || "No description." %></p>
+  </div>
+  <div class="table-actions">
+    <%= link_to "Edit Product", edit_admin_product_path(@product), class: "button button--secondary" %>
+    <%= link_to "New Pricing Rule", new_admin_product_pricing_rule_path(@product), class: "button button--primary" %>
+  </div>
+</section>
+
+<section class="detail-grid">
+  <article class="detail-card">
+    <h3>Product Details</h3>
+    <p><strong>SKU</strong> <span><%= @product.sku.presence || "-" %></span></p>
+    <p><strong>Pricing mode</strong> <span><%= @product.pricing_mode.humanize %></span></p>
+    <p><strong>Base price</strong> <span><%= number_to_currency(@product.base_price, unit: "AUD ") %></span></p>
+    <p><strong>Status</strong> <span><%= @product.active? ? "Active" : "Inactive" %></span></p>
+  </article>
+  <article class="detail-card">
+    <h3>Usage</h3>
+    <p><strong>Quote items</strong> <span><%= @product.quote_items.count %></span></p>
+    <p><strong>Pricing rules</strong> <span><%= @pricing_rules.count %></span></p>
+  </article>
+</section>
+
+<section class="panel">
+  <h3>Pricing Rules</h3>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Priority</th>
+          <th>Condition</th>
+          <th>Adjustment</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @pricing_rules.each do |rule| %>
+          <tr>
+            <td><%= rule.name %></td>
+            <td><%= rule.priority %></td>
+            <td>
+              Area <%= rule.min_area || "*" %>-<%= rule.max_area || "*" %> sqm,
+              Qty <%= rule.min_quantity || "*" %>-<%= rule.max_quantity || "*" %>
+            </td>
+            <td>
+              <% case rule.adjustment_type %>
+              <% when "percentage" %>
+                <%= rule.adjustment_value %>% 
+              <% when "fixed_amount" %>
+                <%= number_to_currency(rule.adjustment_value, unit: "AUD ") %>
+              <% when "set_unit_price" %>
+                Set <%= number_to_currency(rule.adjustment_value, unit: "AUD ") %>
+              <% end %>
+            </td>
+            <td><%= rule.active? ? "Active" : "Inactive" %></td>
+            <td class="table-actions">
+              <%= link_to "Edit", edit_admin_product_pricing_rule_path(@product, rule), class: "button button--secondary button--small" %>
+              <%= button_to "Delete", admin_product_pricing_rule_path(@product, rule), method: :delete, class: "button button--danger button--small", form: { class: "inline-form", data: { turbo_confirm: "Delete this pricing rule?" } } %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</section>

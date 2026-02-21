@@ -1,0 +1,15 @@
+standard:
+  name: standard
+  heading: Standard Curtain Quote
+  intro: Thank you for your enquiry.
+  terms: Quote valid for 14 days.
+  footer: Contact us to proceed.
+  default_template: true
+
+premium:
+  name: premium
+  heading: Premium Curtain Quote
+  intro: Premium service quote details.
+  terms: Valid for 21 days.
+  footer: Includes premium support.
+  default_template: false

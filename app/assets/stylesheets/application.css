@@ -575,7 +575,58 @@ h3 {
   color: #0c7c51;
 }
 
+.status-pill--priced {
+  background: rgba(17, 122, 214, 0.16);
+  color: #0e4b86;
+}
+
+.status-pill--sent_to_customer {
+  background: rgba(111, 95, 214, 0.16);
+  color: #4636a8;
+}
+
+.status-pill--approved {
+  background: rgba(11, 161, 87, 0.17);
+  color: #0a7b45;
+}
+
+.status-pill--rejected {
+  background: rgba(222, 63, 61, 0.14);
+  color: #9f2d2b;
+}
+
+.status-pill--converted_to_job {
+  background: rgba(40, 181, 168, 0.2);
+  color: #0f7269;
+}
+
 .muted {
+  color: var(--ink-soft);
+}
+
+.quote-doc .lead {
+  max-width: none;
+}
+
+.legal-doc h3 {
+  margin-top: 1.1rem;
+}
+
+.legal-doc h3:first-child {
+  margin-top: 0;
+}
+
+.legal-footer {
+  display: flex;
+  gap: 0.4rem;
+  justify-content: center;
+  align-items: center;
+  margin-top: 0.8rem;
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+}
+
+.legal-footer a {
   color: var(--ink-soft);
 }
 
@@ -646,5 +697,36 @@ h3 {
   *::after {
     animation: none !important;
     transition: none !important;
+  }
+}
+
+@media print {
+  body {
+    background: #ffffff;
+  }
+
+  body::before,
+  body::after,
+  .topbar,
+  .flash-stack,
+  .no-print {
+    display: none !important;
+  }
+
+  .app-shell {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  .content {
+    margin: 0;
+    padding: 0;
+    border: none;
+    box-shadow: none;
+  }
+
+  .panel {
+    box-shadow: none;
   }
 }

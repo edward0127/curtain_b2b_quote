@@ -5,7 +5,12 @@ Rails app for B2B curtain quote requests with:
 - Devise login (no self-registration)
 - Role enum on `User` (`admin`, `b2b_customer`)
 - Admin portal to create/edit/delete B2B customer credentials
-- B2B quote form (width, height, quantity, notes)
+- Product catalog (`Product`) with pricing mode (`per_square_meter`, `per_unit`)
+- Product-level pricing rules (`PricingRule`) with quantity and area conditions
+- Multi-item quote builder (`QuoteRequest` + `QuoteItem`)
+- Quote templates (`QuoteTemplate`) and printable document/PDF export
+- Admin quote workflow (`submitted -> reviewed -> priced -> sent -> approved -> converted`)
+- Job conversion (`Job`) from approved quotes
 - Email notification sent via Action Mailer with Mailgun SMTP
 
 ## Stack
@@ -55,10 +60,11 @@ Rails app for B2B curtain quote requests with:
 ## Main Flow
 
 1. Admin logs in and opens `Manage Customers`.
-2. Admin opens `Settings` and configures Mailgun SMTP/email/app URL values.
-3. Admin creates B2B users (email + password).
-4. B2B user logs in and submits quote request.
-5. System sends quote details using DB-backed settings.
+2. Admin configures catalog (`Products`) and pricing logic (`Pricing Rules`).
+3. Admin configures quote content (`Quote Templates`) and SMTP settings.
+4. B2B user logs in and submits multi-item quote request.
+5. System computes line pricing, sends quote email, and stores workflow state.
+6. Admin advances workflow status and converts approved quote to `Job`.
 
 ## Docker Deploy (Single Server)
 

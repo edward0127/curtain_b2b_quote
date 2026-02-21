@@ -64,4 +64,32 @@ class Admin::B2bCustomersControllerTest < ActionDispatch::IntegrationTest
     get new_admin_b2b_customer_url
     assert_response :success
   end
+
+  test "admin can impersonate b2b customer" do
+    sign_in users(:admin)
+
+    post impersonate_admin_b2b_customer_url(users(:customer))
+    assert_redirected_to dashboard_url(tab: :new_quote)
+
+    get new_quote_request_url
+    assert_response :success
+  end
+
+  test "b2b customer cannot impersonate another customer" do
+    sign_in users(:customer)
+
+    post impersonate_admin_b2b_customer_url(users(:customer))
+    assert_redirected_to root_url
+  end
+
+  test "impersonated user can return to admin" do
+    sign_in users(:admin)
+    post impersonate_admin_b2b_customer_url(users(:customer))
+
+    delete impersonation_url
+    assert_redirected_to dashboard_url(tab: :customers, compact: 1)
+
+    get admin_b2b_customers_url
+    assert_response :success
+  end
 end

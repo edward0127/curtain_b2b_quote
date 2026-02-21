@@ -1,0 +1,45 @@
+<% if quote_template.errors.any? %>
+  <div class="flash flash--alert">
+    <strong><%= pluralize(quote_template.errors.count, "error") %> prevented saving:</strong>
+    <ul>
+      <% quote_template.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<%= form_with model: [ :admin, quote_template ] do |form| %>
+  <div class="form-grid">
+    <div class="field">
+      <%= form.label :name, "Internal name" %>
+      <%= form.text_field :name, required: true, placeholder: "standard" %>
+    </div>
+    <div class="field">
+      <%= form.label :heading, "Heading" %>
+      <%= form.text_field :heading, required: true %>
+    </div>
+    <div class="field field--full">
+      <%= form.label :intro %>
+      <%= form.text_area :intro, rows: 3 %>
+    </div>
+    <div class="field field--full">
+      <%= form.label :terms %>
+      <%= form.text_area :terms, rows: 4 %>
+    </div>
+    <div class="field field--full">
+      <%= form.label :footer %>
+      <%= form.text_area :footer, rows: 3 %>
+    </div>
+    <div class="field field--full">
+      <label>
+        <%= form.check_box :default_template %>
+        Use as default template
+      </label>
+    </div>
+  </div>
+
+  <div class="actions">
+    <%= form.submit class: "button button--primary" %>
+  </div>
+<% end %>

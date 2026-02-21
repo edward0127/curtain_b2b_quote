@@ -1,7 +1,7 @@
 class Admin::B2bCustomersController < ApplicationController
   before_action :authenticate_user!
   before_action :require_admin!
-  before_action :set_b2b_customer, only: [ :edit, :update, :destroy ]
+  before_action :set_b2b_customer, only: [ :edit, :update, :destroy, :impersonate ]
 
   def index
     @b2b_customers = User.b2b_customer.order(created_at: :desc)
@@ -38,6 +38,12 @@ class Admin::B2bCustomersController < ApplicationController
   def destroy
     @b2b_customer.destroy
     redirect_to admin_b2b_customers_path, notice: "B2B customer deleted."
+  end
+
+  def impersonate
+    session[:impersonator_admin_user_id] = current_user.id
+    sign_in(:user, @b2b_customer)
+    redirect_to dashboard_path(tab: :new_quote), notice: "Now logged in as #{@b2b_customer.email}."
   end
 
   private

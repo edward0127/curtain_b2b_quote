@@ -1,0 +1,10 @@
+<section class="hero hero--compact">
+  <div>
+    <p class="eyebrow">Pricing Rules</p>
+    <h2>New Rule for <%= @product.name %></h2>
+  </div>
+</section>
+
+<section class="panel">
+  <%= render "form", product: @product, pricing_rule: @pricing_rule %>
+</section>

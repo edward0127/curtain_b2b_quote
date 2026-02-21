@@ -19,7 +19,7 @@ class DashboardControllerTest < ActionDispatch::IntegrationTest
     get dashboard_url
     assert_response :success
     assert_select "a.tab.tab--active", text: "Submit a New Quote"
-    assert_select "h3", text: "Submit Curtain Quote Request"
+    assert_select "h3", text: "Submit Multi-Item Quote"
   end
 
   test "customer can open quote history tab on dashboard" do

@@ -1,0 +1,50 @@
+<% if product.errors.any? %>
+  <div class="flash flash--alert">
+    <strong><%= pluralize(product.errors.count, "error") %> prevented saving:</strong>
+    <ul>
+      <% product.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<%= form_with model: [ :admin, product ] do |form| %>
+  <div class="form-grid">
+    <div class="field">
+      <%= form.label :name %>
+      <%= form.text_field :name, required: true %>
+    </div>
+
+    <div class="field">
+      <%= form.label :sku, "SKU" %>
+      <%= form.text_field :sku %>
+    </div>
+
+    <div class="field">
+      <%= form.label :base_price, "Base Price (AUD)" %>
+      <%= form.number_field :base_price, step: 0.01, min: 0, required: true %>
+    </div>
+
+    <div class="field">
+      <%= form.label :pricing_mode %>
+      <%= form.select :pricing_mode, Product.pricing_modes.keys.map { |value| [ value.humanize, value ] } %>
+    </div>
+
+    <div class="field field--full">
+      <%= form.label :description %>
+      <%= form.text_area :description, rows: 4 %>
+    </div>
+
+    <div class="field field--full">
+      <label>
+        <%= form.check_box :active %>
+        Active product
+      </label>
+    </div>
+  </div>
+
+  <div class="actions">
+    <%= form.submit class: "button button--primary" %>
+  </div>
+<% end %>

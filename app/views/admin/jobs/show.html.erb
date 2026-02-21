@@ -1,0 +1,44 @@
+<section class="hero hero--compact">
+  <div>
+    <p class="eyebrow">Job</p>
+    <h2><%= @job.job_number %></h2>
+    <p class="lead">Converted from quote <%= link_to @job.quote_request.quote_number, admin_quote_request_path(@job.quote_request) %>.</p>
+  </div>
+</section>
+
+<section class="detail-grid">
+  <article class="detail-card">
+    <h3>Job Summary</h3>
+    <p><strong>Customer</strong> <span><%= @job.user.email %></span></p>
+    <p><strong>Status</strong> <span><%= @job.status.humanize %></span></p>
+    <p><strong>Scheduled</strong> <span><%= @job.scheduled_on.present? ? l(@job.scheduled_on, format: :long) : "Not scheduled" %></span></p>
+    <p><strong>Quote Total</strong> <span><%= number_to_currency(@job.quote_request.total, unit: "#{@job.quote_request.currency} ") %></span></p>
+  </article>
+  <article class="detail-card">
+    <h3>Notes</h3>
+    <p><%= @job.notes.presence || "No notes." %></p>
+  </article>
+</section>
+
+<section class="panel">
+  <h3>Update Job</h3>
+  <%= form_with model: [ :admin, @job ] do |form| %>
+    <div class="form-grid">
+      <div class="field">
+        <%= form.label :status %>
+        <%= form.select :status, Job.statuses.keys.map { |value| [ value.humanize, value ] } %>
+      </div>
+      <div class="field">
+        <%= form.label :scheduled_on %>
+        <%= form.date_field :scheduled_on %>
+      </div>
+      <div class="field field--full">
+        <%= form.label :notes %>
+        <%= form.text_area :notes, rows: 4 %>
+      </div>
+    </div>
+    <div class="actions">
+      <%= form.submit "Update Job", class: "button button--primary" %>
+    </div>
+  <% end %>
+</section>

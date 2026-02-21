@@ -1,0 +1,36 @@
+<section class="hero hero--compact">
+  <div>
+    <p class="eyebrow">Jobs</p>
+    <h2>Converted Jobs</h2>
+    <p class="lead">Track jobs that were converted from approved quotes.</p>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Job #</th>
+          <th>Quote #</th>
+          <th>Customer</th>
+          <th>Status</th>
+          <th>Scheduled</th>
+          <th>Created</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @jobs.each do |job| %>
+          <tr>
+            <td><%= link_to job.job_number, admin_job_path(job) %></td>
+            <td><%= job.quote_request.quote_number %></td>
+            <td><%= job.user.email %></td>
+            <td><%= job.status.humanize %></td>
+            <td><%= job.scheduled_on.present? ? l(job.scheduled_on, format: :long) : "-" %></td>
+            <td><%= l(job.created_at, format: :short) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</section>

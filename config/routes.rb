@@ -2,12 +2,34 @@ Rails.application.routes.draw do
   devise_for :users, skip: [ :registrations ]
 
   namespace :admin do
-    resources :b2b_customers, except: [ :show ]
+    resources :b2b_customers, except: [ :show ] do
+      post :impersonate, on: :member
+    end
     resource :settings, only: [ :edit, :update ]
+    resources :products do
+      resources :pricing_rules, except: [ :index, :show ]
+    end
+    resources :quote_templates, except: [ :show ]
+    resources :quote_requests, only: [ :index, :show, :update ] do
+      member do
+        patch :update_status
+        post :convert_to_job
+        get :document
+      end
+    end
+    resources :jobs, only: [ :index, :show, :update ]
   end
 
+  resource :impersonation, only: [ :destroy ]
+  get "terms", to: "legal#terms"
+  get "privacy", to: "legal#privacy"
+
   get "dashboard", to: "dashboard#show", as: :dashboard
-  resources :quote_requests, only: [ :index, :new, :create, :show ]
+  resources :quote_requests, only: [ :index, :new, :create, :show ] do
+    member do
+      get :document
+    end
+  end
 
   root "dashboard#show"
 

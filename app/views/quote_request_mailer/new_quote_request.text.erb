@@ -1,13 +1,21 @@
 New curtain quote request received.
 
 Quote ID: <%= @quote_request.id %>
+Quote Number: <%= @quote_request.quote_number %>
 Submitted at: <%= l(@quote_request.created_at, format: :long) %>
 Customer: <%= @customer.email %>
+Reference: <%= @quote_request.customer_reference.presence || "N/A" %>
+Template: <%= @quote_request.quote_template.heading %>
+Valid Until: <%= l(@quote_request.valid_until, format: :long) %>
+Total: <%= @quote_request.currency %> <%= format("%.2f", @quote_request.total) %>
 
-Measurements
-- Width: <%= @quote_request.width %> cm
-- Height: <%= @quote_request.height %> cm
-- Quantity: <%= @quote_request.quantity %>
+Line Items
+<% @quote_request.quote_items.each_with_index do |item, index| %>
+<% size_line = item.product.per_square_meter? ? "#{item.width} x #{item.height} cm (#{item.area_sqm} sqm)" : "Unit priced" %>
+<%= index + 1 %>. <%= item.product.name %> | Qty: <%= item.quantity %> | Size: <%= size_line %> | Unit: <%= @quote_request.currency %> <%= format("%.2f", item.unit_price) %> | Line Total: <%= @quote_request.currency %> <%= format("%.2f", item.line_total) %>
+<% end %>
+
+Workflow
 - Status: <%= @quote_request.status.humanize %>
 
 Notes

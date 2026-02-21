@@ -1,0 +1,69 @@
+<section class="hero hero--compact quote-doc">
+  <div>
+    <p class="eyebrow">Quote Document</p>
+    <h2><%= @quote_request.quote_template.heading %></h2>
+    <p class="lead">
+      <strong><%= @quote_request.quote_number %></strong>
+      <% if @quote_request.customer_reference.present? %>
+        | Ref: <%= @quote_request.customer_reference %>
+      <% end %>
+    </p>
+  </div>
+  <span class="status-pill status-pill--<%= @quote_request.status %>"><%= @quote_request.status.humanize %></span>
+</section>
+
+<section class="panel">
+  <p><%= @quote_request.quote_template.intro.presence || "Thank you for your enquiry." %></p>
+
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Line</th>
+          <th>Product</th>
+          <th>Dimensions</th>
+          <th>Qty</th>
+          <th>Unit Price</th>
+          <th>Line Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @quote_request.quote_items.each_with_index do |item, index| %>
+          <tr>
+            <td><%= index + 1 %></td>
+            <td><%= item.product.name %></td>
+            <td>
+              <% if item.product.per_square_meter? %>
+                <%= item.width %> x <%= item.height %> cm
+              <% else %>
+                Unit priced
+              <% end %>
+            </td>
+            <td><%= item.quantity %></td>
+            <td><%= number_to_currency(item.unit_price, unit: "#{@quote_request.currency} ") %></td>
+            <td><%= number_to_currency(item.line_total, unit: "#{@quote_request.currency} ") %></td>
+          </tr>
+        <% end %>
+      </tbody>
+      <tfoot>
+        <tr>
+          <th colspan="5">Quote Total</th>
+          <th><%= number_to_currency(@quote_request.total, unit: "#{@quote_request.currency} ") %></th>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <p><strong>Valid Until:</strong> <%= l(@quote_request.valid_until, format: :long) %></p>
+  <p><%= @quote_request.quote_template.terms.presence || "Quote valid for 14 days unless otherwise stated." %></p>
+  <p><%= @quote_request.quote_template.footer.presence || "Please contact us for acceptance or any requested changes." %></p>
+</section>
+
+<div class="actions no-print">
+  <button class="button button--secondary" onclick="window.print()">Print / Save as PDF</button>
+  <% if current_user.admin? %>
+    <%= link_to "Back to Admin Quote", admin_quote_request_path(@quote_request), class: "button button--primary" %>
+  <% else %>
+    <%= link_to "Back to Quote", quote_request_path(@quote_request), class: "button button--primary" %>
+  <% end %>
+</div>

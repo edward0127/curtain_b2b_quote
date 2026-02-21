@@ -6,9 +6,9 @@
 
   <% if @customer_tab == "new_quote" %>
     <section class="panel tab-panel">
-      <h3>Submit Curtain Quote Request</h3>
-      <p class="muted">Enter measurements in centimeters and include any installation notes.</p>
-      <%= render "quote_requests/form", quote_request: @quote_request %>
+      <h3>Submit Multi-Item Quote</h3>
+      <p class="muted">Build quotes with multiple products, dimensions, and quantity lines.</p>
+      <p><%= link_to "Open Quote Builder", new_quote_request_path, class: "button button--primary", data: { turbo_frame: "_top" } %></p>
     </section>
   <% else %>
     <section class="panel tab-panel">
@@ -18,9 +18,9 @@
           <thead>
             <tr>
               <th>ID</th>
-              <th>Width</th>
-              <th>Height</th>
-              <th>Qty</th>
+              <th>Quote #</th>
+              <th>Items</th>
+              <th>Total</th>
               <th>Status</th>
               <th>Created</th>
             </tr>
@@ -29,9 +29,9 @@
             <% @quote_history.each do |quote| %>
               <tr>
                 <td><%= link_to quote.id, quote_request_path(quote), data: { turbo_frame: "_top" } %></td>
-                <td><%= quote.width %> cm</td>
-                <td><%= quote.height %> cm</td>
-                <td><%= quote.quantity %></td>
+                <td><%= quote.quote_number %></td>
+                <td><%= quote.line_items_count %></td>
+                <td><%= number_to_currency(quote.total, unit: "#{quote.currency} ") %></td>
                 <td><span class="status-pill status-pill--<%= quote.status %>"><%= quote.status.humanize %></span></td>
                 <td><%= l(quote.created_at, format: :short) %></td>
               </tr>

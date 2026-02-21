@@ -1,0 +1,42 @@
+<section class="hero hero--compact">
+  <div>
+    <p class="eyebrow">Catalog</p>
+    <h2>Products</h2>
+    <p class="lead">Manage curtain product definitions and base pricing.</p>
+  </div>
+  <%= link_to "New Product", new_admin_product_path, class: "button button--primary" %>
+</section>
+
+<section class="panel">
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>SKU</th>
+          <th>Pricing Mode</th>
+          <th>Base Price</th>
+          <th>Rules</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @products.each do |product| %>
+          <tr>
+            <td><%= link_to product.name, admin_product_path(product) %></td>
+            <td><%= product.sku.presence || "-" %></td>
+            <td><%= product.pricing_mode.humanize %></td>
+            <td><%= number_to_currency(product.base_price, unit: "AUD ") %></td>
+            <td><%= product.pricing_rules.size %></td>
+            <td><%= product.active? ? "Active" : "Inactive" %></td>
+            <td class="table-actions">
+              <%= link_to "Edit", edit_admin_product_path(product), class: "button button--secondary button--small" %>
+              <%= button_to "Delete", admin_product_path(product), method: :delete, class: "button button--danger button--small", form: { class: "inline-form", data: { turbo_confirm: "Delete this product?" } } %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</section>

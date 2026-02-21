@@ -7,6 +7,7 @@ class User < ApplicationRecord
   enum :role, { admin: 0, b2b_customer: 1 }
 
   has_many :quote_requests, dependent: :destroy
+  has_many :jobs, dependent: :nullify
 
   validates :role, presence: true
 end

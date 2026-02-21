@@ -12,24 +12,71 @@
 <%= form_with model: quote_request, data: { controller: "submit-state", action: "turbo:submit-start->submit-state#start turbo:submit-end->submit-state#end", turbo_frame: "_top" } do |form| %>
   <div class="form-grid">
     <div class="field">
-      <%= form.label :width, "Width (cm)" %>
-      <%= form.number_field :width, step: 0.01, min: 0.01, required: true %>
+      <%= form.label :customer_reference, "Customer reference" %>
+      <%= form.text_field :customer_reference, placeholder: "PO-00123" %>
     </div>
 
     <div class="field">
-      <%= form.label :height, "Height (cm)" %>
-      <%= form.number_field :height, step: 0.01, min: 0.01, required: true %>
-    </div>
-
-    <div class="field">
-      <%= form.label :quantity %>
-      <%= form.number_field :quantity, min: 1, required: true %>
+      <%= form.label :valid_until, "Quote valid until" %>
+      <%= form.date_field :valid_until %>
     </div>
 
     <div class="field field--full">
-      <%= form.label :notes, "Additional details" %>
-      <%= form.text_area :notes, rows: 5 %>
+      <%= form.label :quote_template_id, "Document template" %>
+      <%= form.collection_select :quote_template_id, @quote_templates, :id, :heading %>
     </div>
+  </div>
+
+  <h3>Quote Items</h3>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Width (cm)</th>
+          <th>Height (cm)</th>
+          <th>Qty</th>
+          <th>Line note</th>
+        </tr>
+      </thead>
+      <tbody>
+        <%= form.fields_for :quote_items do |item_fields| %>
+          <tr>
+            <td>
+              <div class="field">
+                <%= item_fields.hidden_field :line_position %>
+                <%= item_fields.collection_select :product_id, @products, :id, :name, { include_blank: "Select product" }, { required: false } %>
+              </div>
+            </td>
+            <td>
+              <div class="field">
+                <%= item_fields.number_field :width, step: 0.01, min: 0.01 %>
+              </div>
+            </td>
+            <td>
+              <div class="field">
+                <%= item_fields.number_field :height, step: 0.01, min: 0.01 %>
+              </div>
+            </td>
+            <td>
+              <div class="field">
+                <%= item_fields.number_field :quantity, min: 1, value: item_fields.object.quantity || 1 %>
+              </div>
+            </td>
+            <td>
+              <div class="field">
+                <%= item_fields.text_field :description, placeholder: "Optional line detail" %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="field field--full">
+    <%= form.label :notes, "Additional details" %>
+    <%= form.text_area :notes, rows: 5 %>
   </div>
 
   <div class="actions">

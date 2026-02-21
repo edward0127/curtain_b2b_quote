@@ -1,0 +1,25 @@
+one_line_one:
+  quote_request: one
+  product: sheer_panel
+  line_position: 1
+  description: Main office sheer
+  width: 120.5
+  height: 200.0
+  quantity: 2
+  area_sqm: 2.410
+  unit_price: 90.00
+  line_total: 180.00
+  applied_rule_names:
+
+two_line_one:
+  quote_request: two
+  product: blackout_panel
+  line_position: 1
+  description: Reception blackout
+  width: 150.0
+  height: 210.25
+  quantity: 4
+  area_sqm: 3.154
+  unit_price: 105.00
+  line_total: 420.00
+  applied_rule_names:
