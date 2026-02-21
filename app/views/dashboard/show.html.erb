@@ -45,17 +45,22 @@
               <th>Items</th>
               <th>Total</th>
               <th>Status</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             <% @recent_quotes.each do |quote| %>
               <tr>
-                <td><%= quote.id %></td>
-                <td><%= quote.quote_number %></td>
+                <td><%= link_to quote.id, admin_quote_request_path(quote) %></td>
+                <td><%= link_to quote.quote_number, admin_quote_request_path(quote) %></td>
                 <td><%= quote.user.email %></td>
                 <td><%= quote.line_items_count %></td>
                 <td><%= number_to_currency(quote.total, unit: "#{quote.currency} ") %></td>
                 <td><span class="status-pill status-pill--<%= quote.status %>"><%= quote.status.humanize %></span></td>
+                <td class="table-actions">
+                  <%= link_to "View", admin_quote_request_path(quote), class: "button button--secondary button--small" %>
+                  <%= link_to "PDF", document_admin_quote_request_path(quote, format: :pdf), class: "button button--primary button--small" %>
+                </td>
               </tr>
             <% end %>
           </tbody>

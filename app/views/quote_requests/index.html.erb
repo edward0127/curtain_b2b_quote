@@ -19,6 +19,7 @@
           <th>Status</th>
           <th>Template</th>
           <th>Created</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -31,6 +32,10 @@
             <td><span class="status-pill status-pill--<%= quote.status %>"><%= quote.status.humanize %></span></td>
             <td><%= quote.quote_template.heading %></td>
             <td><%= l(quote.created_at, format: :short) %></td>
+            <td class="table-actions">
+              <%= link_to "View", quote_request_path(quote), class: "button button--secondary button--small" %>
+              <%= link_to "PDF", document_quote_request_path(quote, format: :pdf), class: "button button--primary button--small" %>
+            </td>
           </tr>
         <% end %>
       </tbody>

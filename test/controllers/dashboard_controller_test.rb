@@ -29,6 +29,7 @@ class DashboardControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "a.tab.tab--active", text: "View Full Quote History"
     assert_select "h3", text: "Full Quote History"
+    assert_select "a[href='#{document_quote_request_path(quote_requests(:one), format: :pdf)}']", text: "PDF"
   end
 
   test "admin dashboard shows recent quote requests above tab panel" do

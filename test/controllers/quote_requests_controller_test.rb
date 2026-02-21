@@ -5,6 +5,8 @@ class QuoteRequestsControllerTest < ActionDispatch::IntegrationTest
     sign_in users(:customer)
     get quote_requests_url
     assert_response :success
+    assert_select "a[href='#{quote_request_path(quote_requests(:one))}']", text: "View"
+    assert_select "a[href='#{document_quote_request_path(quote_requests(:one), format: :pdf)}']", text: "PDF"
   end
 
   test "b2b customer can create multi item quote request" do
@@ -93,5 +95,13 @@ class QuoteRequestsControllerTest < ActionDispatch::IntegrationTest
     get document_quote_request_url(quote_requests(:one))
     assert_response :success
     assert_match quote_requests(:one).quote_number, @response.body
+  end
+
+  test "renders styled pdf document for owner" do
+    sign_in users(:customer)
+    get document_quote_request_url(quote_requests(:one), format: :pdf)
+    assert_response :success
+    assert_equal "application/pdf", response.media_type
+    assert @response.body.start_with?("%PDF-1.4")
   end
 end

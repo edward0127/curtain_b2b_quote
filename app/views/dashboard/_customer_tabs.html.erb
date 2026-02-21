@@ -23,6 +23,7 @@
               <th>Total</th>
               <th>Status</th>
               <th>Created</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -34,6 +35,10 @@
                 <td><%= number_to_currency(quote.total, unit: "#{quote.currency} ") %></td>
                 <td><span class="status-pill status-pill--<%= quote.status %>"><%= quote.status.humanize %></span></td>
                 <td><%= l(quote.created_at, format: :short) %></td>
+                <td class="table-actions">
+                  <%= link_to "View", quote_request_path(quote), class: "button button--secondary button--small", data: { turbo_frame: "_top" } %>
+                  <%= link_to "PDF", document_quote_request_path(quote, format: :pdf), class: "button button--primary button--small", data: { turbo_frame: "_top" } %>
+                </td>
               </tr>
             <% end %>
           </tbody>
