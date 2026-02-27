@@ -1,0 +1,53 @@
+<section class="lv-hero lv-hero--partners">
+  <%= image_tag "public-e-1.jpg", class: "lv-hero__image", alt: "Interior project with full-height sheer curtains" %>
+  <div class="lv-hero__veil"></div>
+  <article class="lv-hero__content">
+    <p class="lv-kicker">Partners</p>
+    <h1>Who do we work with?</h1>
+    <p class="lv-lead">Built for long-term trade relationships.</p>
+    <p>
+      Join our community of satisfied long-term clients and experience the financial and process advantages
+      that come with partnering with us.
+    </p>
+    <div class="lv-actions">
+      <%= link_to "Builders & Developers", builders_path, class: "lv-pill lv-pill--dark", data: { turbo_frame: "_top" } %>
+      <%= link_to "Get in touch", root_path(anchor: "get-in-touch"), class: "lv-pill", data: { turbo_frame: "_top" } %>
+    </div>
+  </article>
+</section>
+
+<section class="lv-section">
+  <header class="lv-section__header">
+    <p class="lv-kicker">Partner Types</p>
+    <h2>Who we work with across projects</h2>
+  </header>
+  <div class="lv-partner-grid">
+    <article>Developers</article>
+    <article>Builders</article>
+    <article>Architects</article>
+    <article>Interior designers</article>
+    <article>Local window furnishing businesses</article>
+    <article>Real Estate Professionals</article>
+  </div>
+</section>
+
+<section class="lv-section lv-section--split">
+  <article class="lv-panel">
+    <%= image_tag "public-e-12.jpg", alt: "Bedroom styled with sheers", class: "lv-panel__image" %>
+  </article>
+  <article class="lv-panel lv-panel--copy">
+    <h2>Built for long-term trade partnerships</h2>
+    <p>
+      With a focus on quality, reliability and service, you can confidently grow your business with Light Vue.
+    </p>
+    <ul class="lv-bullet-list">
+      <li>Clear communication from quote to install</li>
+      <li>Consistent quality across repeat projects</li>
+      <li>Reliable delivery for time-sensitive programs</li>
+    </ul>
+    <div class="lv-actions">
+      <%= link_to "B2B Login", new_user_session_path, class: "lv-pill lv-pill--dark", data: { turbo_frame: "_top" } %>
+      <%= link_to "Get in touch", root_path(anchor: "get-in-touch"), class: "lv-pill lv-pill--dark", data: { turbo_frame: "_top" } %>
+    </div>
+  </article>
+</section>

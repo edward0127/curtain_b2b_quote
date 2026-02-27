@@ -1,6 +1,11 @@
 Rails.application.routes.draw do
   devise_for :users, skip: [ :registrations ]
 
+  get "partners", to: "public_pages#partners"
+  get "builders", to: "public_pages#builders"
+  get "builders-developers", to: "public_pages#builders"
+  post "get-in-touch", to: "public_pages#create_contact", as: :public_contact
+
   namespace :admin do
     resources :b2b_customers, except: [ :show ] do
       post :impersonate, on: :member
@@ -31,7 +36,7 @@ Rails.application.routes.draw do
     end
   end
 
-  root "dashboard#show"
+  root "public_pages#home"
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

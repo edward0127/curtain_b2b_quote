@@ -23,15 +23,19 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
-    <main class="app-shell">
-      <header class="topbar card card--blur">
-        <div>
-          <p class="eyebrow">Operations Workspace</p>
-          <h1 class="topbar__title">Curtain B2B Quote Portal</h1>
-        </div>
+  <body class="<%= if user_signed_in?
+    "app-body app-body--portal"
+  else
+    "app-body app-body--public public-page public-page--#{controller_name.dasherize}-#{action_name.dasherize}"
+  end %>">
+    <% if user_signed_in? %>
+      <main class="app-shell">
+        <header class="topbar card card--blur">
+          <div>
+            <p class="eyebrow">Operations Workspace</p>
+            <h1 class="topbar__title">Curtain B2B Quote Portal</h1>
+          </div>
 
-        <% if user_signed_in? %>
           <div class="topbar__right">
             <p class="user-chip">
               <strong><%= current_user.email %></strong>
@@ -62,27 +66,97 @@
               <%= button_to "Sign out", destroy_user_session_path, method: :delete, class: "button button--ghost", form: { class: "inline-form" } %>
             </nav>
           </div>
-        <% end %>
-      </header>
+        </header>
 
-      <div class="flash-stack">
-        <% if notice.present? %>
-          <p class="flash flash--notice"><%= notice %></p>
+        <% if notice.present? || alert.present? %>
+          <div class="flash-stack">
+            <% if notice.present? %>
+              <div class="flash flash--notice" data-controller="flash" data-flash-timeout-value="6000">
+                <div class="flash__content"><%= notice %></div>
+                <button type="button" class="flash__close" data-action="flash#close" aria-label="Dismiss notification">&times;</button>
+              </div>
+            <% end %>
+            <% if alert.present? %>
+              <div class="flash flash--alert" data-controller="flash" data-flash-timeout-value="9000">
+                <div class="flash__content"><%= alert %></div>
+                <button type="button" class="flash__close" data-action="flash#close" aria-label="Dismiss alert">&times;</button>
+              </div>
+            <% end %>
+          </div>
         <% end %>
-        <% if alert.present? %>
-          <p class="flash flash--alert"><%= alert %></p>
+
+        <section class="content card card--content">
+          <%= yield %>
+        </section>
+
+        <footer class="legal-footer">
+          <%= link_to "Terms of Service", terms_path %>
+          <span>|</span>
+          <%= link_to "Privacy Policy", privacy_path %>
+        </footer>
+      </main>
+    <% else %>
+      <main class="public-shell">
+        <header class="public-topbar" data-controller="topbar">
+          <%= link_to root_path, class: "public-brand", data: { turbo_frame: "_top" } do %>
+            <%= image_tag "lightvue-logo-white.png", alt: "Light Vue logo", class: "public-brand__logo" %>
+            <span class="public-brand__meta">
+              <span class="public-brand__name">Light Vue</span>
+              <span class="public-brand__tagline">Curtains & Tracks for Trade Partners</span>
+            </span>
+          <% end %>
+
+          <nav class="public-nav">
+            <%= link_to "Home", root_path, class: [ "public-nav__link", ("public-nav__link--active" if current_page?(root_path)) ].compact.join(" "), data: { turbo_frame: "_top" } %>
+            <%= link_to "Partners", partners_path, class: [ "public-nav__link", ("public-nav__link--active" if current_page?(partners_path)) ].compact.join(" "), data: { turbo_frame: "_top" } %>
+            <%= link_to "Builders & Developers", builders_path, class: [ "public-nav__link", ("public-nav__link--active" if current_page?(builders_path)) ].compact.join(" "), data: { turbo_frame: "_top" } %>
+            <%= link_to "B2B Login", new_user_session_path, class: "button button--primary public-nav__login", data: { turbo_frame: "_top" } %>
+          </nav>
+        </header>
+
+        <% if notice.present? || alert.present? %>
+          <div class="flash-stack flash-stack--public">
+            <% if notice.present? %>
+              <div class="flash flash--notice" data-controller="flash" data-flash-timeout-value="6000">
+                <div class="flash__content"><%= notice %></div>
+                <button type="button" class="flash__close" data-action="flash#close" aria-label="Dismiss notification">&times;</button>
+              </div>
+            <% end %>
+            <% if alert.present? %>
+              <div class="flash flash--alert" data-controller="flash" data-flash-timeout-value="9000">
+                <div class="flash__content"><%= alert %></div>
+                <button type="button" class="flash__close" data-action="flash#close" aria-label="Dismiss alert">&times;</button>
+              </div>
+            <% end %>
+          </div>
         <% end %>
-      </div>
 
-      <section class="content card card--content">
-        <%= yield %>
-      </section>
+        <% if controller_name == "public_pages" %>
+          <%= yield %>
+        <% else %>
+          <section class="public-static card card--content">
+            <%= yield %>
+          </section>
+        <% end %>
 
-      <footer class="legal-footer">
-        <%= link_to "Terms of Service", terms_path %>
-        <span>|</span>
-        <%= link_to "Privacy Policy", privacy_path %>
-      </footer>
-    </main>
+        <footer class="public-footer card">
+          <div class="public-footer__brand">
+            <%= image_tag "lightvue-logo-white.png", alt: "Light Vue logo", class: "public-footer__logo" %>
+            <p>Not just your ordinary curtain supplier.</p>
+          </div>
+          <div class="public-footer__contact">
+            <p><a href="mailto:info@lightvue.com.au">E: info@lightvue.com.au</a></p>
+            <p><a href="tel:+61431262042">P: 0431 262 042</a></p>
+          </div>
+          <div class="public-footer__legal">
+            <%= link_to "Home", root_path, data: { turbo_frame: "_top" } %>
+            <%= link_to "Partners", partners_path, data: { turbo_frame: "_top" } %>
+            <%= link_to "Builders & Developers", builders_path, data: { turbo_frame: "_top" } %>
+            <%= link_to "Terms of Service", terms_path %>
+            <%= link_to "Privacy Policy", privacy_path %>
+          </div>
+        </footer>
+      </main>
+    <% end %>
   </body>
 </html>

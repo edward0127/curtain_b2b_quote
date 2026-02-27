@@ -1,0 +1,9 @@
+New get in touch submission received.
+
+Name: <%= @contact_form.full_name %>
+Email: <%= @contact_form.email %>
+Company: <%= @contact_form.company %>
+Sign up for updates: <%= @contact_form.subscribe_updates ? "Yes" : "No" %>
+
+Message
+<%= @contact_form.message %>

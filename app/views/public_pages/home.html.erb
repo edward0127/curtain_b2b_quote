@@ -1,0 +1,165 @@
+<section class="lv-hero">
+  <%= image_tag "public-new-background-1.png", class: "lv-hero__image", alt: "Warm-toned curtains in a modern interior" %>
+  <div class="lv-hero__veil"></div>
+  <article class="lv-hero__content">
+    <p class="lv-kicker">LIGHT VUE</p>
+    <h1>Curtains & Tracks for Trade Partners</h1>
+    <p class="lv-lead">Not just your ordinary curtain supplier.</p>
+    <p>
+      Welcome to Light Vue - your trusted wholesale partner for high quality curtains, sheers and tracks.
+      We specialise in servicing developers and interior professionals with quality curtains at wholesale pricing to elevate every space.
+    </p>
+    <ul class="lv-hero__signals">
+      <li>Wholesale pricing</li>
+      <li>Curated premium range</li>
+      <li>Heat-treated perfect pleats</li>
+    </ul>
+    <div class="lv-actions">
+      <%= link_to "Get in touch", "#get-in-touch", class: "lv-pill", data: { turbo: false } %>
+      <%= link_to "B2B Login", new_user_session_path, class: "lv-pill lv-pill--dark", data: { turbo_frame: "_top" } %>
+    </div>
+  </article>
+</section>
+
+<section class="lv-section">
+  <header class="lv-section__header">
+    <p class="lv-kicker">Why Light Vue</p>
+    <h2>We are not just another curtain supplier. Here's why.</h2>
+  </header>
+
+  <div class="lv-feature-grid">
+    <article class="lv-feature-card">
+      <%= image_tag "public-e-14.jpg", alt: "S-wave curtain detail" %>
+      <div>
+        <h3>Wholesale B2B customers only</h3>
+        <p>We only supply to local curtain businesses and trade customers in the building and development industry.</p>
+      </div>
+    </article>
+    <article class="lv-feature-card">
+      <%= image_tag "public-e-3.jpg", alt: "Sheer curtains in a living room" %>
+      <div>
+        <h3>A Curated, Premium Range</h3>
+        <p>We keep it simple - offering a limited selection of handpicked fabrics that meet the needs of most residential and commercial projects. No overwhelm, just options that work.</p>
+      </div>
+    </article>
+    <article class="lv-feature-card">
+      <%= image_tag "public-e-37.jpg", alt: "Curtain fabric in hand" %>
+      <div>
+        <h3>Heat-Treated Curtain Pleats</h3>
+        <p>We're proud to offer Heat-Treated Perfect Pleats - ensuring smooth, even folds that hold their shape from top to bottom. It's consistency you can count on, every time.</p>
+      </div>
+    </article>
+    <article class="lv-feature-card">
+      <%= image_tag "public-e-1.jpg", alt: "Open space with sheers" %>
+      <div>
+        <h3>People Over Promotion</h3>
+        <p>No showrooms. No over-the-top branding. Just solid relationships, transparent pricing, and practical support from people with years of industry experience. We keep it lean so you get more value where it matters.</p>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section class="lv-section">
+  <header class="lv-section__header">
+    <p class="lv-kicker">Products</p>
+    <h2>Built for repeatable quality across every project</h2>
+  </header>
+
+  <div class="lv-product-grid">
+    <article class="lv-product-card">
+      <%= image_tag "public-e-12.jpg", alt: "Bedroom with sheer curtains" %>
+      <div>
+        <h3>Curtain Tracks</h3>
+        <p>Durable and discreet, our cut to size curtain tracks offer smooth and reliable gliding for all fabrics. Available in multiple mounting options to suit any project.</p>
+      </div>
+    </article>
+    <article class="lv-product-card">
+      <%= image_tag "public-e-14.jpg", alt: "Pleated sheer curtain" %>
+      <div>
+        <h3>S-Wave Curtains</h3>
+        <p>Achieve a sleek, modern look with our S-Wave curtains, designed for effortless flow and a consistent wave finish.</p>
+      </div>
+    </article>
+    <article class="lv-product-card">
+      <%= image_tag "public-e-40.jpg", alt: "Floor to ceiling curtain in neutral interior" %>
+      <div>
+        <h3>Pinch Pleat Curtains</h3>
+        <p>Get that timeless and classic look with Pinch Pleat style curtains and elevate rooms in unexpected ways.</p>
+      </div>
+    </article>
+    <article class="lv-product-card">
+      <%= image_tag "public-e-37.jpg", alt: "Fabric texture closeup" %>
+      <div>
+        <h3>Fabric Options</h3>
+        <p>We consciously don't offer a wide range of fabric choices. Instead, only a selected range of proven fabrics that add impact to spaces.</p>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section id="get-in-touch" class="lv-section lv-section--contact-form">
+  <div class="lv-contact-layout">
+    <div class="lv-contact-intro">
+      <h2>Get in Touch</h2>
+      <h3>Got a project in the pipeline?</h3>
+      <p>
+        Whether you're a quoting for a specific project or looking for a new curtain supplier, we are ready to help.
+      </p>
+      <p><a href="mailto:info@lightvue.com.au">E: info@lightvue.com.au</a></p>
+      <p><a href="tel:+61431262042">P: 0431 262 042</a></p>
+    </div>
+
+    <div class="lv-contact-form-wrap">
+      <% if @contact_form.errors.any? %>
+        <div class="lv-contact-errors">
+          <p>Please review the form details:</p>
+          <ul>
+            <% @contact_form.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <%= form_with model: @contact_form, url: public_contact_path, method: :post, class: "lv-contact-form", data: { controller: "submit-state", action: "turbo:submit-start->submit-state#start turbo:submit-end->submit-state#end", submit_state_submitting_label_value: "Sending...", submit_state_submitting_message_value: "Sending your message. Please wait..." } do |f| %>
+        <p class="lv-form-row lv-form-row--label">Name</p>
+        <div class="lv-form-row lv-form-row--two">
+          <label class="lv-form-field">
+            <span>First Name <em>(required)</em></span>
+            <%= f.text_field :first_name, required: true, autocomplete: "given-name" %>
+          </label>
+          <label class="lv-form-field">
+            <span>Last Name <em>(required)</em></span>
+            <%= f.text_field :last_name, required: true, autocomplete: "family-name" %>
+          </label>
+        </div>
+
+        <label class="lv-form-field">
+          <span>Email <em>(required)</em></span>
+          <%= f.email_field :email, required: true, autocomplete: "email" %>
+        </label>
+
+        <label class="lv-form-checkbox">
+          <%= f.check_box :subscribe_updates %>
+          <span>Sign up for news and updates</span>
+        </label>
+
+        <label class="lv-form-field">
+          <span>Company <em>(required)</em></span>
+          <%= f.text_field :company, required: true, autocomplete: "organization" %>
+        </label>
+
+        <label class="lv-form-field">
+          <span>Message <em>(required)</em></span>
+          <%= f.text_area :message, required: true, rows: 6 %>
+        </label>
+
+        <button type="submit" class="lv-form-submit button--with-spinner" data-submit-state-target="button">
+          <span data-submit-state-target="label">Submit</span>
+          <span class="button__spinner" data-submit-state-target="spinner" hidden></span>
+        </button>
+        <p class="lv-form-status" data-submit-state-target="message" role="status" aria-live="polite"></p>
+      <% end %>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,28 @@
+<h2 style="margin: 0 0 8px; font-size: 24px; line-height: 1.25; color: #123447;">New Get In Touch Submission</h2>
+<p class="muted" style="margin: 0 0 18px; font-size: 14px; color: #4d6575;">
+  Received on <strong style="color: #123447;"><%= l(Time.current, format: :long) %></strong>.
+</p>
+
+<table role="presentation" width="100%" style="border: 1px solid #d9e5ec; border-radius: 10px; margin-bottom: 16px; background-color: #f9fcfe;">
+  <tr>
+    <td style="padding: 12px 14px; border-bottom: 1px solid #d9e5ec; width: 40%; color: #4d6575; font-size: 13px;">Name</td>
+    <td style="padding: 12px 14px; border-bottom: 1px solid #d9e5ec; font-size: 14px; color: #123447;"><strong><%= @contact_form.full_name %></strong></td>
+  </tr>
+  <tr>
+    <td style="padding: 12px 14px; border-bottom: 1px solid #d9e5ec; color: #4d6575; font-size: 13px;">Email</td>
+    <td style="padding: 12px 14px; border-bottom: 1px solid #d9e5ec; font-size: 14px; color: #123447;"><strong><%= @contact_form.email %></strong></td>
+  </tr>
+  <tr>
+    <td style="padding: 12px 14px; border-bottom: 1px solid #d9e5ec; color: #4d6575; font-size: 13px;">Company</td>
+    <td style="padding: 12px 14px; border-bottom: 1px solid #d9e5ec; font-size: 14px; color: #123447;"><strong><%= @contact_form.company %></strong></td>
+  </tr>
+  <tr>
+    <td style="padding: 12px 14px; color: #4d6575; font-size: 13px;">Sign up for updates</td>
+    <td style="padding: 12px 14px; font-size: 14px; color: #123447;"><strong><%= @contact_form.subscribe_updates ? "Yes" : "No" %></strong></td>
+  </tr>
+</table>
+
+<p style="margin: 0 0 8px; font-size: 13px; color: #4d6575; text-transform: uppercase; letter-spacing: 0.05em;"><strong>Message</strong></p>
+<div style="padding: 12px 14px; border-radius: 10px; border: 1px solid #d9e5ec; background-color: #ffffff; color: #123447; font-size: 14px; line-height: 1.45;">
+  <%= simple_format(@contact_form.message) %>
+</div>

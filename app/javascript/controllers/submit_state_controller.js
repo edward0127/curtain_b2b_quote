@@ -2,6 +2,10 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["button", "label", "spinner", "message"]
+  static values = {
+    submittingLabel: String,
+    submittingMessage: String
+  }
 
   connect() {
     this.originalLabel = this.hasLabelTarget ? this.labelTarget.textContent.trim() : ""
@@ -14,7 +18,7 @@ export default class extends Controller {
     }
 
     if (this.hasLabelTarget) {
-      this.labelTarget.textContent = "Submitting..."
+      this.labelTarget.textContent = this.hasSubmittingLabelValue ? this.submittingLabelValue : "Submitting..."
     }
 
     if (this.hasSpinnerTarget) {
@@ -22,7 +26,7 @@ export default class extends Controller {
     }
 
     if (this.hasMessageTarget) {
-      this.messageTarget.textContent = "Submitting quote request. Please wait..."
+      this.messageTarget.textContent = this.hasSubmittingMessageValue ? this.submittingMessageValue : "Submitting quote request. Please wait..."
     }
   }
 
