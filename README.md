@@ -131,3 +131,20 @@ Useful commands:
 - `./script/deploy.sh logs`
 - `./script/deploy.sh migrate`
 - `./script/deploy.sh down`
+
+
+```bash
+SHA=$(git rev-parse --short HEAD)
+docker buildx build --platform linux/amd64 \
+  -t ghcr.io/edward0127/curtain_b2b_quote:$SHA \
+  -t ghcr.io/edward0127/curtain_b2b_quote:latest \
+  --push .
+```
+
+then on the docker server, run the command to redeploy
+
+```bash
+cd /var/curtain_b2b_quote
+git pull
+./script/deploy.sh deploy
+```
