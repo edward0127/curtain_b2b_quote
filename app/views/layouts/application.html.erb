@@ -93,6 +93,11 @@
           <%= link_to "Terms of Service", terms_path %>
           <span>|</span>
           <%= link_to "Privacy Policy", privacy_path %>
+          <span>|</span>
+          <span>
+            Website designed by
+            <%= link_to "Tudouke Studio", "https://tudouke.com", target: "_blank", rel: "noopener" %>
+          </span>
         </footer>
       </main>
     <% else %>
@@ -154,6 +159,10 @@
             <%= link_to "Builders & Developers", builders_path, data: { turbo_frame: "_top" } %>
             <%= link_to "Terms of Service", terms_path %>
             <%= link_to "Privacy Policy", privacy_path %>
+            <p>
+              Website designed by
+              <%= link_to "Tudouke Studio", "https://tudouke.com", target: "_blank", rel: "noopener" %>
+            </p>
           </div>
         </footer>
       </main>
