@@ -4,25 +4,25 @@ class PublicPagesControllerTest < ActionDispatch::IntegrationTest
   test "guest can access homepage" do
     get root_url
     assert_response :success
-    assert_select "h1", text: "Curtains & Tracks for Trade Partners"
+    assert_select "h1", text: "Your trade partner for exceptional interiors."
   end
 
   test "guest can access partners page" do
     get partners_url
     assert_response :success
-    assert_select "h1", text: "Who do we work with?"
+    assert_select "h1", text: "Who we work with"
   end
 
   test "guest can access builders page" do
     get builders_url
     assert_response :success
-    assert_select "h1", text: "The finishing touch that lifts every project"
+    assert_select "h1", text: "The finishing touch that completes every project"
   end
 
   test "guest can access builders-developers route" do
     get "/builders-developers"
     assert_response :success
-    assert_select "h1", text: "The finishing touch that lifts every project"
+    assert_select "h1", text: "The finishing touch that completes every project"
   end
 
   test "guest can submit get in touch form" do

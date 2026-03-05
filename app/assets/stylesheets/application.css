@@ -2513,3 +2513,176 @@ h3 {
 .lv-section .lv-actions .lv-pill.lv-pill--dark:hover {
   background: linear-gradient(150deg, rgba(89, 72, 53, 0.94), rgba(113, 93, 71, 0.94));
 }
+
+/* Spacing pass: align closer to the existing Light Vue website rhythm */
+.public-shell {
+  width: 100%;
+  max-width: none;
+  padding: 1.2rem clamp(0.9rem, 2.2vw, 2.4rem) 4.2rem;
+}
+
+.public-topbar {
+  margin-bottom: 1.4rem;
+  padding: 1rem 1.15rem;
+}
+
+.lv-hero {
+  min-height: 96vh;
+}
+
+.public-page--public-pages-home .lv-hero {
+  min-height: 100vh;
+}
+
+.lv-hero__content {
+  left: 2.2rem;
+  bottom: 3.2rem;
+  width: min(760px, calc(100% - 4.4rem));
+  padding: 1.9rem 2.2rem 1.85rem;
+  border-radius: 10px;
+}
+
+.lv-hero__content h1 {
+  margin-bottom: 0.8rem;
+}
+
+.lv-hero__content p {
+  max-width: 62ch;
+}
+
+.lv-hero__signals {
+  margin-top: 1rem;
+  gap: 0.55rem;
+}
+
+.lv-actions {
+  margin-top: 1.2rem;
+}
+
+.lv-section {
+  margin-top: 2.5rem;
+  padding: 2.15rem 2.25rem;
+  border-radius: 14px;
+}
+
+.lv-section__header {
+  margin-bottom: 1.35rem;
+  padding-bottom: 0.95rem;
+  gap: 0.45rem;
+}
+
+.lv-feature-grid {
+  gap: 1.3rem;
+}
+
+.lv-feature-card {
+  padding: 1rem;
+  border-radius: 12px;
+}
+
+.lv-feature-card img {
+  min-height: 180px;
+}
+
+.lv-product-grid {
+  gap: 1.2rem;
+}
+
+.lv-product-card {
+  border-radius: 12px;
+}
+
+.lv-product-card img {
+  height: 236px;
+}
+
+.lv-section--split {
+  gap: 1.35rem;
+}
+
+.lv-panel {
+  padding: 1.15rem 1.2rem;
+  border-radius: 12px;
+}
+
+.lv-panel__image {
+  max-height: 560px;
+}
+
+.lv-partner-grid {
+  gap: 0.95rem;
+}
+
+.lv-partner-grid article {
+  padding: 0.95rem 1.05rem;
+}
+
+.lv-contact-layout {
+  gap: 2.2rem;
+}
+
+.public-footer {
+  margin-top: 2rem;
+  padding: 1.45rem 1.55rem;
+  border-radius: 14px;
+}
+
+.public-footer__legal {
+  gap: 0.65rem;
+}
+
+@media (max-width: 900px) {
+  .public-shell {
+    padding: 0.9rem 0.75rem 2.4rem;
+  }
+
+  .public-topbar {
+    margin-bottom: 0.95rem;
+    padding: 0.78rem;
+  }
+
+  .lv-hero,
+  .public-page--public-pages-home .lv-hero,
+  .public-page--public-pages-partners .lv-hero,
+  .public-page--public-pages-builders .lv-hero {
+    min-height: 82vh;
+  }
+
+  .lv-hero__image,
+  .public-page--public-pages-partners .lv-hero__image,
+  .public-page--public-pages-builders .lv-hero__image {
+    height: 82vh;
+  }
+
+  .lv-hero__content {
+    left: 1rem;
+    bottom: 1rem;
+    width: calc(100% - 2rem);
+    padding: 1.1rem 1.15rem 1.05rem;
+  }
+
+  .lv-section {
+    margin-top: 1.35rem;
+    padding: 1.2rem 1.05rem;
+    border-radius: 10px;
+  }
+
+  .lv-feature-grid,
+  .lv-product-grid,
+  .lv-section--split,
+  .lv-partner-grid,
+  .public-footer {
+    gap: 0.85rem;
+  }
+
+  .lv-feature-card img,
+  .lv-product-card img {
+    min-height: 0;
+    height: 190px;
+  }
+
+  .public-footer {
+    margin-top: 1.4rem;
+    padding: 1.05rem;
+  }
+}

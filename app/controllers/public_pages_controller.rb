@@ -3,12 +3,15 @@ class PublicPagesController < ApplicationController
   before_action :build_contact_form, only: [ :home, :partners, :builders ]
 
   def home
+    render template: "public_pages/home"
   end
 
   def partners
+    render template: "public_pages/partners"
   end
 
   def builders
+    render template: "public_pages/builders"
   end
 
   def create_contact

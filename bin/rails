@@ -1,4 +1,32 @@
 #!/usr/bin/env ruby.exe
-APP_PATH = File.expand_path("../config/application", __dir__)
+
+app_path = File.expand_path("../config/application", __dir__)
+
+if Gem.win_platform?
+  normalize_windows_path = lambda do |path|
+    expanded = File.expand_path(path).tr("\\", "/")
+    drive, remainder = expanded.split(":/", 2)
+    next expanded unless drive
+
+    current = "#{drive.upcase}:/"
+
+    remainder.to_s.split("/").reject(&:empty?).each do |segment|
+      begin
+        entries = Dir.children(current)
+        match = entries.find { |entry| entry.casecmp(segment).zero? }
+      rescue StandardError
+        match = nil
+      end
+
+      current = File.join(current, match || segment)
+    end
+
+    current.tr("\\", "/")
+  end
+
+  app_path = normalize_windows_path.call(app_path)
+end
+
+APP_PATH = app_path
 require_relative "../config/boot"
 require "rails/commands"
