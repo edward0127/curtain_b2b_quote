@@ -2516,9 +2516,21 @@ h3 {
 
 /* Spacing pass: align closer to the existing Light Vue website rhythm */
 .public-shell {
+  --public-shell-gutter: clamp(0.9rem, 2.2vw, 2.4rem);
   width: 100%;
   max-width: none;
-  padding: 1.2rem clamp(0.9rem, 2.2vw, 2.4rem) 4.2rem;
+  padding: 1.2rem var(--public-shell-gutter) 4.2rem;
+}
+
+.public-shell > .lv-hero {
+  width: calc(100% + (var(--public-shell-gutter) * 2));
+  margin-inline: calc(var(--public-shell-gutter) * -1);
+}
+
+.public-shell > .lv-hero,
+.public-shell > .lv-hero .lv-hero__image,
+.public-shell > .lv-hero .lv-hero__veil {
+  border-radius: 0;
 }
 
 .public-topbar {
@@ -2633,7 +2645,8 @@ h3 {
 
 @media (max-width: 900px) {
   .public-shell {
-    padding: 0.9rem 0.75rem 2.4rem;
+    --public-shell-gutter: 0.75rem;
+    padding: 0.9rem var(--public-shell-gutter) 2.4rem;
   }
 
   .public-topbar {
