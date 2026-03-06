@@ -160,6 +160,7 @@ This project includes:
 - `docker-compose.yml`
 - `.env.prod.example`
 - `script/deploy.sh`
+- `script/deploy_production.sh` (run from your local machine)
 
 Recommended for your existing server with multiple containers: bind this app to a new host port (default `3012`) to avoid conflicts.
 
@@ -219,30 +220,30 @@ Useful commands:
 - `./script/deploy.sh migrate`
 - `./script/deploy.sh down`
 
+### Automated Production Deploy (Local Machine)
+
+Use the helper script to automate push, Docker build/push, and remote deploy:
 
 ```bash
-SHA=$(git rev-parse --short HEAD)
-docker buildx build --platform linux/amd64 \
-  -t ghcr.io/edward0127/curtain_b2b_quote:$SHA \
-  -t ghcr.io/edward0127/curtain_b2b_quote:latest \
-  --push .
+./script/deploy_production.sh --auto-commit "Your deploy message"
 ```
 
-then on the docker server, run the command to redeploy
+What it does:
+
+1. Optionally commits your local changes (`--auto-commit`).
+2. Pushes current git branch.
+3. Builds and pushes `ghcr.io/edward0127/curtain_b2b_quote:<short_sha>` and `ghcr.io/edward0127/curtain_b2b_quote:latest`.
+4. SSHes to `root@amituofo.com.au` and runs `cd /var/curtain_b2b_quote && git pull --ff-only && ./script/deploy.sh deploy`.
+
+Examples:
 
 ```bash
-cd /var/curtain_b2b_quote
-git pull
-./script/deploy.sh deploy
-```
+# Full end-to-end deploy with auto-commit
+./script/deploy_production.sh --auto-commit "Homepage + editor updates"
 
-Hi currently when new changes are done, I need to commit the change and push to remote repo, then regenerate the docker image via the command:
-  SHA=$(git rev-parse --short HEAD)
-  docker buildx build --platform linux/amd64 \
-    -t ghcr.io/edward0127/curtain_b2b_quote:$SHA \
-    -t ghcr.io/edward0127/curtain_b2b_quote:latest \
-    --push .
-  then run the command to ssh to remote server: ssh root@amituofo.com.au and go to the dictionary /var/curtain_b2b_quote and run the command to update the live site
-  git pull
-  ./script/deploy.sh deploy
-  Could you automate the whole process similar to C:\Users\edward\projects\saas_savings_site\script\deploy_production.sh does?
+# Build and push image only (no remote SSH deploy)
+./script/deploy_production.sh --skip-remote
+
+# Use a custom SSH key
+./script/deploy_production.sh --auto-commit "Deploy changes" --ssh-key ~/.ssh/id_ed25519
+```
