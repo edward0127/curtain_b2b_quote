@@ -1,6 +1,11 @@
 <section class="partners-editor-toolbar">
   <p class="partners-editor-note">Edit mode is enabled. Click text to edit, then click Save Draft before Preview or Publish.</p>
   <p class="partners-editor-note partners-editor-note--dirty" data-partners-editor-target="dirtyNotice" hidden>Unsaved changes in browser only. Click Save Draft to include them in preview/publish.</p>
+  <p class="partners-editor-note partners-editor-note--processing"
+     data-partners-editor-target="processingNotice"
+     role="status"
+     aria-live="polite"
+     hidden>Processing changes now. Please wait...</p>
 
   <div class="partners-editor-toolbar__grid">
     <label>
@@ -77,8 +82,29 @@
   </div>
 
   <div class="partners-editor-toolbar__actions">
-    <%= button_tag "Save Draft", type: "submit", name: "editor_action", value: "save", class: "button button--secondary", data: { partners_editor_target: "saveButton" } %>
-    <%= button_tag "Preview", type: "submit", name: "editor_action", value: "preview", class: "button button--ghost", formtarget: "_blank" %>
-    <%= button_tag "Publish", type: "submit", name: "editor_action", value: "publish", class: [ "button", "button--primary", ("partners-editor-button--pending" if draft_pending) ].compact.join(" "), data: { partners_editor_target: "publishButton", turbo_confirm: "Publish saved draft changes now?" } %>
+    <%= hidden_field_tag :editor_action, "", data: { partners_editor_target: "editorAction" } %>
+    <%= button_tag type: "submit",
+                   name: "editor_action",
+                   value: "save",
+                   class: "button button--secondary button--with-spinner",
+                   data: { partners_editor_target: "saveButton actionButton" } do %>
+      <span data-partners-editor-target="saveButtonLabel">Save Draft</span>
+      <span class="button__spinner" data-partners-editor-target="saveButtonSpinner" hidden aria-hidden="true"></span>
+    <% end %>
+    <%= button_tag "Preview",
+                   type: "submit",
+                   name: "editor_action",
+                   value: "preview",
+                   class: "button button--ghost",
+                   formtarget: "_blank",
+                   data: { partners_editor_target: "actionButton" } %>
+    <%= button_tag type: "submit",
+                   name: "editor_action",
+                   value: "publish",
+                   class: [ "button", "button--primary", "button--with-spinner", ("partners-editor-button--pending" if draft_pending) ].compact.join(" "),
+                   data: { partners_editor_target: "publishButton actionButton", turbo_confirm: "Publish saved draft changes now?" } do %>
+      <span data-partners-editor-target="publishButtonLabel">Publish</span>
+      <span class="button__spinner" data-partners-editor-target="publishButtonSpinner" hidden aria-hidden="true"></span>
+    <% end %>
   </div>
 </section>

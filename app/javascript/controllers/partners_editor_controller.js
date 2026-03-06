@@ -3,6 +3,7 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static targets = [
     "payload",
+    "editorAction",
     "editable",
     "selectedLabel",
     "fontSize",
@@ -16,9 +17,15 @@ export default class extends Controller {
     "fontItalic",
     "imageInput",
     "imagePreview",
+    "actionButton",
     "saveButton",
+    "saveButtonLabel",
+    "saveButtonSpinner",
     "publishButton",
-    "dirtyNotice"
+    "publishButtonLabel",
+    "publishButtonSpinner",
+    "dirtyNotice",
+    "processingNotice"
   ]
 
   static values = {
@@ -38,10 +45,15 @@ export default class extends Controller {
   }
 
   beforeSubmit(event) {
-    const action = event.submitter?.value || ""
+    const action = event.submitter?.value || "save"
+
+    if (this.hasEditorActionTarget) {
+      this.editorActionTarget.value = action
+    }
 
     if (action === "save") {
       this.payloadTarget.value = JSON.stringify(this.payload)
+      this.startProcessing(action)
       return
     }
 
@@ -54,6 +66,10 @@ export default class extends Controller {
     }
 
     this.payloadTarget.value = JSON.stringify(this.savedPayload)
+
+    if (action === "publish") {
+      this.startProcessing(action)
+    }
   }
 
   pickImage(event) {
@@ -246,7 +262,7 @@ export default class extends Controller {
     if (this.dirty) {
       if (this.hasSaveButtonTarget) {
         this.saveButtonTarget.classList.add("partners-editor-button--dirty")
-        this.saveButtonTarget.textContent = "Save Draft (Unsaved)"
+        this.setSaveButtonLabel("Save Draft (Unsaved)")
       }
 
       if (this.hasDirtyNoticeTarget) {
@@ -264,7 +280,7 @@ export default class extends Controller {
 
     if (this.hasSaveButtonTarget) {
       this.saveButtonTarget.classList.remove("partners-editor-button--dirty")
-      this.saveButtonTarget.textContent = "Save Draft"
+      this.setSaveButtonLabel("Save Draft")
     }
 
     if (this.hasDirtyNoticeTarget) {
@@ -283,6 +299,52 @@ export default class extends Controller {
   applyPendingState() {
     if (this.draftPendingValue && this.hasPublishButtonTarget) {
       this.publishButtonTarget.classList.add("partners-editor-button--pending")
+    }
+  }
+
+  startProcessing(action) {
+    this.actionButtonTargets.forEach((button) => {
+      button.disabled = true
+      button.setAttribute("aria-busy", "true")
+    })
+
+    if (this.hasDirtyNoticeTarget) {
+      this.dirtyNoticeTarget.hidden = true
+    }
+
+    if (this.hasProcessingNoticeTarget) {
+      this.processingNoticeTarget.textContent = action === "publish" ? "Publishing changes now. Please wait..." : "Saving draft changes now. Please wait..."
+      this.processingNoticeTarget.hidden = false
+    }
+
+    this.toggleActionSpinners(action)
+  }
+
+  toggleActionSpinners(action) {
+    if (this.hasSaveButtonSpinnerTarget) {
+      this.saveButtonSpinnerTarget.hidden = action !== "save"
+    }
+    if (this.hasPublishButtonSpinnerTarget) {
+      this.publishButtonSpinnerTarget.hidden = action !== "publish"
+    }
+
+    if (action === "save") {
+      this.setSaveButtonLabel("Saving Draft...")
+    }
+
+    if (action === "publish" && this.hasPublishButtonLabelTarget) {
+      this.publishButtonLabelTarget.textContent = "Publishing..."
+    }
+  }
+
+  setSaveButtonLabel(label) {
+    if (this.hasSaveButtonLabelTarget) {
+      this.saveButtonLabelTarget.textContent = label
+      return
+    }
+
+    if (this.hasSaveButtonTarget) {
+      this.saveButtonTarget.textContent = label
     }
   }
 

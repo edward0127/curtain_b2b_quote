@@ -3006,6 +3006,17 @@ h3 {
   font-weight: 700;
 }
 
+.partners-editor-note--processing {
+  color: #ffe1a8;
+  font-weight: 700;
+}
+
+.partners-editor-toolbar__actions .button--secondary .button__spinner,
+.partners-editor-toolbar__actions .button--ghost .button__spinner {
+  border-color: rgba(47, 38, 29, 0.32);
+  border-top-color: #2f261d;
+}
+
 .partners-editor-field {
   position: relative;
   border: 1px dashed rgba(248, 233, 208, 0.36);
