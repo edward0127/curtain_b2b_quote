@@ -7,6 +7,20 @@ class PublicPagesControllerTest < ActionDispatch::IntegrationTest
     assert_select "h1", text: "Your trade partner for exceptional interiors."
   end
 
+  test "homepage uses configurable public settings content" do
+    AppSetting.current.update!(
+      public_home_hero_title: "Configurable hero heading",
+      public_home_hero_image: "https://example.com/configurable-home.jpg",
+      public_cta_contact_label: "Reach us"
+    )
+
+    get root_url
+    assert_response :success
+    assert_select "h1", text: "Configurable hero heading"
+    assert_select "a", text: "Reach us"
+    assert_match "https://example.com/configurable-home.jpg", response.body
+  end
+
   test "guest can access partners page" do
     get partners_url
     assert_response :success
@@ -73,5 +87,31 @@ class PublicPagesControllerTest < ActionDispatch::IntegrationTest
 
     get builders_url
     assert_redirected_to dashboard_url
+  end
+
+  test "admin can open partners preview without dashboard redirect" do
+    sign_in users(:admin)
+    setting = AppSetting.current
+    payload = setting.partners_page_content(preview: false)
+    payload["texts"]["hero_title"] = "Draft Preview Heading"
+    setting.save_partners_page_draft!(payload)
+
+    get partners_url(preview: 1)
+    assert_response :success
+    assert_select "h1", text: "Draft Preview Heading"
+    assert_select "a", text: "Return to editor"
+  end
+
+  test "admin can access frontend pages without dashboard redirect" do
+    sign_in users(:admin)
+
+    get root_url
+    assert_response :success
+
+    get partners_url
+    assert_response :success
+
+    get builders_url
+    assert_response :success
   end
 end

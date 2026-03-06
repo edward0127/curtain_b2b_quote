@@ -6,6 +6,7 @@ class ApplicationController < ActionController::Base
   stale_when_importmap_changes
 
   helper_method :impersonating?, :impersonator_admin_user
+  helper_method :app_setting, :render_public_shell?, :public_edit_mode?
 
   protected
 
@@ -33,5 +34,22 @@ class ApplicationController < ActionController::Base
     return nil unless impersonating?
 
     @impersonator_admin_user ||= User.admin.find_by(id: session[:impersonator_admin_user_id])
+  end
+
+  def app_setting
+    @app_setting ||= AppSetting.current
+  end
+
+  def render_public_shell?
+    return true unless user_signed_in?
+    return false unless current_user&.admin?
+
+    controller_name == "partners_editor" || controller_name == "public_pages"
+  end
+
+  def public_edit_mode?
+    return false unless current_user&.admin?
+
+    controller_name == "partners_editor" || (controller_name == "public_pages" && [ params[:edit].to_s, params[:preview].to_s ].include?("1"))
   end
 end

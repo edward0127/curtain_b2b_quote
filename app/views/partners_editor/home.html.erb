@@ -1,0 +1,350 @@
+<% page_key = "home" %>
+<% home_texts = @page_content.fetch("texts", {}) %>
+<% home_images = @page_content.fetch("images", {}) %>
+<% home_styles = @page_content.fetch("styles", {}) %>
+
+<%= form_with url: update_page_editor_path(page: page_key),
+              method: :patch,
+              html: { multipart: true, class: "partners-editor-shell" },
+              data: {
+                controller: "partners-editor",
+                action: "submit->partners-editor#beforeSubmit",
+                turbo: false,
+                partners_editor_font_map_value: AppSetting::PUBLIC_FONT_STACKS.to_json,
+                partners_editor_draft_pending_value: @draft_pending.to_s
+              } do %>
+  <%= hidden_field_tag :page_payload_json, @page_content.to_json, data: { partners_editor_target: "payload" } %>
+
+  <%= render "toolbar", page_key: page_key, draft_pending: @draft_pending %>
+
+  <section class="lv-hero">
+    <div class="partners-editor-image" data-image-key="hero_image" data-action="click->partners-editor#pickImage">
+      <%= image_tag home_images.fetch("hero_image"), class: "lv-hero__image", alt: "Warm-toned curtains in a modern interior", data: { partners_editor_target: "imagePreview", image_key: "hero_image" } %>
+    </div>
+    <%= file_field_tag "images[hero_image]", accept: "image/*", class: "partners-editor-file", data: { partners_editor_target: "imageInput", image_key: "hero_image", action: "change->partners-editor#imageChanged" } %>
+    <div class="lv-hero__veil"></div>
+    <article class="lv-hero__content">
+      <button type="button" class="partners-editor-image-button" data-image-key="hero_image" data-action="click->partners-editor#pickImage">Replace banner image</button>
+      <p class="lv-kicker">LIGHT VUE</p>
+      <h1 contenteditable="true"
+          class="partners-editor-field"
+          style="<%= public_text_style(home_styles, "hero_title") %>"
+          data-partners-editor-target="editable"
+          data-text-key="hero_title"
+          data-style-key="hero_title"
+          data-label="Hero title"
+          data-action="click->partners-editor#selectEditable input->partners-editor#updateText"><%= home_texts.fetch("hero_title") %></h1>
+      <p class="lv-lead partners-editor-field"
+         contenteditable="true"
+         style="<%= public_text_style(home_styles, "hero_lead") %>"
+         data-partners-editor-target="editable"
+         data-text-key="hero_lead"
+         data-style-key="hero_lead"
+         data-label="Hero subtitle"
+         data-action="click->partners-editor#selectEditable input->partners-editor#updateText"><%= home_texts.fetch("hero_lead") %></p>
+      <ul class="lv-hero__signals">
+        <li>Wholesale pricing</li>
+        <li>Reliable lead times</li>
+        <li>Consistent finish</li>
+      </ul>
+      <div class="lv-actions">
+        <%= link_to site_setting(:public_cta_contact_label), "#", class: "lv-pill", data: { turbo: false } %>
+        <%= link_to site_setting(:public_cta_login_label), "#", class: "lv-pill lv-pill--dark", data: { turbo: false } %>
+      </div>
+    </article>
+  </section>
+
+  <section class="lv-section">
+    <header class="lv-section__header">
+      <p class="lv-kicker">Why Light Vue</p>
+      <h2 contenteditable="true"
+          class="partners-editor-field"
+          style="<%= public_text_style(home_styles, "why_title") %>"
+          data-partners-editor-target="editable"
+          data-text-key="why_title"
+          data-style-key="why_title"
+          data-label="Why section heading"
+          data-action="click->partners-editor#selectEditable input->partners-editor#updateText"><%= home_texts.fetch("why_title") %></h2>
+    </header>
+
+    <div class="lv-feature-grid">
+      <article class="lv-feature-card">
+        <div class="partners-editor-image" data-image-key="why_card_1_image" data-action="click->partners-editor#pickImage">
+          <%= image_tag home_images.fetch("why_card_1_image"), alt: "S-wave curtain detail", data: { partners_editor_target: "imagePreview", image_key: "why_card_1_image" } %>
+        </div>
+        <%= file_field_tag "images[why_card_1_image]", accept: "image/*", class: "partners-editor-file", data: { partners_editor_target: "imageInput", image_key: "why_card_1_image", action: "change->partners-editor#imageChanged" } %>
+        <div>
+          <h3 contenteditable="true"
+              class="partners-editor-field"
+              style="<%= public_text_style(home_styles, "why_card_1_title") %>"
+              data-partners-editor-target="editable"
+              data-text-key="why_card_1_title"
+              data-style-key="why_card_1_title"
+              data-label="Why card 1 title"
+              data-action="click->partners-editor#selectEditable input->partners-editor#updateText"><%= home_texts.fetch("why_card_1_title") %></h3>
+          <p contenteditable="true"
+             class="partners-editor-field"
+             style="<%= public_text_style(home_styles, "why_card_1_body") %>"
+             data-partners-editor-target="editable"
+             data-text-key="why_card_1_body"
+             data-style-key="why_card_1_body"
+             data-label="Why card 1 body"
+             data-action="click->partners-editor#selectEditable input->partners-editor#updateText"><%= home_texts.fetch("why_card_1_body") %></p>
+        </div>
+      </article>
+      <article class="lv-feature-card">
+        <div class="partners-editor-image" data-image-key="why_card_2_image" data-action="click->partners-editor#pickImage">
+          <%= image_tag home_images.fetch("why_card_2_image"), alt: "Sheer curtains in a living room", data: { partners_editor_target: "imagePreview", image_key: "why_card_2_image" } %>
+        </div>
+        <%= file_field_tag "images[why_card_2_image]", accept: "image/*", class: "partners-editor-file", data: { partners_editor_target: "imageInput", image_key: "why_card_2_image", action: "change->partners-editor#imageChanged" } %>
+        <div>
+          <h3 contenteditable="true"
+              class="partners-editor-field"
+              style="<%= public_text_style(home_styles, "why_card_2_title") %>"
+              data-partners-editor-target="editable"
+              data-text-key="why_card_2_title"
+              data-style-key="why_card_2_title"
+              data-label="Why card 2 title"
+              data-action="click->partners-editor#selectEditable input->partners-editor#updateText"><%= home_texts.fetch("why_card_2_title") %></h3>
+          <p contenteditable="true"
+             class="partners-editor-field"
+             style="<%= public_text_style(home_styles, "why_card_2_body") %>"
+             data-partners-editor-target="editable"
+             data-text-key="why_card_2_body"
+             data-style-key="why_card_2_body"
+             data-label="Why card 2 body"
+             data-action="click->partners-editor#selectEditable input->partners-editor#updateText"><%= home_texts.fetch("why_card_2_body") %></p>
+        </div>
+      </article>
+      <article class="lv-feature-card">
+        <div class="partners-editor-image" data-image-key="why_card_3_image" data-action="click->partners-editor#pickImage">
+          <%= image_tag home_images.fetch("why_card_3_image"), alt: "Curtain fabric in hand", data: { partners_editor_target: "imagePreview", image_key: "why_card_3_image" } %>
+        </div>
+        <%= file_field_tag "images[why_card_3_image]", accept: "image/*", class: "partners-editor-file", data: { partners_editor_target: "imageInput", image_key: "why_card_3_image", action: "change->partners-editor#imageChanged" } %>
+        <div>
+          <h3 contenteditable="true"
+              class="partners-editor-field"
+              style="<%= public_text_style(home_styles, "why_card_3_title") %>"
+              data-partners-editor-target="editable"
+              data-text-key="why_card_3_title"
+              data-style-key="why_card_3_title"
+              data-label="Why card 3 title"
+              data-action="click->partners-editor#selectEditable input->partners-editor#updateText"><%= home_texts.fetch("why_card_3_title") %></h3>
+          <p contenteditable="true"
+             class="partners-editor-field"
+             style="<%= public_text_style(home_styles, "why_card_3_body") %>"
+             data-partners-editor-target="editable"
+             data-text-key="why_card_3_body"
+             data-style-key="why_card_3_body"
+             data-label="Why card 3 body"
+             data-action="click->partners-editor#selectEditable input->partners-editor#updateText"><%= home_texts.fetch("why_card_3_body") %></p>
+        </div>
+      </article>
+      <article class="lv-feature-card">
+        <div class="partners-editor-image" data-image-key="why_card_4_image" data-action="click->partners-editor#pickImage">
+          <%= image_tag home_images.fetch("why_card_4_image"), alt: "Open space with sheers", data: { partners_editor_target: "imagePreview", image_key: "why_card_4_image" } %>
+        </div>
+        <%= file_field_tag "images[why_card_4_image]", accept: "image/*", class: "partners-editor-file", data: { partners_editor_target: "imageInput", image_key: "why_card_4_image", action: "change->partners-editor#imageChanged" } %>
+        <div>
+          <h3 contenteditable="true"
+              class="partners-editor-field"
+              style="<%= public_text_style(home_styles, "why_card_4_title") %>"
+              data-partners-editor-target="editable"
+              data-text-key="why_card_4_title"
+              data-style-key="why_card_4_title"
+              data-label="Why card 4 title"
+              data-action="click->partners-editor#selectEditable input->partners-editor#updateText"><%= home_texts.fetch("why_card_4_title") %></h3>
+          <p contenteditable="true"
+             class="partners-editor-field"
+             style="<%= public_text_style(home_styles, "why_card_4_body") %>"
+             data-partners-editor-target="editable"
+             data-text-key="why_card_4_body"
+             data-style-key="why_card_4_body"
+             data-label="Why card 4 body"
+             data-action="click->partners-editor#selectEditable input->partners-editor#updateText"><%= home_texts.fetch("why_card_4_body") %></p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="lv-section">
+    <header class="lv-section__header">
+      <p class="lv-kicker">Products</p>
+      <h2 contenteditable="true"
+          class="partners-editor-field"
+          style="<%= public_text_style(home_styles, "products_title") %>"
+          data-partners-editor-target="editable"
+          data-text-key="products_title"
+          data-style-key="products_title"
+          data-label="Products section heading"
+          data-action="click->partners-editor#selectEditable input->partners-editor#updateText"><%= home_texts.fetch("products_title") %></h2>
+    </header>
+
+    <div class="lv-product-grid">
+      <article class="lv-product-card">
+        <div class="partners-editor-image" data-image-key="product_1_image" data-action="click->partners-editor#pickImage">
+          <%= image_tag home_images.fetch("product_1_image"), alt: "Bedroom with sheer curtains", data: { partners_editor_target: "imagePreview", image_key: "product_1_image" } %>
+        </div>
+        <%= file_field_tag "images[product_1_image]", accept: "image/*", class: "partners-editor-file", data: { partners_editor_target: "imageInput", image_key: "product_1_image", action: "change->partners-editor#imageChanged" } %>
+        <div>
+          <h3 contenteditable="true"
+              class="partners-editor-field"
+              style="<%= public_text_style(home_styles, "product_1_title") %>"
+              data-partners-editor-target="editable"
+              data-text-key="product_1_title"
+              data-style-key="product_1_title"
+              data-label="Product 1 title"
+              data-action="click->partners-editor#selectEditable input->partners-editor#updateText"><%= home_texts.fetch("product_1_title") %></h3>
+          <p contenteditable="true"
+             class="partners-editor-field"
+             style="<%= public_text_style(home_styles, "product_1_body") %>"
+             data-partners-editor-target="editable"
+             data-text-key="product_1_body"
+             data-style-key="product_1_body"
+             data-label="Product 1 body"
+             data-action="click->partners-editor#selectEditable input->partners-editor#updateText"><%= home_texts.fetch("product_1_body") %></p>
+        </div>
+      </article>
+      <article class="lv-product-card">
+        <div class="partners-editor-image" data-image-key="product_2_image" data-action="click->partners-editor#pickImage">
+          <%= image_tag home_images.fetch("product_2_image"), alt: "Pleated sheer curtain", data: { partners_editor_target: "imagePreview", image_key: "product_2_image" } %>
+        </div>
+        <%= file_field_tag "images[product_2_image]", accept: "image/*", class: "partners-editor-file", data: { partners_editor_target: "imageInput", image_key: "product_2_image", action: "change->partners-editor#imageChanged" } %>
+        <div>
+          <h3 contenteditable="true"
+              class="partners-editor-field"
+              style="<%= public_text_style(home_styles, "product_2_title") %>"
+              data-partners-editor-target="editable"
+              data-text-key="product_2_title"
+              data-style-key="product_2_title"
+              data-label="Product 2 title"
+              data-action="click->partners-editor#selectEditable input->partners-editor#updateText"><%= home_texts.fetch("product_2_title") %></h3>
+          <p contenteditable="true"
+             class="partners-editor-field"
+             style="<%= public_text_style(home_styles, "product_2_body") %>"
+             data-partners-editor-target="editable"
+             data-text-key="product_2_body"
+             data-style-key="product_2_body"
+             data-label="Product 2 body"
+             data-action="click->partners-editor#selectEditable input->partners-editor#updateText"><%= home_texts.fetch("product_2_body") %></p>
+        </div>
+      </article>
+      <article class="lv-product-card">
+        <div class="partners-editor-image" data-image-key="product_3_image" data-action="click->partners-editor#pickImage">
+          <%= image_tag home_images.fetch("product_3_image"), alt: "Floor to ceiling curtain in neutral interior", data: { partners_editor_target: "imagePreview", image_key: "product_3_image" } %>
+        </div>
+        <%= file_field_tag "images[product_3_image]", accept: "image/*", class: "partners-editor-file", data: { partners_editor_target: "imageInput", image_key: "product_3_image", action: "change->partners-editor#imageChanged" } %>
+        <div>
+          <h3 contenteditable="true"
+              class="partners-editor-field"
+              style="<%= public_text_style(home_styles, "product_3_title") %>"
+              data-partners-editor-target="editable"
+              data-text-key="product_3_title"
+              data-style-key="product_3_title"
+              data-label="Product 3 title"
+              data-action="click->partners-editor#selectEditable input->partners-editor#updateText"><%= home_texts.fetch("product_3_title") %></h3>
+          <p contenteditable="true"
+             class="partners-editor-field"
+             style="<%= public_text_style(home_styles, "product_3_body") %>"
+             data-partners-editor-target="editable"
+             data-text-key="product_3_body"
+             data-style-key="product_3_body"
+             data-label="Product 3 body"
+             data-action="click->partners-editor#selectEditable input->partners-editor#updateText"><%= home_texts.fetch("product_3_body") %></p>
+        </div>
+      </article>
+      <article class="lv-product-card">
+        <div class="partners-editor-image" data-image-key="product_4_image" data-action="click->partners-editor#pickImage">
+          <%= image_tag home_images.fetch("product_4_image"), alt: "Fabric texture closeup", data: { partners_editor_target: "imagePreview", image_key: "product_4_image" } %>
+        </div>
+        <%= file_field_tag "images[product_4_image]", accept: "image/*", class: "partners-editor-file", data: { partners_editor_target: "imageInput", image_key: "product_4_image", action: "change->partners-editor#imageChanged" } %>
+        <div>
+          <h3 contenteditable="true"
+              class="partners-editor-field"
+              style="<%= public_text_style(home_styles, "product_4_title") %>"
+              data-partners-editor-target="editable"
+              data-text-key="product_4_title"
+              data-style-key="product_4_title"
+              data-label="Product 4 title"
+              data-action="click->partners-editor#selectEditable input->partners-editor#updateText"><%= home_texts.fetch("product_4_title") %></h3>
+          <p contenteditable="true"
+             class="partners-editor-field"
+             style="<%= public_text_style(home_styles, "product_4_body") %>"
+             data-partners-editor-target="editable"
+             data-text-key="product_4_body"
+             data-style-key="product_4_body"
+             data-label="Product 4 body"
+             data-action="click->partners-editor#selectEditable input->partners-editor#updateText"><%= home_texts.fetch("product_4_body") %></p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="lv-section lv-section--contact-form">
+    <div class="lv-contact-layout">
+      <div class="lv-contact-intro">
+        <h2 contenteditable="true"
+            class="partners-editor-field"
+            style="<%= public_text_style(home_styles, "contact_title") %>"
+            data-partners-editor-target="editable"
+            data-text-key="contact_title"
+            data-style-key="contact_title"
+            data-label="Contact section title"
+            data-action="click->partners-editor#selectEditable input->partners-editor#updateText"><%= home_texts.fetch("contact_title") %></h2>
+        <h3 contenteditable="true"
+            class="partners-editor-field"
+            style="<%= public_text_style(home_styles, "contact_subtitle") %>"
+            data-partners-editor-target="editable"
+            data-text-key="contact_subtitle"
+            data-style-key="contact_subtitle"
+            data-label="Contact section subtitle"
+            data-action="click->partners-editor#selectEditable input->partners-editor#updateText"><%= home_texts.fetch("contact_subtitle") %></h3>
+        <p contenteditable="true"
+           class="partners-editor-field"
+           style="<%= public_text_style(home_styles, "contact_intro_lead") %>"
+           data-partners-editor-target="editable"
+           data-text-key="contact_intro_lead"
+           data-style-key="contact_intro_lead"
+           data-label="Contact intro paragraph"
+           data-action="click->partners-editor#selectEditable input->partners-editor#updateText"><%= home_texts.fetch("contact_intro_lead") %></p>
+        <p><a href="mailto:info@lightvue.com.au">E: info@lightvue.com.au</a></p>
+        <p><a href="tel:+61431262042">P: 0431 262 042</a></p>
+      </div>
+
+      <div class="lv-contact-form-wrap">
+        <div class="lv-contact-form">
+          <p class="lv-form-row lv-form-row--label">Live form remains on the published page.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="public-footer card">
+    <div class="public-footer__brand">
+      <%= image_tag "lightvue-logo-white.png", alt: "Light Vue logo", class: "public-footer__logo" %>
+      <p contenteditable="true"
+         class="partners-editor-field"
+         style="<%= public_text_style(home_styles, "footer_tagline") %>"
+         data-partners-editor-target="editable"
+         data-text-key="footer_tagline"
+         data-style-key="footer_tagline"
+         data-label="Footer tagline"
+         data-action="click->partners-editor#selectEditable input->partners-editor#updateText"><%= home_texts.fetch("footer_tagline") %></p>
+    </div>
+    <div class="public-footer__contact">
+      <p><a href="mailto:info@lightvue.com.au">E: info@lightvue.com.au</a></p>
+      <p><a href="tel:+61431262042">P: 0431 262 042</a></p>
+    </div>
+    <div class="public-footer__legal">
+      <%= link_to "Home", edit_pages_path, data: { turbo_frame: "_top" } %>
+      <%= link_to "Partners", edit_partners_page_path, data: { turbo_frame: "_top" } %>
+      <%= link_to "Builders & Developers", edit_builders_page_path, data: { turbo_frame: "_top" } %>
+      <%= link_to "Terms of Service", terms_path %>
+      <%= link_to "Privacy Policy", privacy_path %>
+      <p>
+        Website designed by
+        <%= link_to "Tudouke Studio", "https://tudouke.com", target: "_blank", rel: "noopener" %>
+      </p>
+    </div>
+  </footer>
+<% end %>

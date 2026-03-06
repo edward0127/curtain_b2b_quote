@@ -23,12 +23,12 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="<%= if user_signed_in?
-    "app-body app-body--portal"
+  <body class="<%= if render_public_shell?
+    "app-body app-body--public public-page public-page--#{controller_name.dasherize}-#{action_name.dasherize} public-heading-font-#{public_font_class(:public_heading_font)} public-body-font-#{public_font_class(:public_body_font)}"
   else
-    "app-body app-body--public public-page public-page--#{controller_name.dasherize}-#{action_name.dasherize}"
+    "app-body app-body--portal"
   end %>">
-    <% if user_signed_in? %>
+    <% if !render_public_shell? %>
       <main class="app-shell">
         <header class="topbar card card--blur">
           <div>
@@ -56,6 +56,7 @@
                 <%= link_to "Templates", admin_quote_templates_path, data: { turbo_frame: "_top" } %>
                 <%= link_to "Jobs", admin_jobs_path, data: { turbo_frame: "_top" } %>
                 <%= link_to "Open System Settings", dashboard_path(tab: :settings, compact: 1), data: { turbo_frame: "_top" } %>
+                <%= link_to "Edit Pages", edit_pages_path, data: { turbo_frame: "_top" } %>
               <% else %>
                 <%= link_to "Submit a New Quote", dashboard_path(tab: :new_quote), data: { turbo_frame: "_top" } %>
                 <%= link_to "View Full Quote History", dashboard_path(tab: :history), data: { turbo_frame: "_top" } %>
@@ -101,9 +102,15 @@
         </footer>
       </main>
     <% else %>
+      <% admin_public = current_user&.admin? %>
+      <% edit_mode = public_edit_mode? %>
+      <% home_nav_path = edit_mode ? edit_pages_path : root_path %>
+      <% partners_nav_path = edit_mode ? edit_partners_page_path : partners_path %>
+      <% builders_nav_path = edit_mode ? edit_builders_page_path : builders_path %>
+
       <main class="public-shell">
         <header class="public-topbar" data-controller="topbar">
-          <%= link_to root_path, class: "public-brand", data: { turbo_frame: "_top" } do %>
+          <%= link_to home_nav_path, class: "public-brand", data: { turbo_frame: "_top" } do %>
             <%= image_tag "lightvue-logo-white.png", alt: "Light Vue logo", class: "public-brand__logo" %>
             <span class="public-brand__meta">
               <span class="public-brand__name">Light Vue</span>
@@ -112,10 +119,20 @@
           <% end %>
 
           <nav class="public-nav">
-            <%= link_to "Home", root_path, class: [ "public-nav__link", ("public-nav__link--active" if current_page?(root_path)) ].compact.join(" "), data: { turbo_frame: "_top" } %>
-            <%= link_to "Partners", partners_path, class: [ "public-nav__link", ("public-nav__link--active" if current_page?(partners_path)) ].compact.join(" "), data: { turbo_frame: "_top" } %>
-            <%= link_to "Builders & Developers", builders_path, class: [ "public-nav__link", ("public-nav__link--active" if current_page?(builders_path)) ].compact.join(" "), data: { turbo_frame: "_top" } %>
-            <%= link_to "B2B Login", new_user_session_path, class: [ "public-nav__link", ("public-nav__link--active" if current_page?(new_user_session_path)) ].compact.join(" "), data: { turbo_frame: "_top" } %>
+            <%= link_to "Home", home_nav_path, class: [ "public-nav__link", ("public-nav__link--active" if current_page?(home_nav_path)) ].compact.join(" "), data: { turbo_frame: "_top" } %>
+            <%= link_to "Partners", partners_nav_path, class: [ "public-nav__link", ("public-nav__link--active" if current_page?(partners_nav_path)) ].compact.join(" "), data: { turbo_frame: "_top" } %>
+            <%= link_to "Builders & Developers", builders_nav_path, class: [ "public-nav__link", ("public-nav__link--active" if current_page?(builders_nav_path)) ].compact.join(" "), data: { turbo_frame: "_top" } %>
+            <% if admin_public %>
+              <% if edit_mode %>
+                <%= link_to "View Live", root_path, class: "public-nav__link", data: { turbo_frame: "_top" } %>
+              <% else %>
+                <%= link_to "Edit Pages", edit_pages_path, class: [ "public-nav__link", ("public-nav__link--active" if current_page?(edit_pages_path)) ].compact.join(" "), data: { turbo_frame: "_top" } %>
+              <% end %>
+              <%= link_to "Dashboard", dashboard_path, class: "public-nav__link", data: { turbo_frame: "_top" } %>
+              <%= button_to "Sign out", destroy_user_session_path, method: :delete, class: "public-nav__link public-nav__link--button", form: { class: "inline-form" } %>
+            <% else %>
+              <%= link_to site_setting(:public_cta_login_label), new_user_session_path, class: [ "public-nav__link", ("public-nav__link--active" if current_page?(new_user_session_path)) ].compact.join(" "), data: { turbo_frame: "_top" } %>
+            <% end %>
           </nav>
         </header>
 
@@ -136,7 +153,7 @@
           </div>
         <% end %>
 
-        <% if controller_name == "public_pages" %>
+        <% if [ "public_pages", "partners_editor" ].include?(controller_name) %>
           <%= yield %>
         <% else %>
           <section class="public-static card card--content">
@@ -144,27 +161,34 @@
           </section>
         <% end %>
 
-        <footer class="public-footer card">
-          <div class="public-footer__brand">
-            <%= image_tag "lightvue-logo-white.png", alt: "Light Vue logo", class: "public-footer__logo" %>
-            <p>Not just your ordinary curtain supplier.</p>
-          </div>
-          <div class="public-footer__contact">
-            <p><a href="mailto:info@lightvue.com.au">E: info@lightvue.com.au</a></p>
-            <p><a href="tel:+61431262042">P: 0431 262 042</a></p>
-          </div>
-          <div class="public-footer__legal">
-            <%= link_to "Home", root_path, data: { turbo_frame: "_top" } %>
-            <%= link_to "Partners", partners_path, data: { turbo_frame: "_top" } %>
-            <%= link_to "Builders & Developers", builders_path, data: { turbo_frame: "_top" } %>
-            <%= link_to "Terms of Service", terms_path %>
-            <%= link_to "Privacy Policy", privacy_path %>
-            <p>
-              Website designed by
-              <%= link_to "Tudouke Studio", "https://tudouke.com", target: "_blank", rel: "noopener" %>
-            </p>
-          </div>
-        </footer>
+        <% unless controller_name == "partners_editor" && action_name == "home" %>
+          <footer class="public-footer card">
+            <% footer_tagline = if controller_name == "public_pages" && action_name == "home" && defined?(@home_content) && @home_content.present?
+              @home_content.dig("texts", "footer_tagline").presence || site_setting(:public_footer_tagline)
+            else
+              site_setting(:public_footer_tagline)
+            end %>
+            <div class="public-footer__brand">
+              <%= image_tag "lightvue-logo-white.png", alt: "Light Vue logo", class: "public-footer__logo" %>
+              <p><%= footer_tagline %></p>
+            </div>
+            <div class="public-footer__contact">
+              <p><a href="mailto:info@lightvue.com.au">E: info@lightvue.com.au</a></p>
+              <p><a href="tel:+61431262042">P: 0431 262 042</a></p>
+            </div>
+            <div class="public-footer__legal">
+              <%= link_to "Home", home_nav_path, data: { turbo_frame: "_top" } %>
+              <%= link_to "Partners", partners_nav_path, data: { turbo_frame: "_top" } %>
+              <%= link_to "Builders & Developers", builders_nav_path, data: { turbo_frame: "_top" } %>
+              <%= link_to "Terms of Service", terms_path %>
+              <%= link_to "Privacy Policy", privacy_path %>
+              <p>
+                Website designed by
+                <%= link_to "Tudouke Studio", "https://tudouke.com", target: "_blank", rel: "noopener" %>
+              </p>
+            </div>
+          </footer>
+        <% end %>
       </main>
     <% end %>
   </body>

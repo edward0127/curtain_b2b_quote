@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Outfit:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600;700&family=Lato:wght@400;700&family=Lora:wght@400;600;700&family=Manrope:wght@400;500;700&family=Merriweather:wght@400;700&family=Montserrat:wght@400;600;700&family=Nunito:wght@400;600;700&family=Open+Sans:wght@400;600;700&family=Outfit:wght@500;700&family=Playfair+Display:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Raleway:wght@400;600;700&family=Roboto+Slab:wght@400;600;700&family=Roboto:wght@400;500;700&family=Source+Sans+3:wght@400;600;700&display=swap");
 
 :root {
   --bg-a: #eef5f8;
@@ -753,6 +753,11 @@ h3 {
   background: rgba(236, 250, 255, 0.92);
 }
 
+.public-nav__link--button {
+  font: inherit;
+  cursor: pointer;
+}
+
 .public-nav__link--active {
   color: #ffffff;
   background: linear-gradient(145deg, #06617f, #0088b8);
@@ -1174,6 +1179,7 @@ h3 {
   position: absolute;
   inset: 0;
   background: none;
+  pointer-events: none;
 }
 
 .lv-hero__content {
@@ -2515,11 +2521,20 @@ h3 {
 }
 
 /* Spacing pass: align closer to the existing Light Vue website rhythm */
-.public-shell {
+/*.public-shell {
   --public-shell-gutter: clamp(0.9rem, 2.2vw, 2.4rem);
   width: 100%;
   max-width: none;
   padding: 1.2rem var(--public-shell-gutter) 4.2rem;
+}
+*/
+.public-shell {
+  --public-shell-gutter: clamp(0.9rem, 2.2vw, 2.4rem);
+  width: 100%;
+  max-width: none;
+  padding-right: var(--public-shell-gutter);
+  padding-bottom: 4.2rem;
+  padding-left: var(--public-shell-gutter);
 }
 
 .public-shell > .lv-hero {
@@ -2697,5 +2712,464 @@ h3 {
   .public-footer {
     margin-top: 1.4rem;
     padding: 1.05rem;
+  }
+}
+
+/* Admin-configurable public font presets */
+.app-body--public.public-body-font-plus_jakarta_sans {
+  font-family: "Plus Jakarta Sans", "Avenir Next", "Segoe UI", sans-serif;
+}
+
+.app-body--public.public-body-font-outfit {
+  font-family: "Outfit", "Trebuchet MS", sans-serif;
+}
+
+.app-body--public.public-body-font-fraunces {
+  font-family: "Fraunces", "Times New Roman", serif;
+}
+
+.app-body--public.public-heading-font-plus_jakarta_sans h1,
+.app-body--public.public-heading-font-plus_jakarta_sans h2,
+.app-body--public.public-heading-font-plus_jakarta_sans h3,
+.app-body--public.public-heading-font-plus_jakarta_sans .lv-kicker,
+.app-body--public.public-heading-font-plus_jakarta_sans .public-brand__name {
+  font-family: "Plus Jakarta Sans", "Avenir Next", "Segoe UI", sans-serif;
+}
+
+.app-body--public.public-heading-font-outfit h1,
+.app-body--public.public-heading-font-outfit h2,
+.app-body--public.public-heading-font-outfit h3,
+.app-body--public.public-heading-font-outfit .lv-kicker,
+.app-body--public.public-heading-font-outfit .public-brand__name {
+  font-family: "Outfit", "Trebuchet MS", sans-serif;
+}
+
+.app-body--public.public-heading-font-fraunces h1,
+.app-body--public.public-heading-font-fraunces h2,
+.app-body--public.public-heading-font-fraunces h3,
+.app-body--public.public-heading-font-fraunces .lv-kicker,
+.app-body--public.public-heading-font-fraunces .public-brand__name {
+  font-family: "Fraunces", "Times New Roman", serif;
+}
+
+.app-body--public.public-body-font-poppins {
+  font-family: "Poppins", "Segoe UI", sans-serif;
+}
+
+.app-body--public.public-body-font-montserrat {
+  font-family: "Montserrat", "Segoe UI", sans-serif;
+}
+
+.app-body--public.public-body-font-lato {
+  font-family: "Lato", "Segoe UI", sans-serif;
+}
+
+.app-body--public.public-body-font-nunito {
+  font-family: "Nunito", "Segoe UI", sans-serif;
+}
+
+.app-body--public.public-body-font-raleway {
+  font-family: "Raleway", "Segoe UI", sans-serif;
+}
+
+.app-body--public.public-body-font-playfair_display {
+  font-family: "Playfair Display", "Times New Roman", serif;
+}
+
+.app-body--public.public-body-font-merriweather {
+  font-family: "Merriweather", "Times New Roman", serif;
+}
+
+.app-body--public.public-body-font-roboto_slab {
+  font-family: "Roboto Slab", "Times New Roman", serif;
+}
+
+.app-body--public.public-body-font-source_sans_3 {
+  font-family: "Source Sans 3", "Segoe UI", sans-serif;
+}
+
+.app-body--public.public-body-font-inter {
+  font-family: "Inter", "Segoe UI", sans-serif;
+}
+
+.app-body--public.public-heading-font-poppins h1,
+.app-body--public.public-heading-font-poppins h2,
+.app-body--public.public-heading-font-poppins h3,
+.app-body--public.public-heading-font-poppins .lv-kicker,
+.app-body--public.public-heading-font-poppins .public-brand__name {
+  font-family: "Poppins", "Segoe UI", sans-serif;
+}
+
+.app-body--public.public-heading-font-montserrat h1,
+.app-body--public.public-heading-font-montserrat h2,
+.app-body--public.public-heading-font-montserrat h3,
+.app-body--public.public-heading-font-montserrat .lv-kicker,
+.app-body--public.public-heading-font-montserrat .public-brand__name {
+  font-family: "Montserrat", "Segoe UI", sans-serif;
+}
+
+.app-body--public.public-heading-font-lato h1,
+.app-body--public.public-heading-font-lato h2,
+.app-body--public.public-heading-font-lato h3,
+.app-body--public.public-heading-font-lato .lv-kicker,
+.app-body--public.public-heading-font-lato .public-brand__name {
+  font-family: "Lato", "Segoe UI", sans-serif;
+}
+
+.app-body--public.public-heading-font-nunito h1,
+.app-body--public.public-heading-font-nunito h2,
+.app-body--public.public-heading-font-nunito h3,
+.app-body--public.public-heading-font-nunito .lv-kicker,
+.app-body--public.public-heading-font-nunito .public-brand__name {
+  font-family: "Nunito", "Segoe UI", sans-serif;
+}
+
+.app-body--public.public-heading-font-raleway h1,
+.app-body--public.public-heading-font-raleway h2,
+.app-body--public.public-heading-font-raleway h3,
+.app-body--public.public-heading-font-raleway .lv-kicker,
+.app-body--public.public-heading-font-raleway .public-brand__name {
+  font-family: "Raleway", "Segoe UI", sans-serif;
+}
+
+.app-body--public.public-heading-font-playfair_display h1,
+.app-body--public.public-heading-font-playfair_display h2,
+.app-body--public.public-heading-font-playfair_display h3,
+.app-body--public.public-heading-font-playfair_display .lv-kicker,
+.app-body--public.public-heading-font-playfair_display .public-brand__name {
+  font-family: "Playfair Display", "Times New Roman", serif;
+}
+
+.app-body--public.public-heading-font-merriweather h1,
+.app-body--public.public-heading-font-merriweather h2,
+.app-body--public.public-heading-font-merriweather h3,
+.app-body--public.public-heading-font-merriweather .lv-kicker,
+.app-body--public.public-heading-font-merriweather .public-brand__name {
+  font-family: "Merriweather", "Times New Roman", serif;
+}
+
+.app-body--public.public-heading-font-roboto_slab h1,
+.app-body--public.public-heading-font-roboto_slab h2,
+.app-body--public.public-heading-font-roboto_slab h3,
+.app-body--public.public-heading-font-roboto_slab .lv-kicker,
+.app-body--public.public-heading-font-roboto_slab .public-brand__name {
+  font-family: "Roboto Slab", "Times New Roman", serif;
+}
+
+.app-body--public.public-heading-font-source_sans_3 h1,
+.app-body--public.public-heading-font-source_sans_3 h2,
+.app-body--public.public-heading-font-source_sans_3 h3,
+.app-body--public.public-heading-font-source_sans_3 .lv-kicker,
+.app-body--public.public-heading-font-source_sans_3 .public-brand__name {
+  font-family: "Source Sans 3", "Segoe UI", sans-serif;
+}
+
+.app-body--public.public-heading-font-inter h1,
+.app-body--public.public-heading-font-inter h2,
+.app-body--public.public-heading-font-inter h3,
+.app-body--public.public-heading-font-inter .lv-kicker,
+.app-body--public.public-heading-font-inter .public-brand__name {
+  font-family: "Inter", "Segoe UI", sans-serif;
+}
+
+.app-body--public.public-body-font-roboto {
+  font-family: "Roboto", "Segoe UI", sans-serif;
+}
+
+.app-body--public.public-body-font-open_sans {
+  font-family: "Open Sans", "Segoe UI", sans-serif;
+}
+
+.app-body--public.public-body-font-manrope {
+  font-family: "Manrope", "Segoe UI", sans-serif;
+}
+
+.app-body--public.public-body-font-dm_sans {
+  font-family: "DM Sans", "Segoe UI", sans-serif;
+}
+
+.app-body--public.public-body-font-lora {
+  font-family: "Lora", "Times New Roman", serif;
+}
+
+.app-body--public.public-heading-font-roboto h1,
+.app-body--public.public-heading-font-roboto h2,
+.app-body--public.public-heading-font-roboto h3,
+.app-body--public.public-heading-font-roboto .lv-kicker,
+.app-body--public.public-heading-font-roboto .public-brand__name {
+  font-family: "Roboto", "Segoe UI", sans-serif;
+}
+
+.app-body--public.public-heading-font-open_sans h1,
+.app-body--public.public-heading-font-open_sans h2,
+.app-body--public.public-heading-font-open_sans h3,
+.app-body--public.public-heading-font-open_sans .lv-kicker,
+.app-body--public.public-heading-font-open_sans .public-brand__name {
+  font-family: "Open Sans", "Segoe UI", sans-serif;
+}
+
+.app-body--public.public-heading-font-manrope h1,
+.app-body--public.public-heading-font-manrope h2,
+.app-body--public.public-heading-font-manrope h3,
+.app-body--public.public-heading-font-manrope .lv-kicker,
+.app-body--public.public-heading-font-manrope .public-brand__name {
+  font-family: "Manrope", "Segoe UI", sans-serif;
+}
+
+.app-body--public.public-heading-font-dm_sans h1,
+.app-body--public.public-heading-font-dm_sans h2,
+.app-body--public.public-heading-font-dm_sans h3,
+.app-body--public.public-heading-font-dm_sans .lv-kicker,
+.app-body--public.public-heading-font-dm_sans .public-brand__name {
+  font-family: "DM Sans", "Segoe UI", sans-serif;
+}
+
+.app-body--public.public-heading-font-lora h1,
+.app-body--public.public-heading-font-lora h2,
+.app-body--public.public-heading-font-lora h3,
+.app-body--public.public-heading-font-lora .lv-kicker,
+.app-body--public.public-heading-font-lora .public-brand__name {
+  font-family: "Lora", "Times New Roman", serif;
+}
+
+/* Inline partners page editor */
+.partners-editor-shell {
+  margin-top: 0.9rem;
+}
+
+.partners-editor-toolbar {
+  position: sticky;
+  top: 6.1rem;
+  z-index: 24;
+  display: grid;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+  padding: 0.95rem;
+  border: 1px solid rgba(248, 233, 208, 0.26);
+  border-radius: 12px;
+  background: rgba(50, 39, 28, 0.86);
+  backdrop-filter: blur(10px);
+}
+
+.partners-editor-toolbar__pages {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.partners-editor-toolbar__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0.55rem;
+}
+
+.partners-editor-toolbar label {
+  display: grid;
+  gap: 0.22rem;
+  color: rgba(252, 248, 242, 0.94);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.partners-editor-toolbar input,
+.partners-editor-toolbar select {
+  width: 100%;
+  min-height: 2rem;
+  border: 1px solid rgba(248, 233, 208, 0.34);
+  border-radius: 8px;
+  background: rgba(255, 247, 235, 0.94);
+  color: #2f261d;
+  font: inherit;
+  padding: 0.3rem 0.45rem;
+}
+
+.partners-editor-toolbar input[type="checkbox"] {
+  width: 1rem;
+  min-height: 1rem;
+  margin: 0;
+}
+
+.partners-editor-toolbar__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.partners-editor-note {
+  margin: 0;
+  font-size: 0.82rem;
+  color: rgba(252, 245, 233, 0.94);
+}
+
+.partners-editor-note--dirty {
+  color: #ffb3b3;
+  font-weight: 700;
+}
+
+.partners-editor-field {
+  position: relative;
+  border: 1px dashed rgba(248, 233, 208, 0.36);
+  border-radius: 6px;
+  padding: 0.2rem 0.3rem;
+  cursor: text;
+}
+
+.partners-editor-field:focus {
+  outline: none;
+  border-color: rgba(248, 233, 208, 0.7);
+  box-shadow: 0 0 0 2px rgba(248, 233, 208, 0.22);
+}
+
+.partners-editor-field--selected {
+  border-color: rgba(255, 245, 222, 0.92);
+  box-shadow: 0 0 0 2px rgba(255, 245, 222, 0.25);
+}
+
+.partners-editor-field--dirty {
+  border-color: rgba(255, 114, 114, 0.95);
+  box-shadow: 0 0 0 2px rgba(255, 114, 114, 0.34);
+}
+
+.partners-editor-image {
+  position: relative;
+  cursor: pointer;
+}
+
+.partners-editor-image::after {
+  content: "Click image to replace";
+  position: absolute;
+  right: 0.6rem;
+  bottom: 0.6rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #fff7ec;
+  background: rgba(20, 14, 10, 0.66);
+  border: 1px solid rgba(248, 233, 208, 0.34);
+  border-radius: 999px;
+  padding: 0.2rem 0.45rem;
+}
+
+.partners-editor-image--dirty::after {
+  border-color: rgba(255, 114, 114, 0.82);
+  box-shadow: 0 0 0 2px rgba(255, 114, 114, 0.25);
+}
+
+.partners-editor-image-button {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  border: 1px solid rgba(248, 233, 208, 0.4);
+  border-radius: 999px;
+  padding: 0.35rem 0.7rem;
+  color: #fff7ec;
+  background: rgba(20, 14, 10, 0.62);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.partners-editor-image-button:hover {
+  background: rgba(20, 14, 10, 0.78);
+}
+
+.partners-editor-file {
+  display: none;
+}
+
+.partners-editor-button--dirty {
+  border-color: rgba(255, 163, 163, 0.82);
+  background: linear-gradient(145deg, #ae1f1f, #d73737);
+  color: #fff5f5;
+  box-shadow: 0 0 0 3px rgba(255, 90, 90, 0.24), 0 10px 18px rgba(130, 24, 24, 0.42);
+  animation: editor-dirty-pulse 1.25s ease-in-out infinite;
+}
+
+.partners-editor-button--pending {
+  box-shadow: 0 0 0 3px rgba(255, 193, 94, 0.32), 0 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes editor-dirty-pulse {
+  0% { box-shadow: 0 0 0 2px rgba(255, 90, 90, 0.2), 0 8px 16px rgba(130, 24, 24, 0.34); }
+  50% { box-shadow: 0 0 0 5px rgba(255, 90, 90, 0.38), 0 10px 19px rgba(130, 24, 24, 0.48); }
+  100% { box-shadow: 0 0 0 2px rgba(255, 90, 90, 0.2), 0 8px 16px rgba(130, 24, 24, 0.34); }
+}
+
+@media (max-width: 980px) {
+  .partners-editor-toolbar {
+    top: 5.1rem;
+    padding: 0.75rem;
+  }
+
+  .partners-editor-toolbar__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Final public nav contrast and placement above hero */
+.public-topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  margin-bottom: 0;
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid rgba(248, 233, 208, 0.3);
+  background: linear-gradient(180deg, rgba(10, 8, 6, 0.72), rgba(10, 8, 6, 0.2));
+  backdrop-filter: blur(10px);
+}
+
+.public-topbar.public-topbar--scrolled {
+  border-bottom-color: rgba(248, 233, 208, 0.34);
+  background: linear-gradient(180deg, rgba(16, 12, 9, 0.96), rgba(12, 10, 8, 0.9));
+}
+
+.public-topbar .public-nav__link,
+.public-topbar.public-topbar--scrolled .public-nav__link {
+  color: #fff6e9;
+  border-color: rgba(248, 233, 208, 0.3);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.public-topbar .public-nav__link:hover,
+.public-topbar.public-topbar--scrolled .public-nav__link:hover {
+  border-color: rgba(248, 233, 208, 0.52);
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.public-topbar .public-nav__link--active,
+.public-topbar.public-topbar--scrolled .public-nav__link--active {
+  color: #2f261d;
+  border-color: transparent;
+  background: linear-gradient(155deg, #f6ddbf, #f0cfa5);
+}
+
+.flash-stack--public {
+  margin: 5.25rem auto 0;
+}
+
+.public-page--public-pages-home .flash-stack--public {
+  position: absolute;
+  top: 4.9rem;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+}
+
+.partners-editor-toolbar {
+  top: 6.1rem;
+}
+
+@media (max-width: 980px) {
+  .partners-editor-toolbar {
+    top: 5.1rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .public-topbar {
+    top: 0;
+    padding: 0.72rem 0.7rem;
   }
 }

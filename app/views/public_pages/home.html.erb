@@ -1,18 +1,32 @@
+<% home_content = @home_content || app_setting.home_page_content(preview: false) %>
+<% home_texts = home_content.fetch("texts", {}) %>
+<% home_images = home_content.fetch("images", {}) %>
+<% home_styles = home_content.fetch("styles", {}) %>
+
+<% if current_user&.admin? && params[:preview].to_s == "1" %>
+  <section class="panel">
+    <p class="muted" style="margin: 0;">
+      Preview mode is active.
+      <%= link_to "Return to editor", edit_pages_path, data: { turbo_frame: "_top" } %>
+    </p>
+  </section>
+<% end %>
+
 <section class="lv-hero">
-  <%= image_tag "public-new-background-1.png", class: "lv-hero__image", alt: "Warm-toned curtains in a modern interior" %>
+  <%= image_tag home_images.fetch("hero_image", site_setting(:public_home_hero_image)), class: "lv-hero__image", alt: "Warm-toned curtains in a modern interior" %>
   <div class="lv-hero__veil"></div>
   <article class="lv-hero__content">
     <p class="lv-kicker">LIGHT VUE</p>
-    <h1>Your trade partner for exceptional interiors.</h1>
-    <p class="lv-lead">Wholesale curtains, sheers and tracks for builders, developers and interior professionals.</p>
+    <h1 style="<%= public_text_style(home_styles, "hero_title") %>"><%= home_texts.fetch("hero_title", site_setting(:public_home_hero_title)) %></h1>
+    <p class="lv-lead" style="<%= public_text_style(home_styles, "hero_lead") %>"><%= home_texts.fetch("hero_lead", site_setting(:public_home_hero_lead)) %></p>
     <ul class="lv-hero__signals">
       <li>Wholesale pricing</li>
       <li>Reliable lead times</li>
       <li>Consistent finish</li>
     </ul>
     <div class="lv-actions">
-      <%= link_to "Get in touch", "#get-in-touch", class: "lv-pill", data: { turbo: false } %>
-      <%= link_to "B2B Login", new_user_session_path, class: "lv-pill lv-pill--dark", data: { turbo_frame: "_top" } %>
+      <%= link_to site_setting(:public_cta_contact_label), "#get-in-touch", class: "lv-pill", data: { turbo: false } %>
+      <%= link_to site_setting(:public_cta_login_label), new_user_session_path, class: "lv-pill lv-pill--dark", data: { turbo_frame: "_top" } %>
     </div>
   </article>
 </section>
@@ -20,36 +34,36 @@
 <section class="lv-section">
   <header class="lv-section__header">
     <p class="lv-kicker">Why Light Vue</p>
-    <h2>Simple, reliable supply for trade projects.</h2>
+    <h2 style="<%= public_text_style(home_styles, "why_title") %>"><%= home_texts.fetch("why_title", site_setting(:public_home_why_title)) %></h2>
   </header>
 
   <div class="lv-feature-grid">
     <article class="lv-feature-card">
-      <%= image_tag "public-e-14.jpg", alt: "S-wave curtain detail" %>
+      <%= image_tag home_images.fetch("why_card_1_image", "public-e-14.jpg"), alt: "S-wave curtain detail" %>
       <div>
-        <h3>Trade-only supply</h3>
-        <p>For builders, developers, designers and local curtain businesses.</p>
+        <h3 style="<%= public_text_style(home_styles, "why_card_1_title") %>"><%= home_texts.fetch("why_card_1_title", "Trade-only supply") %></h3>
+        <p style="<%= public_text_style(home_styles, "why_card_1_body") %>"><%= home_texts.fetch("why_card_1_body", "For builders, developers, designers and local curtain businesses.") %></p>
       </div>
     </article>
     <article class="lv-feature-card">
-      <%= image_tag "public-e-3.jpg", alt: "Sheer curtains in a living room" %>
+      <%= image_tag home_images.fetch("why_card_2_image", "public-e-3.jpg"), alt: "Sheer curtains in a living room" %>
       <div>
-        <h3>Curated range</h3>
-        <p>A focused fabric range selected for repeatable results.</p>
+        <h3 style="<%= public_text_style(home_styles, "why_card_2_title") %>"><%= home_texts.fetch("why_card_2_title", "Curated range") %></h3>
+        <p style="<%= public_text_style(home_styles, "why_card_2_body") %>"><%= home_texts.fetch("why_card_2_body", "A focused fabric range selected for repeatable results.") %></p>
       </div>
     </article>
     <article class="lv-feature-card">
-      <%= image_tag "public-e-37.jpg", alt: "Curtain fabric in hand" %>
+      <%= image_tag home_images.fetch("why_card_3_image", "public-e-37.jpg"), alt: "Curtain fabric in hand" %>
       <div>
-        <h3>Heat-set pleats</h3>
-        <p>Smooth, even folds that hold their shape over time.</p>
+        <h3 style="<%= public_text_style(home_styles, "why_card_3_title") %>"><%= home_texts.fetch("why_card_3_title", "Heat-set pleats") %></h3>
+        <p style="<%= public_text_style(home_styles, "why_card_3_body") %>"><%= home_texts.fetch("why_card_3_body", "Smooth, even folds that hold their shape over time.") %></p>
       </div>
     </article>
     <article class="lv-feature-card">
-      <%= image_tag "public-e-1.jpg", alt: "Open space with sheers" %>
+      <%= image_tag home_images.fetch("why_card_4_image", "public-e-1.jpg"), alt: "Open space with sheers" %>
       <div>
-        <h3>Practical support</h3>
-        <p>Lean service focused on what helps projects move.</p>
+        <h3 style="<%= public_text_style(home_styles, "why_card_4_title") %>"><%= home_texts.fetch("why_card_4_title", "Practical support") %></h3>
+        <p style="<%= public_text_style(home_styles, "why_card_4_body") %>"><%= home_texts.fetch("why_card_4_body", "Lean service focused on what helps projects move.") %></p>
       </div>
     </article>
   </div>
@@ -58,36 +72,36 @@
 <section class="lv-section">
   <header class="lv-section__header">
     <p class="lv-kicker">Products</p>
-    <h2>Core range for trade projects</h2>
+    <h2 style="<%= public_text_style(home_styles, "products_title") %>"><%= home_texts.fetch("products_title", site_setting(:public_home_products_title)) %></h2>
   </header>
 
   <div class="lv-product-grid">
     <article class="lv-product-card">
-      <%= image_tag "public-e-12.jpg", alt: "Bedroom with sheer curtains" %>
+      <%= image_tag home_images.fetch("product_1_image", "public-e-12.jpg"), alt: "Bedroom with sheer curtains" %>
       <div>
-        <h3>Curtain Tracks</h3>
-        <p>Cut-to-size tracks for smooth operation.</p>
+        <h3 style="<%= public_text_style(home_styles, "product_1_title") %>"><%= home_texts.fetch("product_1_title", "Curtain Tracks") %></h3>
+        <p style="<%= public_text_style(home_styles, "product_1_body") %>"><%= home_texts.fetch("product_1_body", "Cut-to-size tracks for smooth operation.") %></p>
       </div>
     </article>
     <article class="lv-product-card">
-      <%= image_tag "public-e-14.jpg", alt: "Pleated sheer curtain" %>
+      <%= image_tag home_images.fetch("product_2_image", "public-e-14.jpg"), alt: "Pleated sheer curtain" %>
       <div>
-        <h3>S-Wave Curtains</h3>
-        <p>Clean, modern lines with consistent drape.</p>
+        <h3 style="<%= public_text_style(home_styles, "product_2_title") %>"><%= home_texts.fetch("product_2_title", "S-Wave Curtains") %></h3>
+        <p style="<%= public_text_style(home_styles, "product_2_body") %>"><%= home_texts.fetch("product_2_body", "Clean, modern lines with consistent drape.") %></p>
       </div>
     </article>
     <article class="lv-product-card">
-      <%= image_tag "public-e-40.jpg", alt: "Floor to ceiling curtain in neutral interior" %>
+      <%= image_tag home_images.fetch("product_3_image", "public-e-40.jpg"), alt: "Floor to ceiling curtain in neutral interior" %>
       <div>
-        <h3>Pinch Pleat Curtains</h3>
-        <p>Classic, tailored finish for premium interiors.</p>
+        <h3 style="<%= public_text_style(home_styles, "product_3_title") %>"><%= home_texts.fetch("product_3_title", "Pinch Pleat Curtains") %></h3>
+        <p style="<%= public_text_style(home_styles, "product_3_body") %>"><%= home_texts.fetch("product_3_body", "Classic, tailored finish for premium interiors.") %></p>
       </div>
     </article>
     <article class="lv-product-card">
-      <%= image_tag "public-e-37.jpg", alt: "Fabric texture closeup" %>
+      <%= image_tag home_images.fetch("product_4_image", "public-e-37.jpg"), alt: "Fabric texture closeup" %>
       <div>
-        <h3>Fabric Options</h3>
-        <p>Selected sheers and blockouts for dependable performance.</p>
+        <h3 style="<%= public_text_style(home_styles, "product_4_title") %>"><%= home_texts.fetch("product_4_title", "Fabric Options") %></h3>
+        <p style="<%= public_text_style(home_styles, "product_4_body") %>"><%= home_texts.fetch("product_4_body", "Selected sheers and blockouts for dependable performance.") %></p>
       </div>
     </article>
   </div>
@@ -96,9 +110,9 @@
 <section id="get-in-touch" class="lv-section lv-section--contact-form">
   <div class="lv-contact-layout">
     <div class="lv-contact-intro">
-      <h2>Get in Touch</h2>
-      <h3>Planning a project?</h3>
-      <p>Tell us what you need and our trade team will respond.</p>
+      <h2 style="<%= public_text_style(home_styles, "contact_title") %>"><%= home_texts.fetch("contact_title", site_setting(:public_home_contact_title)) %></h2>
+      <h3 style="<%= public_text_style(home_styles, "contact_subtitle") %>"><%= home_texts.fetch("contact_subtitle", site_setting(:public_home_contact_subtitle)) %></h3>
+      <p style="<%= public_text_style(home_styles, "contact_intro_lead") %>"><%= home_texts.fetch("contact_intro_lead", "Tell us what you need and our trade team will respond.") %></p>
       <p><a href="mailto:info@lightvue.com.au">E: info@lightvue.com.au</a></p>
       <p><a href="tel:+61431262042">P: 0431 262 042</a></p>
     </div>

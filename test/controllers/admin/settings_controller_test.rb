@@ -29,6 +29,24 @@ class Admin::SettingsControllerTest < ActionDispatch::IntegrationTest
     assert_equal original_password, setting.mailgun_smtp_password
   end
 
+  test "admin can update public website settings" do
+    sign_in users(:admin)
+
+    patch admin_settings_url, params: {
+      app_setting: {
+        public_heading_font: "open_sans",
+        public_body_font: "lora",
+        public_home_hero_title: "This should be ignored by strong params"
+      }
+    }
+
+    assert_redirected_to edit_admin_settings_url
+    setting = AppSetting.current
+    assert_equal "open_sans", setting.public_heading_font
+    assert_equal "lora", setting.public_body_font
+    assert_not_equal "This should be ignored by strong params", setting.public_home_hero_title
+  end
+
   test "admin update from dashboard settings tab stays on dashboard" do
     sign_in users(:admin)
 

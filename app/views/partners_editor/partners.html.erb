@@ -1,0 +1,124 @@
+<% page_key = "partners" %>
+<% partners_texts = @page_content.fetch("texts", {}) %>
+<% partners_arrays = @page_content.fetch("arrays", {}) %>
+<% partners_images = @page_content.fetch("images", {}) %>
+<% partners_styles = @page_content.fetch("styles", {}) %>
+
+<%= form_with url: update_page_editor_path(page: page_key),
+              method: :patch,
+              html: { multipart: true, class: "partners-editor-shell" },
+              data: {
+                controller: "partners-editor",
+                action: "submit->partners-editor#beforeSubmit",
+                turbo: false,
+                partners_editor_font_map_value: AppSetting::PUBLIC_FONT_STACKS.to_json,
+                partners_editor_draft_pending_value: @draft_pending.to_s
+              } do %>
+  <%= hidden_field_tag :page_payload_json, @page_content.to_json, data: { partners_editor_target: "payload" } %>
+
+  <%= render "toolbar", page_key: page_key, draft_pending: @draft_pending %>
+
+  <section class="lv-hero lv-hero--partners">
+    <div class="partners-editor-image" data-image-key="hero_image" data-action="click->partners-editor#pickImage">
+      <%= image_tag partners_images.fetch("hero_image"), class: "lv-hero__image", alt: "Interior project with full-height sheer curtains", data: { partners_editor_target: "imagePreview", image_key: "hero_image" } %>
+    </div>
+    <%= file_field_tag "images[hero_image]", accept: "image/*", class: "partners-editor-file", data: { partners_editor_target: "imageInput", image_key: "hero_image", action: "change->partners-editor#imageChanged" } %>
+
+    <div class="lv-hero__veil"></div>
+    <article class="lv-hero__content">
+      <button type="button" class="partners-editor-image-button" data-image-key="hero_image" data-action="click->partners-editor#pickImage">Replace banner image</button>
+      <p class="lv-kicker">Partners</p>
+      <h1 contenteditable="true"
+          class="partners-editor-field"
+          style="<%= public_text_style(partners_styles, "hero_title") %>"
+          data-partners-editor-target="editable"
+          data-text-key="hero_title"
+          data-style-key="hero_title"
+          data-label="Hero title"
+          data-action="click->partners-editor#selectEditable input->partners-editor#updateText"><%= partners_texts.fetch("hero_title") %></h1>
+      <p class="lv-lead partners-editor-field"
+         contenteditable="true"
+         style="<%= public_text_style(partners_styles, "hero_lead") %>"
+         data-partners-editor-target="editable"
+         data-text-key="hero_lead"
+         data-style-key="hero_lead"
+         data-label="Hero subtitle"
+         data-action="click->partners-editor#selectEditable input->partners-editor#updateText"><%= partners_texts.fetch("hero_lead") %></p>
+      <div class="lv-actions">
+        <%= link_to site_setting(:public_cta_contact_label), "#", class: "lv-pill", data: { turbo: false } %>
+        <%= link_to "Builders & Developers", "#", class: "lv-pill lv-pill--dark", data: { turbo: false } %>
+      </div>
+    </article>
+  </section>
+
+  <section class="lv-section">
+    <header class="lv-section__header">
+      <p class="lv-kicker">Partner Types</p>
+      <h2 contenteditable="true"
+          class="partners-editor-field"
+          style="<%= public_text_style(partners_styles, "partner_types_title") %>"
+          data-partners-editor-target="editable"
+          data-text-key="partner_types_title"
+          data-style-key="partner_types_title"
+          data-label="Partner types heading"
+          data-action="click->partners-editor#selectEditable input->partners-editor#updateText"><%= partners_texts.fetch("partner_types_title") %></h2>
+    </header>
+    <div class="lv-partner-grid">
+      <% partners_arrays.fetch("partner_types", []).each_with_index do |partner_type, index| %>
+        <article contenteditable="true"
+                 class="partners-editor-field"
+                 style="<%= public_text_style(partners_styles, "partner_types") %>"
+                 data-partners-editor-target="editable"
+                 data-list-key="partner_types"
+                 data-list-index="<%= index %>"
+                 data-style-key="partner_types"
+                 data-label="Partner type item"
+                 data-action="click->partners-editor#selectEditable input->partners-editor#updateText"><%= partner_type %></article>
+      <% end %>
+    </div>
+  </section>
+
+  <section class="lv-section lv-section--split">
+    <article class="lv-panel">
+      <div class="partners-editor-image" data-image-key="split_image" data-action="click->partners-editor#pickImage">
+        <%= image_tag partners_images.fetch("split_image"), alt: "Bedroom styled with sheers", class: "lv-panel__image", data: { partners_editor_target: "imagePreview", image_key: "split_image" } %>
+      </div>
+      <%= file_field_tag "images[split_image]", accept: "image/*", class: "partners-editor-file", data: { partners_editor_target: "imageInput", image_key: "split_image", action: "change->partners-editor#imageChanged" } %>
+    </article>
+    <article class="lv-panel lv-panel--copy">
+      <h2 contenteditable="true"
+          class="partners-editor-field"
+          style="<%= public_text_style(partners_styles, "split_title") %>"
+          data-partners-editor-target="editable"
+          data-text-key="split_title"
+          data-style-key="split_title"
+          data-label="Split section title"
+          data-action="click->partners-editor#selectEditable input->partners-editor#updateText"><%= partners_texts.fetch("split_title") %></h2>
+      <p contenteditable="true"
+         class="partners-editor-field"
+         style="<%= public_text_style(partners_styles, "split_lead") %>"
+         data-partners-editor-target="editable"
+         data-text-key="split_lead"
+         data-style-key="split_lead"
+         data-label="Split section lead"
+         data-action="click->partners-editor#selectEditable input->partners-editor#updateText"><%= partners_texts.fetch("split_lead") %></p>
+      <ul class="lv-bullet-list">
+        <% partners_arrays.fetch("bullets", []).each_with_index do |bullet, index| %>
+          <li contenteditable="true"
+              class="partners-editor-field"
+              style="<%= public_text_style(partners_styles, "bullets") %>"
+              data-partners-editor-target="editable"
+              data-list-key="bullets"
+              data-list-index="<%= index %>"
+              data-style-key="bullets"
+              data-label="Bullet item"
+              data-action="click->partners-editor#selectEditable input->partners-editor#updateText"><%= bullet %></li>
+        <% end %>
+      </ul>
+      <div class="lv-actions">
+        <%= link_to site_setting(:public_cta_contact_label), "#", class: "lv-pill", data: { turbo: false } %>
+        <%= link_to site_setting(:public_cta_login_label), "#", class: "lv-pill lv-pill--dark", data: { turbo: false } %>
+      </div>
+    </article>
+  </section>
+<% end %>

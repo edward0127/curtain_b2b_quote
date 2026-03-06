@@ -80,6 +80,26 @@
     </div>
   </div>
 
+  <h3>Public Website Typography</h3>
+  <p class="muted">Global defaults for heading and body font. These are also used as fallback for the partners page inline editor.</p>
+
+  <div class="form-grid">
+    <div class="field">
+      <%= form.label :public_heading_font, "Heading font" %>
+      <%= form.select :public_heading_font, options_for_select(AppSetting::PUBLIC_FONT_OPTIONS.to_a, app_setting.public_heading_font.presence || AppSetting::DEFAULTS[:public_heading_font]), required: true %>
+    </div>
+
+    <div class="field">
+      <%= form.label :public_body_font, "Body font" %>
+      <%= form.select :public_body_font, options_for_select(AppSetting::PUBLIC_FONT_OPTIONS.to_a, app_setting.public_body_font.presence || AppSetting::DEFAULTS[:public_body_font]), required: true %>
+    </div>
+  </div>
+
+  <p class="muted">
+    To edit website page text and images, open
+    <%= link_to "/edit", edit_pages_path, data: { turbo_frame: "_top" } %>.
+  </p>
+
   <div class="actions">
     <%= form.submit "Save settings", class: "button button--primary" %>
   </div>

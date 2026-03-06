@@ -1,12 +1,27 @@
+<% partners_content = @partners_content || app_setting.partners_page_content(preview: false) %>
+<% partners_texts = partners_content.fetch("texts", {}) %>
+<% partners_arrays = partners_content.fetch("arrays", {}) %>
+<% partners_images = partners_content.fetch("images", {}) %>
+<% partners_styles = partners_content.fetch("styles", {}) %>
+
+<% if current_user&.admin? && params[:preview].to_s == "1" %>
+  <section class="panel">
+    <p class="muted" style="margin: 0;">
+      Preview mode is active.
+      <%= link_to "Return to editor", edit_partners_page_path, data: { turbo_frame: "_top" } %>
+    </p>
+  </section>
+<% end %>
+
 <section class="lv-hero lv-hero--partners">
-  <%= image_tag "public-e-1.jpg", class: "lv-hero__image", alt: "Interior project with full-height sheer curtains" %>
+  <%= image_tag partners_images.fetch("hero_image", site_setting(:public_partners_hero_image)), class: "lv-hero__image", alt: "Interior project with full-height sheer curtains" %>
   <div class="lv-hero__veil"></div>
   <article class="lv-hero__content">
     <p class="lv-kicker">Partners</p>
-    <h1>Who we work with</h1>
-    <p class="lv-lead">Long-term trade partnerships built on reliability.</p>
+    <h1 style="<%= public_text_style(partners_styles, "hero_title") %>"><%= partners_texts.fetch("hero_title", site_setting(:public_partners_hero_title)) %></h1>
+    <p class="lv-lead" style="<%= public_text_style(partners_styles, "hero_lead") %>"><%= partners_texts.fetch("hero_lead", site_setting(:public_partners_hero_lead)) %></p>
     <div class="lv-actions">
-      <%= link_to "Get in touch", root_path(anchor: "get-in-touch"), class: "lv-pill", data: { turbo_frame: "_top" } %>
+      <%= link_to site_setting(:public_cta_contact_label), root_path(anchor: "get-in-touch"), class: "lv-pill", data: { turbo_frame: "_top" } %>
       <%= link_to "Builders & Developers", builders_path, class: "lv-pill lv-pill--dark", data: { turbo_frame: "_top" } %>
     </div>
   </article>
@@ -15,33 +30,30 @@
 <section class="lv-section">
   <header class="lv-section__header">
     <p class="lv-kicker">Partner Types</p>
-    <h2>Who we work with across projects</h2>
+    <h2 style="<%= public_text_style(partners_styles, "partner_types_title") %>"><%= partners_texts.fetch("partner_types_title", "Who we work with across projects") %></h2>
   </header>
   <div class="lv-partner-grid">
-    <article>Developers</article>
-    <article>Builders</article>
-    <article>Architects</article>
-    <article>Interior Designers</article>
-    <article>Window Furnishing Businesses</article>
-    <article>Real Estate Professionals</article>
+    <% partners_arrays.fetch("partner_types", []).each do |label| %>
+      <article style="<%= public_text_style(partners_styles, "partner_types") %>"><%= label %></article>
+    <% end %>
   </div>
 </section>
 
 <section class="lv-section lv-section--split">
   <article class="lv-panel">
-    <%= image_tag "public-e-12.jpg", alt: "Bedroom styled with sheers", class: "lv-panel__image" %>
+    <%= image_tag partners_images.fetch("split_image", "public-e-12.jpg"), alt: "Bedroom styled with sheers", class: "lv-panel__image" %>
   </article>
   <article class="lv-panel lv-panel--copy">
-    <h2>Built for repeat projects</h2>
-    <p>Clear quoting, practical communication, and dependable delivery.</p>
+    <h2 style="<%= public_text_style(partners_styles, "split_title") %>"><%= partners_texts.fetch("split_title", "Built for repeat projects") %></h2>
+    <p style="<%= public_text_style(partners_styles, "split_lead") %>"><%= partners_texts.fetch("split_lead", "Clear quoting, practical communication, and dependable delivery.") %></p>
     <ul class="lv-bullet-list">
-      <li>Clear updates from quote to install</li>
-      <li>Consistent quality across projects</li>
-      <li>Delivery you can plan around</li>
+      <% partners_arrays.fetch("bullets", []).each do |bullet| %>
+        <li style="<%= public_text_style(partners_styles, "bullets") %>"><%= bullet %></li>
+      <% end %>
     </ul>
     <div class="lv-actions">
-      <%= link_to "Get in touch", root_path(anchor: "get-in-touch"), class: "lv-pill", data: { turbo_frame: "_top" } %>
-      <%= link_to "B2B Login", new_user_session_path, class: "lv-pill lv-pill--dark", data: { turbo_frame: "_top" } %>
+      <%= link_to site_setting(:public_cta_contact_label), root_path(anchor: "get-in-touch"), class: "lv-pill", data: { turbo_frame: "_top" } %>
+      <%= link_to site_setting(:public_cta_login_label), new_user_session_path, class: "lv-pill lv-pill--dark", data: { turbo_frame: "_top" } %>
     </div>
   </article>
 </section>

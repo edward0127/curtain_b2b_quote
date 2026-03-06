@@ -57,6 +57,93 @@ Rails app for B2B curtain quote requests with:
 
    - `http://localhost:3000`
 
+## S3 Setup (Public Page Image Uploads)
+
+The website page editor (`/edit`) now supports uploading page images to S3 instead of writing to `public/uploads/...`.
+
+### 1) Recommended bucket security
+
+- Keep **S3 Block Public Access ON**.
+- Serve images through **CloudFront + Origin Access Control (OAC)**.
+- Set `PUBLIC_UPLOAD_ASSET_HOST` to your CloudFront domain (for example `https://d123abc.cloudfront.net`).
+
+### 2) Environment variables
+
+Set these in `.env.prod` (or your server environment):
+
+```bash
+PUBLIC_UPLOAD_S3_BUCKET=your-public-page-images-bucket
+PUBLIC_UPLOAD_S3_REGION=ap-southeast-2
+PUBLIC_UPLOAD_ASSET_HOST=https://your-cloudfront-domain
+AWS_REGION=ap-southeast-2
+AWS_ACCESS_KEY_ID=...
+AWS_SECRET_ACCESS_KEY=...
+```
+
+If you are using an IAM role on the server, omit `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`.
+
+### 3) IAM policy for app upload credentials/role
+
+Attach this policy to the IAM user/role used by the app:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ListBucket",
+      "Effect": "Allow",
+      "Action": ["s3:ListBucket"],
+      "Resource": "arn:aws:s3:::your-public-page-images-bucket"
+    },
+    {
+      "Sid": "ManagePublicPageObjects",
+      "Effect": "Allow",
+      "Action": ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"],
+      "Resource": "arn:aws:s3:::your-public-page-images-bucket/public_pages/*"
+    }
+  ]
+}
+```
+
+### 4) Bucket policy for CloudFront OAC (private bucket)
+
+Replace the distribution ARN and bucket name:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowCloudFrontReadOnly",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "cloudfront.amazonaws.com"
+      },
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::your-public-page-images-bucket/*",
+      "Condition": {
+        "StringEquals": {
+          "AWS:SourceArn": "arn:aws:cloudfront::123456789012:distribution/EXAMPLE123"
+        }
+      }
+    }
+  ]
+}
+```
+
+### 5) Rails Active Storage (optional S3 backend)
+
+If you also want Rails Active Storage files on S3:
+
+```bash
+ACTIVE_STORAGE_SERVICE=amazon
+AWS_S3_BUCKET=your-active-storage-bucket
+AWS_REGION=ap-southeast-2
+AWS_ACCESS_KEY_ID=...
+AWS_SECRET_ACCESS_KEY=...
+```
+
 ## Main Flow
 
 1. Admin logs in and opens `Manage Customers`.
@@ -148,3 +235,14 @@ cd /var/curtain_b2b_quote
 git pull
 ./script/deploy.sh deploy
 ```
+
+Hi currently when new changes are done, I need to commit the change and push to remote repo, then regenerate the docker image via the command:
+  SHA=$(git rev-parse --short HEAD)
+  docker buildx build --platform linux/amd64 \
+    -t ghcr.io/edward0127/curtain_b2b_quote:$SHA \
+    -t ghcr.io/edward0127/curtain_b2b_quote:latest \
+    --push .
+  then run the command to ssh to remote server: ssh root@amituofo.com.au and go to the dictionary /var/curtain_b2b_quote and run the command to update the live site
+  git pull
+  ./script/deploy.sh deploy
+  Could you automate the whole process similar to C:\Users\edward\projects\saas_savings_site\script\deploy_production.sh does?

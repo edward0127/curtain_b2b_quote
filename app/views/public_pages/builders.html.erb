@@ -1,50 +1,65 @@
+<% builders_content = @builders_content || app_setting.builders_page_content(preview: false) %>
+<% builders_texts = builders_content.fetch("texts", {}) %>
+<% builders_arrays = builders_content.fetch("arrays", {}) %>
+<% builders_images = builders_content.fetch("images", {}) %>
+<% builders_styles = builders_content.fetch("styles", {}) %>
+
+<% if current_user&.admin? && params[:preview].to_s == "1" %>
+  <section class="panel">
+    <p class="muted" style="margin: 0;">
+      Preview mode is active.
+      <%= link_to "Return to editor", edit_builders_page_path, data: { turbo_frame: "_top" } %>
+    </p>
+  </section>
+<% end %>
+
 <section class="lv-hero lv-hero--builders">
-  <%= image_tag "public-e-40.jpg", class: "lv-hero__image", alt: "Custom curtains in a modern lounge setting" %>
+  <%= image_tag builders_images.fetch("hero_image", site_setting(:public_builders_hero_image)), class: "lv-hero__image", alt: "Custom curtains in a modern lounge setting" %>
   <div class="lv-hero__veil"></div>
   <article class="lv-hero__content">
     <p class="lv-kicker">Builders & Developers</p>
-    <h1>The finishing touch that completes every project</h1>
-    <p class="lv-lead">Trade-focused curtains and tracks for builders and developers.</p>
+    <h1 style="<%= public_text_style(builders_styles, "hero_title") %>"><%= builders_texts.fetch("hero_title", site_setting(:public_builders_hero_title)) %></h1>
+    <p class="lv-lead" style="<%= public_text_style(builders_styles, "hero_lead") %>"><%= builders_texts.fetch("hero_lead", site_setting(:public_builders_hero_lead)) %></p>
     <div class="lv-actions">
-      <%= link_to "Get in touch", root_path(anchor: "get-in-touch"), class: "lv-pill", data: { turbo_frame: "_top" } %>
-      <%= link_to "B2B Login", new_user_session_path, class: "lv-pill lv-pill--dark", data: { turbo_frame: "_top" } %>
+      <%= link_to site_setting(:public_cta_contact_label), root_path(anchor: "get-in-touch"), class: "lv-pill", data: { turbo_frame: "_top" } %>
+      <%= link_to site_setting(:public_cta_login_label), new_user_session_path, class: "lv-pill lv-pill--dark", data: { turbo_frame: "_top" } %>
     </div>
   </article>
 </section>
 
 <section class="lv-section lv-section--split">
   <article class="lv-panel">
-    <%= image_tag "public-e-3.jpg", alt: "Open plan living room with sheers", class: "lv-panel__image" %>
+    <%= image_tag builders_images.fetch("split_image_one", "public-e-3.jpg"), alt: "Open plan living room with sheers", class: "lv-panel__image" %>
   </article>
   <article class="lv-panel lv-panel--copy">
     <header class="lv-section__header">
       <p class="lv-kicker">Why It Matters</p>
-      <h2>Curtains shape how finished homes feel</h2>
+      <h2 style="<%= public_text_style(builders_styles, "why_title") %>"><%= builders_texts.fetch("why_title", "Curtains shape how finished homes feel") %></h2>
     </header>
-    <p>Well-fitted sheers and blockouts add warmth, improve presentation, and complete the space.</p>
+    <p style="<%= public_text_style(builders_styles, "why_lead") %>"><%= builders_texts.fetch("why_lead", "Well-fitted sheers and blockouts add warmth, improve presentation, and complete the space.") %></p>
     <ul class="lv-bullet-list">
-      <li>Better presentation at handover</li>
-      <li>Stronger buyer appeal</li>
-      <li>Ready-to-live-in feel</li>
+      <% builders_arrays.fetch("why_bullets", []).each do |bullet| %>
+        <li style="<%= public_text_style(builders_styles, "why_bullets") %>"><%= bullet %></li>
+      <% end %>
     </ul>
   </article>
 </section>
 
 <section class="lv-section lv-section--split">
   <article class="lv-panel">
-    <%= image_tag "public-e-37.jpg", alt: "Close-up of quality curtain fabric", class: "lv-panel__image" %>
+    <%= image_tag builders_images.fetch("split_image_two", "public-e-37.jpg"), alt: "Close-up of quality curtain fabric", class: "lv-panel__image" %>
   </article>
   <article class="lv-panel">
-    <h2>Ready to quote your next development?</h2>
-    <p>Fast pricing, practical communication, and reliable delivery.</p>
+    <h2 style="<%= public_text_style(builders_styles, "quote_title") %>"><%= builders_texts.fetch("quote_title", "Ready to quote your next development?") %></h2>
+    <p style="<%= public_text_style(builders_styles, "quote_lead") %>"><%= builders_texts.fetch("quote_lead", "Fast pricing, practical communication, and reliable delivery.") %></p>
     <ul class="lv-bullet-list">
-      <li>True wholesale pricing</li>
-      <li>Quick turnaround</li>
-      <li>Tailored service to your project specs</li>
+      <% builders_arrays.fetch("quote_bullets", []).each do |bullet| %>
+        <li style="<%= public_text_style(builders_styles, "quote_bullets") %>"><%= bullet %></li>
+      <% end %>
     </ul>
     <div class="lv-actions">
-      <%= link_to "Get in touch", root_path(anchor: "get-in-touch"), class: "lv-pill", data: { turbo_frame: "_top" } %>
-      <%= link_to "B2B Login", new_user_session_path, class: "lv-pill lv-pill--dark", data: { turbo_frame: "_top" } %>
+      <%= link_to site_setting(:public_cta_contact_label), root_path(anchor: "get-in-touch"), class: "lv-pill", data: { turbo_frame: "_top" } %>
+      <%= link_to site_setting(:public_cta_login_label), new_user_session_path, class: "lv-pill lv-pill--dark", data: { turbo_frame: "_top" } %>
     </div>
   </article>
 </section>

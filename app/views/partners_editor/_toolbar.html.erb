@@ -1,0 +1,84 @@
+<section class="partners-editor-toolbar">
+  <p class="partners-editor-note">Edit mode is enabled. Click text to edit, then click Save Draft before Preview or Publish.</p>
+  <p class="partners-editor-note partners-editor-note--dirty" data-partners-editor-target="dirtyNotice" hidden>Unsaved changes in browser only. Click Save Draft to include them in preview/publish.</p>
+
+  <div class="partners-editor-toolbar__grid">
+    <label>
+      Font size
+      <input type="number" min="10" max="160" step="1" data-partners-editor-target="fontSize" data-action="input->partners-editor#updateSelectedStyle change->partners-editor#updateSelectedStyle">
+    </label>
+
+    <label>
+      Font weight
+      <select data-partners-editor-target="fontWeight" data-action="change->partners-editor#updateSelectedStyle">
+        <option value="">Default</option>
+        <option value="400">400</option>
+        <option value="500">500</option>
+        <option value="600">600</option>
+        <option value="700">700</option>
+        <option value="800">800</option>
+      </select>
+    </label>
+
+    <label>
+      Color
+      <input type="color" value="#ffffff" data-partners-editor-target="fontColor" data-action="input->partners-editor#updateSelectedStyle change->partners-editor#updateSelectedStyle">
+    </label>
+
+    <label>
+      Align
+      <select data-partners-editor-target="textAlign" data-action="change->partners-editor#updateSelectedStyle">
+        <option value="">Default</option>
+        <option value="left">Left</option>
+        <option value="center">Center</option>
+        <option value="right">Right</option>
+        <option value="justify">Justify</option>
+      </select>
+    </label>
+
+    <label>
+      Text transform
+      <select data-partners-editor-target="textTransform" data-action="change->partners-editor#updateSelectedStyle">
+        <option value="">Default</option>
+        <option value="none">None</option>
+        <option value="uppercase">UPPERCASE</option>
+        <option value="lowercase">lowercase</option>
+        <option value="capitalize">Capitalize</option>
+      </select>
+    </label>
+
+    <label>
+      Font family
+      <select data-partners-editor-target="fontFamily" data-action="change->partners-editor#updateSelectedStyle">
+        <option value="">Global setting</option>
+        <% AppSetting::PUBLIC_FONT_OPTIONS.each do |label, value| %>
+          <option value="<%= value %>"><%= label %></option>
+        <% end %>
+      </select>
+    </label>
+
+    <label>
+      Letter spacing
+      <input type="number" min="-4" max="24" step="0.1" data-partners-editor-target="letterSpacing" data-action="input->partners-editor#updateSelectedStyle change->partners-editor#updateSelectedStyle">
+    </label>
+
+    <label>
+      Line height
+      <input type="number" min="0.8" max="3" step="0.05" data-partners-editor-target="lineHeight" data-action="input->partners-editor#updateSelectedStyle change->partners-editor#updateSelectedStyle">
+    </label>
+
+    <label>
+      Italic text
+      <span style="display: inline-flex; align-items: center; gap: 0.35rem;">
+        <input type="checkbox" data-partners-editor-target="fontItalic" data-action="change->partners-editor#updateSelectedStyle">
+        <span>Enable</span>
+      </span>
+    </label>
+  </div>
+
+  <div class="partners-editor-toolbar__actions">
+    <%= button_tag "Save Draft", type: "submit", name: "editor_action", value: "save", class: "button button--secondary", data: { partners_editor_target: "saveButton" } %>
+    <%= button_tag "Preview", type: "submit", name: "editor_action", value: "preview", class: "button button--ghost", formtarget: "_blank" %>
+    <%= button_tag "Publish", type: "submit", name: "editor_action", value: "publish", class: [ "button", "button--primary", ("partners-editor-button--pending" if draft_pending) ].compact.join(" "), data: { partners_editor_target: "publishButton", turbo_confirm: "Publish saved draft changes now?" } %>
+  </div>
+</section>

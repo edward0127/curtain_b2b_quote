@@ -49,7 +49,9 @@ class Admin::SettingsController < ApplicationController
       :quote_receiver_email,
       :app_host,
       :app_port,
-      :app_protocol
+      :app_protocol,
+      :public_heading_font,
+      :public_body_font
     )
 
     if permitted[:mailgun_smtp_password].blank?

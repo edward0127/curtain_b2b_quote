@@ -1,6 +1,14 @@
 Rails.application.routes.draw do
   devise_for :users, skip: [ :registrations ]
 
+  get "edit", to: "partners_editor#home", as: :edit_pages
+  get "edit/partners", to: "partners_editor#partners", as: :edit_partners_page
+  get "edit/builders", to: "partners_editor#builders", as: :edit_builders_page
+  patch "edit/:page", to: "partners_editor#update", as: :update_page_editor
+
+  get "partners/edit", to: redirect("/edit/partners")
+  patch "partners/edit", to: "partners_editor#update", defaults: { page: "partners" }, as: :update_partners_page
+
   get "partners", to: "public_pages#partners"
   get "builders", to: "public_pages#builders"
   get "builders-developers", to: "public_pages#builders"

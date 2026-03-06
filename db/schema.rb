@@ -10,18 +10,42 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_21_100000) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_05_122000) do
   create_table "app_settings", force: :cascade do |t|
     t.string "app_host"
     t.integer "app_port"
     t.string "app_protocol"
+    t.text "builders_page_draft_json"
+    t.text "builders_page_published_json"
     t.datetime "created_at", null: false
+    t.text "home_page_draft_json"
+    t.text "home_page_published_json"
     t.string "mail_from_email"
     t.string "mailgun_domain"
     t.string "mailgun_smtp_address"
     t.string "mailgun_smtp_password"
     t.integer "mailgun_smtp_port"
     t.string "mailgun_smtp_username"
+    t.text "partners_page_draft_json"
+    t.text "partners_page_published_json"
+    t.string "public_body_font"
+    t.string "public_builders_hero_image"
+    t.text "public_builders_hero_lead"
+    t.text "public_builders_hero_title"
+    t.string "public_cta_contact_label"
+    t.string "public_cta_login_label"
+    t.text "public_footer_tagline"
+    t.string "public_heading_font"
+    t.text "public_home_contact_subtitle"
+    t.text "public_home_contact_title"
+    t.string "public_home_hero_image"
+    t.text "public_home_hero_lead"
+    t.text "public_home_hero_title"
+    t.text "public_home_products_title"
+    t.text "public_home_why_title"
+    t.string "public_partners_hero_image"
+    t.text "public_partners_hero_lead"
+    t.text "public_partners_hero_title"
     t.string "quote_receiver_email"
     t.datetime "updated_at", null: false
   end
