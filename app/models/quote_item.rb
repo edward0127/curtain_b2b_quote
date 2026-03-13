@@ -2,6 +2,16 @@ class QuoteItem < ApplicationRecord
   belongs_to :quote_request
   belongs_to :product
 
+  enum :opening_type, {
+    single_open: 0,
+    double_open: 1
+  }, prefix: true
+
+  enum :finished_floor_mode, {
+    just_off_floor: 0,
+    puddled: 1
+  }, prefix: true
+
   validates :quantity, numericality: { only_integer: true, greater_than: 0 }
   validates :width, :height, numericality: { greater_than: 0 }, if: :requires_dimensions?
 
@@ -22,6 +32,7 @@ class QuoteItem < ApplicationRecord
 
   def calculate_pricing_snapshot
     return unless product
+    return if order_v2_snapshot?
 
     self.area_sqm = requires_dimensions? ? computed_area_sqm : 0
     base_unit_price = product.per_square_meter? ? area_sqm.to_d * product.base_price.to_d : product.base_price.to_d
@@ -40,5 +51,9 @@ class QuoteItem < ApplicationRecord
 
   def computed_area_sqm
     ((width.to_d * height.to_d) / 10_000).round(3)
+  end
+
+  def order_v2_snapshot?
+    width_mm.present? && ceiling_drop_mm.present?
   end
 end

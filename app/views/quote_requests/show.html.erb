@@ -1,22 +1,20 @@
 <section class="hero hero--compact">
   <div>
-    <p class="eyebrow">Quote Detail</p>
+    <p class="eyebrow"><%= quote_or_order_label %> Detail</p>
     <h2><%= @quote_request.quote_number %></h2>
     <p class="lead">Submitted on <%= l(@quote_request.created_at, format: :long) %>.</p>
   </div>
-  <span class="status-pill status-pill--<%= @quote_request.status %>"><%= @quote_request.status.humanize %></span>
+  <span class="status-pill status-pill--<%= @quote_request.status %>"><%= @quote_request.display_status %></span>
 </section>
+
+<% order_workflow_quote = QuoteRequest::ORDER_WORKFLOW_STATUSES.include?(@quote_request.status) %>
 
 <section class="detail-grid">
   <article class="detail-card">
-    <h3>Quote Summary</h3>
+    <h3><%= quote_or_order_label %> Summary</h3>
     <p><strong>Reference</strong> <span><%= @quote_request.customer_reference.presence || "Not provided" %></span></p>
-    <p><strong>Template</strong> <span><%= @quote_request.quote_template.heading %></span></p>
     <p><strong>Valid Until</strong> <span><%= l(@quote_request.valid_until, format: :long) %></span></p>
     <p><strong>Total</strong> <span><%= number_to_currency(@quote_request.total, unit: "#{@quote_request.currency} ") %></span></p>
-    <% if @quote_request.job.present? %>
-      <p><strong>Job</strong> <span><%= @quote_request.job.job_number %></span></p>
-    <% end %>
   </article>
   <article class="detail-card">
     <h3>Notes</h3>
@@ -63,8 +61,8 @@
 </section>
 
 <div class="actions">
-  <%= link_to "Open Printable Quote", document_quote_request_path(@quote_request), class: "button button--secondary" %>
-  <%= link_to "Download PDF", document_quote_request_path(@quote_request, format: :pdf), class: "button button--primary" %>
+  <%= link_to "Open Printable #{quote_or_order_label}", document_quote_request_path(@quote_request), class: "button button--secondary" %>
+  <%= link_to(order_workflow_quote ? "Invoice PDF" : "Download PDF", document_quote_request_path(@quote_request, format: :pdf), class: "button button--primary") %>
 </div>
 
-<p class="section-link"><%= link_to "Back to my quotes", quote_requests_path %></p>
+<p class="section-link"><%= link_to "Back to my #{quote_or_order_label(count: 2, capitalize: false)}", quote_requests_path %></p>

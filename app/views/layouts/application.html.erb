@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= content_for(:title) || "Curtain B2b Quote" %></title>
+    <% portal_title = "Curtain B2B Order Portal" %>
+    <title><%= content_for(:title) || portal_title %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="Curtain B2b Quote">
+    <meta name="application-name" content="<%= portal_title %>">
     <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
@@ -33,7 +34,7 @@
         <header class="topbar card card--blur">
           <div>
             <p class="eyebrow">Operations Workspace</p>
-            <h1 class="topbar__title">Curtain B2B Quote Portal</h1>
+            <h1 class="topbar__title"><%= portal_title %></h1>
           </div>
 
           <div class="topbar__right">
@@ -51,15 +52,16 @@
               <%= link_to "Dashboard", dashboard_path, data: { turbo_frame: "_top" } %>
               <% if current_user.admin? %>
                 <%= link_to "Manage Customers", dashboard_path(tab: :customers, compact: 1), data: { turbo_frame: "_top" } %>
-                <%= link_to "Quotes Workflow", admin_quote_requests_path, data: { turbo_frame: "_top" } %>
+                <%= link_to "#{quote_or_order_label} Workflow", admin_quote_requests_path, data: { turbo_frame: "_top" } %>
+                <%= link_to "Pricebook Import", admin_pricebook_imports_path, data: { turbo_frame: "_top" } %>
+                <%= link_to "Components Inventory", admin_inventory_items_path, data: { turbo_frame: "_top" } %>
                 <%= link_to "Products", admin_products_path, data: { turbo_frame: "_top" } %>
-                <%= link_to "Templates", admin_quote_templates_path, data: { turbo_frame: "_top" } %>
-                <%= link_to "Jobs", admin_jobs_path, data: { turbo_frame: "_top" } %>
                 <%= link_to "Open System Settings", dashboard_path(tab: :settings, compact: 1), data: { turbo_frame: "_top" } %>
                 <%= link_to "Edit Pages", edit_pages_path, data: { turbo_frame: "_top" } %>
               <% else %>
-                <%= link_to "Submit a New Quote", dashboard_path(tab: :new_quote), data: { turbo_frame: "_top" } %>
-                <%= link_to "View Full Quote History", dashboard_path(tab: :history), data: { turbo_frame: "_top" } %>
+                <%= link_to "Shop", b2b_shop_path, data: { turbo_frame: "_top" } %>
+                <%= link_to "Cart", b2b_cart_path, data: { turbo_frame: "_top" } %>
+                <%= link_to "Order History", dashboard_path(tab: :history), data: { turbo_frame: "_top" } %>
                 <% if impersonating? && impersonator_admin_user.present? %>
                   <%= button_to "Return to Admin", impersonation_path, method: :delete, class: "button button--secondary", form: { class: "inline-form" } %>
                 <% end %>

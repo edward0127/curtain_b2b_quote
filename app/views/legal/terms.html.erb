@@ -9,7 +9,7 @@
 <section class="panel legal-doc">
   <h3>1. Service</h3>
   <p>
-    Curtain B2B Quote Portal provides business customers with access to quote requests,
+    Curtain B2B Order Portal provides business customers with access to order requests,
     order workflow, and related transactional communications.
   </p>
 
@@ -27,7 +27,8 @@
 
   <h3>4. Email Communications</h3>
   <p>
-    The platform sends transactional emails related to quote submission, workflow updates, and account operations.
+    The platform sends transactional emails related to order submission,
+    workflow updates, and account operations.
     We do not send unsolicited marketing from this portal.
   </p>
 
@@ -44,6 +45,6 @@
 
   <h3>7. Contact</h3>
   <p>
-    For legal or account questions, contact: <a href="mailto:edward0127@hotmail.com">edward0127@hotmail.com</a>.
+    For legal or account questions, contact: <%= mail_to AppSetting.fetch(:quote_receiver_email), AppSetting.fetch(:quote_receiver_email) %>.
   </p>
 </section>

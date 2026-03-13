@@ -1,24 +1,24 @@
 <%= turbo_frame_tag "customer_dashboard_tabs" do %>
   <section class="tabs">
-    <%= link_to "Submit a New Quote", dashboard_path(tab: :new_quote), data: { turbo_frame: "customer_dashboard_tabs" }, class: [ "tab", (@customer_tab == "new_quote" ? "tab--active" : nil) ].compact.join(" ") %>
-    <%= link_to "View Full Quote History", dashboard_path(tab: :history), data: { turbo_frame: "customer_dashboard_tabs" }, class: [ "tab", (@customer_tab == "history" ? "tab--active" : nil) ].compact.join(" ") %>
+    <%= link_to "Start New Order", dashboard_path(tab: :new_quote), data: { turbo_frame: "customer_dashboard_tabs" }, class: [ "tab", (@customer_tab == "new_quote" ? "tab--active" : nil) ].compact.join(" ") %>
+    <%= link_to "View Full Order History", dashboard_path(tab: :history), data: { turbo_frame: "customer_dashboard_tabs" }, class: [ "tab", (@customer_tab == "history" ? "tab--active" : nil) ].compact.join(" ") %>
   </section>
 
   <% if @customer_tab == "new_quote" %>
     <section class="panel tab-panel">
-      <h3>Submit Multi-Item Quote</h3>
-      <p class="muted">Build quotes with multiple products, dimensions, and quantity lines.</p>
-      <p><%= link_to "Open Quote Builder", new_quote_request_path, class: "button button--primary", data: { turbo_frame: "_top" } %></p>
+      <h3>Build Multi-Item Order</h3>
+      <p class="muted">Configure products in the B2B shop and submit your order from cart.</p>
+      <p><%= link_to "Open B2B Shop", b2b_shop_path, class: "button button--primary", data: { turbo_frame: "_top" } %></p>
     </section>
   <% else %>
     <section class="panel tab-panel">
-      <h3>Full Quote History</h3>
+      <h3>Full Order History</h3>
       <div class="table-wrap">
         <table class="data-table">
           <thead>
             <tr>
               <th>ID</th>
-              <th>Quote #</th>
+              <th><%= quote_or_order_label %> #</th>
               <th>Items</th>
               <th>Total</th>
               <th>Status</th>
@@ -28,16 +28,17 @@
           </thead>
           <tbody>
             <% @quote_history.each do |quote| %>
+              <% order_workflow_quote = QuoteRequest::ORDER_WORKFLOW_STATUSES.include?(quote.status) %>
               <tr>
                 <td><%= link_to quote.id, quote_request_path(quote), data: { turbo_frame: "_top" } %></td>
                 <td><%= quote.quote_number %></td>
                 <td><%= quote.line_items_count %></td>
                 <td><%= number_to_currency(quote.total, unit: "#{quote.currency} ") %></td>
-                <td><span class="status-pill status-pill--<%= quote.status %>"><%= quote.status.humanize %></span></td>
+                <td><span class="status-pill status-pill--<%= quote.status %>"><%= quote.display_status %></span></td>
                 <td><%= l(quote.created_at, format: :short) %></td>
                 <td class="table-actions">
                   <%= link_to "View", quote_request_path(quote), class: "button button--secondary button--small", data: { turbo_frame: "_top" } %>
-                  <%= link_to "PDF", document_quote_request_path(quote, format: :pdf), class: "button button--primary button--small", data: { turbo_frame: "_top" } %>
+                  <%= link_to(order_workflow_quote ? "Invoice PDF" : "PDF", document_quote_request_path(quote, format: :pdf), class: "button button--primary button--small", data: { turbo_frame: "_top" }) %>
                 </td>
               </tr>
             <% end %>

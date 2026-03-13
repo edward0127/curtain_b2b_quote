@@ -1,4 +1,10 @@
 module ApplicationHelper
+  def quote_or_order_label(count: 1, capitalize: true)
+    noun = "order"
+    noun = noun.pluralize if count.to_i != 1
+    capitalize ? noun.capitalize : noun
+  end
+
   def site_setting(key)
     return AppSetting::DEFAULTS.fetch(key) unless app_setting.respond_to?(key)
 

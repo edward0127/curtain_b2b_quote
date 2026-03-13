@@ -26,7 +26,7 @@ export default class extends Controller {
     }
 
     if (this.hasMessageTarget) {
-      this.messageTarget.textContent = this.hasSubmittingMessageValue ? this.submittingMessageValue : "Submitting quote request. Please wait..."
+      this.messageTarget.textContent = this.hasSubmittingMessageValue ? this.submittingMessageValue : "Submitting order. Please wait..."
     }
   }
 

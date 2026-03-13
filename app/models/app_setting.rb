@@ -9,10 +9,16 @@ class AppSetting < ApplicationRecord
     mailgun_smtp_port: "MAILGUN_SMTP_PORT",
     mail_from_email: "MAIL_FROM_EMAIL",
     quote_receiver_email: "QUOTE_RECEIVER_EMAIL",
+    bank_account_name: "BANK_ACCOUNT_NAME",
+    bank_name: "BANK_NAME",
+    bank_bsb: "BANK_BSB",
+    bank_account_number: "BANK_ACCOUNT_NUMBER",
     app_host: "APP_HOST",
     app_port: "APP_PORT",
     app_protocol: "APP_PROTOCOL"
   }.freeze
+
+  BOOLEAN_KEYS = [].freeze
 
   PUBLIC_FONT_OPTIONS = {
     "Fraunces (Serif)" => "fraunces",
@@ -131,16 +137,22 @@ class AppSetting < ApplicationRecord
   EDITOR_PAGE_KEYS = %w[home partners builders].freeze
 
   DEFAULTS = {
-    mailgun_domain: "email.tudouke.com",
-    mailgun_smtp_username: "postmaster@email.tudouke.com",
+    mailgun_domain: "example.mailgun.org",
+    mailgun_smtp_username: "postmaster@example.mailgun.org",
     mailgun_smtp_password: "",
     mailgun_smtp_address: "smtp.mailgun.org",
     mailgun_smtp_port: 587,
-    mail_from_email: "no-reply@email.tudouke.com",
-    quote_receiver_email: "edward0127@hotmail.com",
+    mail_from_email: "no-reply@example.com",
+    quote_receiver_email: "orders@example.com",
+    bank_account_name: "",
+    bank_name: "",
+    bank_bsb: "",
+    bank_account_number: "",
     app_host: "localhost",
     app_port: 3000,
     app_protocol: "http",
+    pickup_address_default: "1/73 Darvall street, Donvale, 3111",
+    delivery_note_default: "Delivery 2 business days",
 
     public_heading_font: "fraunces",
     public_body_font: "plus_jakarta_sans",
@@ -165,6 +177,7 @@ class AppSetting < ApplicationRecord
   validates :mailgun_smtp_port, numericality: { only_integer: true, greater_than: 0 }
   validates :app_port, numericality: { only_integer: true, greater_than: 0 }
   validates :mail_from_email, :quote_receiver_email, :mailgun_smtp_address, :mailgun_domain, :app_host, :app_protocol, presence: true
+  validates :pickup_address_default, :delivery_note_default, presence: true
   validates :mailgun_smtp_username, presence: true
   validates :public_heading_font, inclusion: { in: PUBLIC_FONT_STACKS.keys }
   validates :public_body_font, inclusion: { in: PUBLIC_FONT_STACKS.keys }
@@ -212,8 +225,12 @@ class AppSetting < ApplicationRecord
   def self.default_attributes
     DEFAULTS.each_with_object({}) do |(key, _), attrs|
       value = env_or_default(key)
-      attrs[key.to_s] = [ :mailgun_smtp_port, :app_port ].include?(key) ? value.to_i : value
+      attrs[key.to_s] = normalize_default_value(key, value)
     end
+  end
+
+  def self.orders_v2_enabled?
+    true
   end
 
   def apply_defaults
@@ -236,7 +253,20 @@ class AppSetting < ApplicationRecord
     ENV.fetch(env_key, default)
   end
 
-  private_class_method :fallback_for, :env_or_default
+  def self.normalize_default_value(key, value)
+    return value.to_i if [ :mailgun_smtp_port, :app_port ].include?(key)
+    return cast_boolean(value) if BOOLEAN_KEYS.include?(key.to_sym)
+
+    value
+  end
+
+  def self.cast_boolean(value)
+    return value if value == true || value == false
+
+    ActiveModel::Type::Boolean.new.cast(value)
+  end
+
+  private_class_method :fallback_for, :env_or_default, :normalize_default_value, :cast_boolean
 
   def page_content(page_key, preview: false)
     page = normalize_page_key(page_key)

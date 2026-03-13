@@ -2,7 +2,7 @@
   <div>
     <p class="eyebrow">Catalog</p>
     <h2>Products</h2>
-    <p class="lead">Manage curtain product definitions and base pricing.</p>
+    <p class="lead">Manage products, customer channel (B2B/B2C), and inventory mappings.</p>
   </div>
   <%= link_to "New Product", new_admin_product_path, class: "button button--primary" %>
 </section>
@@ -15,8 +15,8 @@
           <th>Name</th>
           <th>SKU</th>
           <th>Pricing Mode</th>
-          <th>Base Price</th>
-          <th>Rules</th>
+          <th>Channel</th>
+          <th>Pricing</th>
           <th>Status</th>
           <th>Actions</th>
         </tr>
@@ -27,10 +27,17 @@
             <td><%= link_to product.name, admin_product_path(product) %></td>
             <td><%= product.sku.presence || "-" %></td>
             <td><%= product.pricing_mode.humanize %></td>
-            <td><%= number_to_currency(product.base_price, unit: "AUD ") %></td>
-            <td><%= product.pricing_rules.size %></td>
+            <% channel_key = product.pricing_channel.to_s.strip.downcase %>
+            <% channel_label, channel_class = case channel_key
+            when "b2b" then [ "B2B", "b2b" ]
+            when "b2c" then [ "B2C", "b2c" ]
+            else [ "Not set", "not_set" ]
+            end %>
+            <td><span class="status-pill status-pill--<%= channel_class %>"><%= channel_label %></span></td>
+            <td><%= @pricing_labels[product.id] %></td>
             <td><%= product.active? ? "Active" : "Inactive" %></td>
             <td class="table-actions">
+              <%= link_to "Preview price", preview_price_admin_product_path(product), class: "button button--secondary button--small" %>
               <%= link_to "Edit", edit_admin_product_path(product), class: "button button--secondary button--small" %>
               <%= button_to "Delete", admin_product_path(product), method: :delete, class: "button button--danger button--small", form: { class: "inline-form", data: { turbo_confirm: "Delete this product?" } } %>
             </td>

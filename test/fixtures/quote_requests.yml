@@ -1,6 +1,5 @@
 one:
   user: customer
-  quote_template: standard
   quote_number: Q-20260201-00001
   customer_reference: PO-1001
   currency: AUD
@@ -12,10 +11,11 @@ one:
   total: 180.00
   notes: Office boardroom
   status: 0
+  customer_mode: 0
+  pickup_method: 0
 
 two:
   user: customer
-  quote_template: premium
   quote_number: Q-20260201-00002
   customer_reference: PO-1002
   currency: AUD
@@ -27,3 +27,5 @@ two:
   total: 420.00
   notes: Reception area
   status: 1
+  customer_mode: 0
+  pickup_method: 0

@@ -6,6 +6,7 @@ class Admin::SettingsControllerTest < ActionDispatch::IntegrationTest
 
     get edit_admin_settings_url
     assert_response :success
+    assert_select "label", text: "Enable Orders v2", count: 0
   end
 
   test "admin can update settings" do
@@ -16,7 +17,13 @@ class Admin::SettingsControllerTest < ActionDispatch::IntegrationTest
       app_setting: {
         quote_receiver_email: "new.receiver@example.com",
         mail_from_email: "no-reply@new-domain.com",
+        bank_account_name: "Light Vue Pty Ltd",
+        bank_name: "ANZ",
+        bank_bsb: "013456",
+        bank_account_number: "987654321",
         app_protocol: "https",
+        pickup_address_default: "10 Example Road, Donvale, 3111",
+        delivery_note_default: "Delivery in 3 business days",
         mailgun_smtp_password: ""
       }
     }
@@ -25,7 +32,13 @@ class Admin::SettingsControllerTest < ActionDispatch::IntegrationTest
     setting = AppSetting.current
     assert_equal "new.receiver@example.com", setting.quote_receiver_email
     assert_equal "no-reply@new-domain.com", setting.mail_from_email
+    assert_equal "Light Vue Pty Ltd", setting.bank_account_name
+    assert_equal "ANZ", setting.bank_name
+    assert_equal "013456", setting.bank_bsb
+    assert_equal "987654321", setting.bank_account_number
     assert_equal "https", setting.app_protocol
+    assert_equal "10 Example Road, Donvale, 3111", setting.pickup_address_default
+    assert_equal "Delivery in 3 business days", setting.delivery_note_default
     assert_equal original_password, setting.mailgun_smtp_password
   end
 

@@ -1,10 +1,10 @@
 <section class="hero hero--compact">
   <div>
-    <p class="eyebrow">Quotes</p>
-    <h2>My Quote Requests</h2>
-    <p class="lead">Track quote workflow status, totals, and generated quote documents.</p>
+    <p class="eyebrow"><%= quote_or_order_label(count: 2) %></p>
+    <h2>My <%= quote_or_order_label(count: 2) %></h2>
+    <p class="lead">Track status, totals, and generated documents.</p>
   </div>
-  <%= link_to "Build New Quote", new_quote_request_path, class: "button button--primary" %>
+  <%= link_to "Start New Order", b2b_shop_path, class: "button button--primary" %>
 </section>
 
 <section class="panel">
@@ -13,28 +13,27 @@
       <thead>
         <tr>
           <th>ID</th>
-          <th>Quote #</th>
+          <th><%= quote_or_order_label %> #</th>
           <th>Items</th>
           <th>Total</th>
           <th>Status</th>
-          <th>Template</th>
           <th>Created</th>
           <th>Actions</th>
         </tr>
       </thead>
       <tbody>
         <% @quote_requests.each do |quote| %>
+          <% order_workflow_quote = QuoteRequest::ORDER_WORKFLOW_STATUSES.include?(quote.status) %>
           <tr>
             <td><%= link_to quote.id, quote_request_path(quote) %></td>
             <td><%= quote.quote_number %></td>
             <td><%= quote.line_items_count %></td>
             <td><%= number_to_currency(quote.total, unit: "#{quote.currency} ") %></td>
-            <td><span class="status-pill status-pill--<%= quote.status %>"><%= quote.status.humanize %></span></td>
-            <td><%= quote.quote_template.heading %></td>
+            <td><span class="status-pill status-pill--<%= quote.status %>"><%= quote.display_status %></span></td>
             <td><%= l(quote.created_at, format: :short) %></td>
             <td class="table-actions">
               <%= link_to "View", quote_request_path(quote), class: "button button--secondary button--small" %>
-              <%= link_to "PDF", document_quote_request_path(quote, format: :pdf), class: "button button--primary button--small" %>
+              <%= link_to(order_workflow_quote ? "Invoice PDF" : "PDF", document_quote_request_path(quote, format: :pdf), class: "button button--primary button--small") %>
             </td>
           </tr>
         <% end %>

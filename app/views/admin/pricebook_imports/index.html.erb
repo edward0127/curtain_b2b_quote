@@ -1,0 +1,50 @@
+<section class="hero hero--compact">
+  <div>
+    <p class="eyebrow">Admin</p>
+    <h2>Pricebook Imports</h2>
+    <p class="lead">Upload WHOLESALE Quote Form Tailored - J000.xlsx to refresh matrix pricing and shared track tiers.</p>
+  </div>
+  <%= link_to "Upload Pricebook", new_admin_pricebook_import_path, class: "button button--primary" %>
+</section>
+
+<section class="panel">
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Imported At</th>
+          <th>File</th>
+          <th>Status</th>
+          <th>By</th>
+          <th>Products</th>
+          <th>Matrix Rows</th>
+          <th>Track Tiers</th>
+          <th>Details</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @pricebook_imports.each do |import| %>
+          <tr>
+            <td><%= l(import.created_at, format: :short) %></td>
+            <td><%= import.source_filename %></td>
+            <td><span class="status-pill status-pill--<%= import.status %>"><%= import.status.humanize %></span></td>
+            <td><%= import.imported_by_user.email %></td>
+            <td><%= import.products_updated_count %></td>
+            <td><%= import.price_matrix_entries_count %></td>
+            <td><%= import.track_price_tiers_count %></td>
+            <td>
+              <% if import.failed? %>
+                <strong>Failed:</strong>
+                <%= import.error_message %>
+              <% elsif import.log_output.present? %>
+                <%= simple_format(import.log_output) %>
+              <% else %>
+                -
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</section>

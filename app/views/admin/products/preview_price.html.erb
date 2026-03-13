@@ -1,0 +1,87 @@
+<section class="hero hero--compact">
+  <div>
+    <p class="eyebrow">Pricing Preview</p>
+    <h2><%= @product.name %></h2>
+    <p class="lead">Preview a matrix-priced line without saving data.</p>
+  </div>
+  <div class="table-actions">
+    <%= link_to "Back to Products", admin_products_path, class: "button button--secondary" %>
+    <%= link_to "Product Detail", admin_product_path(@product), class: "button button--ghost" %>
+  </div>
+</section>
+
+<section class="panel">
+  <% if @available_matrix_channels.present? %>
+    <p class="muted">Available matrix customer modes for this product: <strong><%= @available_matrix_channels.map(&:upcase).join(", ") %></strong></p>
+  <% else %>
+    <p class="muted">No matrix rows imported for this product yet.</p>
+  <% end %>
+
+  <%= form_with url: preview_price_admin_product_path(@product), method: :get, scope: :preview, class: "form-grid" do |form| %>
+    <div class="field">
+      <%= form.label :customer_mode, "Customer mode" %>
+      <%= form.select :customer_mode, options_for_select([ [ "B2B", "b2b" ], [ "B2C", "b2c" ] ], @preview_input["customer_mode"]) %>
+    </div>
+
+    <div class="field">
+      <%= form.label :track_selected, "Track selected" %>
+      <%= form.select :track_selected, options_for_select([ [ "Yes", "1" ], [ "No", "0" ] ], @preview_input["track_selected"]) %>
+    </div>
+
+    <div class="field">
+      <%= form.label :width_mm, "Width (mm)" %>
+      <%= form.number_field :width_mm, min: 1, step: 1, value: @preview_input["width_mm"], required: true %>
+      <p class="muted">Use whole millimetres, e.g. 3830.</p>
+    </div>
+
+    <div class="field">
+      <%= form.label :drop_mm, "Drop (mm)" %>
+      <%= form.number_field :drop_mm, min: 1, step: 1, value: @preview_input["drop_mm"], required: true %>
+      <p class="muted">Use whole millimetres, e.g. 2410.</p>
+    </div>
+
+    <div class="actions field--full">
+      <%= form.submit "Preview Price", class: "button button--primary" %>
+    </div>
+  <% end %>
+
+  <section class="panel" id="preview-output">
+    <h3>Preview Output</h3>
+
+    <% if @preview_submitted %>
+      <p class="muted">
+        Last preview request:
+        mode <strong><%= @preview_input["customer_mode"].to_s.upcase %></strong>,
+        width <strong><%= @preview_input["width_mm"].presence || "-" %></strong> mm,
+        drop <strong><%= @preview_input["drop_mm"].presence || "-" %></strong> mm,
+        track <strong><%= ActiveModel::Type::Boolean.new.cast(@preview_input["track_selected"]) ? "Yes" : "No" %></strong>.
+      </p>
+    <% else %>
+      <p class="muted">Submit the form above to calculate a price preview.</p>
+    <% end %>
+
+    <% if @preview_error.present? %>
+      <div class="flash flash--alert">
+        <%= @preview_error %>
+      </div>
+    <% elsif @preview_result.present? %>
+      <div class="detail-grid">
+        <article class="detail-card">
+          <h3>Ex GST</h3>
+          <p><strong>Curtain price</strong> <span><%= number_to_currency(@preview_result[:curtain_price], unit: "AUD ") %></span></p>
+          <p><strong>Track price</strong> <span><%= number_to_currency(@preview_result[:track_price], unit: "AUD ") %></span></p>
+          <p><strong>Line total</strong> <span><%= number_to_currency(@preview_result[:line_total], unit: "AUD ") %></span></p>
+        </article>
+        <article class="detail-card">
+          <h3>GST Breakdown</h3>
+          <p><strong>GST (10%)</strong> <span><%= number_to_currency(@preview_result[:gst], unit: "AUD ") %></span></p>
+          <p><strong>Total inc GST</strong> <span><%= number_to_currency(@preview_result[:total_inc_gst], unit: "AUD ") %></span></p>
+        </article>
+      </div>
+    <% elsif @preview_submitted %>
+      <div class="flash flash--alert">
+        No preview result returned. Please verify inputs and try again.
+      </div>
+    <% end %>
+  </section>
+</section>

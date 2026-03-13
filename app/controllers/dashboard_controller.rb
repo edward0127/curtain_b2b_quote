@@ -8,7 +8,6 @@ class DashboardController < ApplicationController
       @customers = User.b2b_customer.order(created_at: :desc)
       @recent_quotes = QuoteRequest.includes(:user, :quote_items).recent_first.limit(10)
       @active_products_count = Product.active.count
-      @active_jobs_count = Job.open.count
       @app_setting = AppSetting.current if @admin_tab == "settings"
 
       if turbo_frame_request_for?("admin_dashboard_tabs")

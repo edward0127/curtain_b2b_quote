@@ -19,7 +19,7 @@ class ApplicationController < ActionController::Base
   def require_b2b_customer!
     return if current_user&.b2b_customer?
 
-    redirect_to root_path, alert: "Only B2B customer accounts can submit quotes."
+    redirect_to root_path, alert: "Only B2B customer accounts can submit orders."
   end
 
   def after_sign_in_path_for(_resource)

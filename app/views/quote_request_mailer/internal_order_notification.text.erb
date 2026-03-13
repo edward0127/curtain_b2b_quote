@@ -1,0 +1,11 @@
+New order submitted: <%= @quote_request.quote_number %>
+Customer contact: <%= @customer_contact %>
+Customer mode: <%= @quote_request.customer_mode.upcase %>
+Status: <%= @quote_request.display_status %>
+
+Line Items
+<% @quote_request.quote_items.each do |item| %>
+- <%= item.line_position %>. <%= item.location_name.presence || "-" %> | <%= item.product.name %> | Qty: <%= item.quantity %> | Line Total: <%= @quote_request.currency %> <%= format("%.2f", item.line_total) %>
+<% end %>
+
+Order Total: <%= @quote_request.currency %> <%= format("%.2f", @quote_request.total) %>

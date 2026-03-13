@@ -1,0 +1,61 @@
+<section class="hero hero--compact">
+  <div>
+    <p class="eyebrow">Admin</p>
+    <h2>Components Inventory</h2>
+    <p class="lead">Inventory here is for components (tracks, hooks, brackets, etc). Curtains themselves do not have stock because they are custom made. Available order quantity is calculated from component stock.</p>
+  </div>
+  <%= link_to "New Inventory Item", new_admin_inventory_item_path, class: "button button--primary" %>
+</section>
+
+<section class="panel">
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Component</th>
+          <th>SKU</th>
+          <th>On Hand</th>
+          <th>Active</th>
+          <th>Change Stock</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @inventory_items.each do |item| %>
+          <tr>
+            <td><%= item.name %></td>
+            <td><%= item.component_type.humanize %></td>
+            <td><%= item.sku.presence || "-" %></td>
+            <td><strong><%= item.on_hand %></strong></td>
+            <td><%= item.active? ? "Yes" : "No" %></td>
+            <td>
+              <% amount_field_id = "amount_#{item.id}" %>
+              <% mode_field_id = "mode_#{item.id}" %>
+              <%= form_with url: adjust_stock_admin_inventory_item_path(item), method: :patch, class: "inline-form", data: { turbo_confirm: "If you selected 'Remove stock', this will reduce available stock. Continue?" } do %>
+                <div style="display:grid; gap:0.35rem;">
+                  <div style="display:flex; gap:0.45rem; align-items:end; flex-wrap:wrap;">
+                    <div>
+                      <%= label_tag amount_field_id, "Amount" %>
+                      <%= number_field_tag :amount, 0, min: 0, id: amount_field_id, style: "width:84px;" %>
+                    </div>
+                    <div>
+                      <%= label_tag mode_field_id, "Action" %>
+                      <%= select_tag :mode, options_for_select([ [ "Set total stock to", "set" ], [ "Add stock", "increase" ], [ "Remove stock", "decrease" ] ]), id: mode_field_id %>
+                    </div>
+                    <%= submit_tag "Apply change", class: "button button--secondary button--small" %>
+                  </div>
+                  <small>Example: current stock 10 + add stock 5 = 15. "Set total stock to 5" replaces the current stock.</small>
+                </div>
+              <% end %>
+            </td>
+            <td class="table-actions">
+              <%= link_to "Edit", edit_admin_inventory_item_path(item), class: "button button--secondary button--small" %>
+              <%= button_to "Delete", admin_inventory_item_path(item), method: :delete, data: { turbo_confirm: "Delete #{item.name}?" }, class: "button button--danger button--small", form: { class: "inline-form" } %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</section>

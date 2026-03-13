@@ -40,7 +40,7 @@ class QuotePdfRenderer
   def draw_document
     y = 802
 
-    add_text(MARGIN, y, @quote_request.quote_template.heading.to_s, size: 22, font: :bold, color: COLORS[:ink])
+    add_text(MARGIN, y, OrderDocumentCopy.heading, size: 22, font: :bold, color: COLORS[:ink])
     y -= 28
     add_text(MARGIN, y, "Quote Number: #{@quote_request.quote_number}", size: 11, color: COLORS[:muted])
     y -= 16
@@ -88,8 +88,8 @@ class QuotePdfRenderer
     add_text(left_x + 72, row_y, truncate(@quote_request.customer_reference.presence || "N/A", 28), size: 10, color: COLORS[:ink])
 
     row_y = top_y - 20
-    add_text(right_x, row_y, "Template", size: 10, font: :bold, color: COLORS[:muted])
-    add_text(right_x + 70, row_y, truncate(@quote_request.quote_template.heading.to_s, 24), size: 10, color: COLORS[:ink])
+    add_text(right_x, row_y, "Document", size: 10, font: :bold, color: COLORS[:muted])
+    add_text(right_x + 70, row_y, truncate(OrderDocumentCopy.heading, 24), size: 10, color: COLORS[:ink])
 
     row_y -= 18
     add_text(right_x, row_y, "Items", size: 10, font: :bold, color: COLORS[:muted])
@@ -157,7 +157,7 @@ class QuotePdfRenderer
     fill_rect(MARGIN, bottom_y, CONTENT_WIDTH, bar_h, COLORS[:panel])
     stroke_rect(MARGIN, bottom_y, CONTENT_WIDTH, bar_h, COLORS[:line])
 
-    add_text(MARGIN + 12, bottom_y + 10, "Quote Total", size: 11, font: :bold, color: COLORS[:ink])
+    add_text(MARGIN + 12, bottom_y + 10, "Order Total", size: 11, font: :bold, color: COLORS[:ink])
     add_text(PAGE_WIDTH - MARGIN - 145, bottom_y + 10, money(@quote_request.total), size: 11, font: :bold, color: COLORS[:ink])
     bottom_y
   end
@@ -184,8 +184,8 @@ class QuotePdfRenderer
   end
 
   def draw_terms_and_footer(top_y)
-    terms_lines = wrap_text(@quote_request.quote_template.terms.presence || "Quote valid for 14 days unless otherwise stated.", 96).first(3)
-    footer_lines = wrap_text(@quote_request.quote_template.footer.presence || "Please contact us to proceed with this quote.", 96).first(2)
+    terms_lines = wrap_text(OrderDocumentCopy.terms, 96).first(3)
+    footer_lines = wrap_text(OrderDocumentCopy.footer, 96).first(2)
 
     y = [top_y, 132].max
     add_text(MARGIN, y, "Terms", size: 10, font: :bold, color: COLORS[:muted])

@@ -1,0 +1,35 @@
+<section class="hero hero--compact">
+  <div>
+    <p class="eyebrow">B2B Shop</p>
+    <h2>Order Products</h2>
+    <p class="lead">Select a product and configure dimensions to add it to your cart.</p>
+  </div>
+  <%= link_to "View Cart", b2b_cart_path, class: "button button--primary" %>
+</section>
+
+<section class="panel">
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>SKU</th>
+          <th>Description</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @products.each do |product| %>
+          <tr>
+            <td><%= product.name %></td>
+            <td><%= product.sku.presence || "-" %></td>
+            <td><%= product.description.presence || "-" %></td>
+            <td class="table-actions">
+              <%= link_to "Configure", b2b_shop_product_path(product), class: "button button--secondary button--small" %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</section>

@@ -1,0 +1,172 @@
+<section class="hero hero--compact">
+  <div>
+    <p class="eyebrow">Admin</p>
+    <h2>Create B2C Order</h2>
+    <p class="lead">Create a customer order manually from admin.</p>
+    <p class="muted">One line item = one window/location in the order.</p>
+  </div>
+</section>
+
+<% if @quote_request.errors.any? %>
+  <div class="flash flash--alert">
+    <strong><%= pluralize(@quote_request.errors.count, "error") %> prevented order submission:</strong>
+    <ul>
+      <% @quote_request.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<section class="panel">
+  <%= form_with model: [ :admin, @quote_request ], class: "form-grid" do |form| %>
+    <%= form.hidden_field :customer_mode, value: "b2c" %>
+
+    <div class="field">
+      <%= form.label :customer_name %>
+      <%= form.text_field :customer_name, required: true %>
+    </div>
+
+    <div class="field">
+      <%= form.label :company_name %>
+      <%= form.text_field :company_name, required: true %>
+      <small>Required for invoicing in the current workflow.</small>
+    </div>
+
+    <div class="field">
+      <%= form.label :customer_email %>
+      <%= form.email_field :customer_email, required: true %>
+    </div>
+
+    <div class="field">
+      <%= form.label :customer_phone %>
+      <%= form.telephone_field :customer_phone %>
+    </div>
+
+    <div class="field">
+      <%= form.label :pickup_method, "How would the customer like to receive this order?" %>
+      <%= form.select :pickup_method, QuoteRequest.pickup_methods.keys.map { |value| [ value.humanize, value ] }, required: true %>
+    </div>
+
+    <div class="field">
+      <%= form.label :customer_reference, "Order reference" %>
+      <%= form.text_field :customer_reference %>
+    </div>
+
+    <div class="field">
+      <%= form.label :valid_until, "Valid until" %>
+      <%= form.date_field :valid_until %>
+    </div>
+
+    <div class="field field--full">
+      <%= form.label :delivery_address %>
+      <%= form.text_area :delivery_address, rows: 3 %>
+      <small>Required if this order will be delivered.</small>
+    </div>
+
+    <div class="field field--full">
+      <%= form.label :billing_address %>
+      <%= form.text_area :billing_address, rows: 3 %>
+      <small>Optional if billing details are unchanged.</small>
+    </div>
+
+    <div class="field field--full">
+      <%= form.label :notes %>
+      <%= form.text_area :notes, rows: 4 %>
+    </div>
+
+    <div class="field field--full" data-controller="admin-order-lines">
+      <h3>Order Lines</h3>
+      <p class="muted">Add one row for each window/location in the order.</p>
+      <p class="muted">Enter width/drop in millimetres (for example, width 2400 and drop 2200).</p>
+      <% line_count = @quote_request.quote_items.reject(&:marked_for_destruction?).size %>
+      <p>
+        <button type="button" class="button button--secondary button--small" data-action="admin-order-lines#addLine">Add another line</button>
+        <noscript>
+          <%= link_to "Add another line", new_admin_quote_request_path(line_count: line_count + 1), class: "button button--secondary button--small", data: { turbo_frame: "_top" } %>
+        </noscript>
+      </p>
+      <% opening_options = [
+        [ "Single open (opens to one side)", "single_open" ],
+        [ "Centre open / double open", "double_open" ]
+      ] %>
+      <% floor_finish_options = [
+        [ "Just off floor", "just_off_floor" ],
+        [ "Puddled on floor", "puddled" ]
+      ] %>
+      <% track_options = @track_codes.map { |value| [ value.to_s.casecmp("shared").zero? ? "Shared track" : value, value ] } %>
+      <% track_options.unshift([ "No track", "none" ]) unless track_options.any? { |_, value| value.to_s == "none" } %>
+      <% fixing_options = [ [ "TF (top fix)", "TF" ], [ "FF (face fix)", "FF" ] ] %>
+      <div class="table-wrap">
+        <table class="data-table admin-order-lines-table">
+          <thead>
+            <tr>
+              <th>Location</th>
+              <th>Product</th>
+              <th>Width (mm)</th>
+              <th>Drop (mm)</th>
+              <th>Opening style</th>
+              <th>Floor finish</th>
+              <th>Track option</th>
+              <th>Fixing type</th>
+              <th>Qty</th>
+              <th>Wand qty (optional)</th>
+              <th>End cap qty (optional)</th>
+              <th>Stopper qty (optional)</th>
+              <th>Wand hook qty (optional)</th>
+            </tr>
+          </thead>
+          <tbody data-admin-order-lines-target="rows">
+            <%= form.fields_for :quote_items do |item_fields| %>
+              <tr>
+                <td>
+                  <%= item_fields.hidden_field :line_position %>
+                  <%= item_fields.text_field :location_name, placeholder: "Example: Living room window" %>
+                </td>
+                <td><%= item_fields.collection_select :product_id, @products, :id, :name, include_blank: "Select product" %></td>
+                <td><%= item_fields.number_field :width_mm, min: 1 %></td>
+                <td><%= item_fields.number_field :ceiling_drop_mm, min: 1 %></td>
+                <td><%= item_fields.select :opening_type, opening_options %></td>
+                <td><%= item_fields.select :finished_floor_mode, floor_finish_options, { selected: (item_fields.object.finished_floor_mode.presence || "just_off_floor") } %></td>
+                <td><%= item_fields.select :track_selected, track_options, { selected: (item_fields.object.track_selected.presence || "shared") } %></td>
+                <td><%= item_fields.select :fixing, fixing_options %></td>
+                <td><%= item_fields.number_field :quantity, min: 1, value: item_fields.object.quantity || 1 %></td>
+                <td><%= item_fields.number_field :wand_quantity, min: 0, value: item_fields.object.wand_quantity || 0 %></td>
+                <td><%= item_fields.number_field :end_cap_quantity, min: 0, value: item_fields.object.end_cap_quantity || 0 %></td>
+                <td><%= item_fields.number_field :stopper_quantity, min: 0, value: item_fields.object.stopper_quantity || 0 %></td>
+                <td><%= item_fields.number_field :wand_hook_quantity, min: 0, value: item_fields.object.wand_hook_quantity || 0 %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+      <template data-admin-order-lines-target="template">
+        <tr>
+          <td>
+            <%= hidden_field_tag "quote_request[quote_items_attributes][__INDEX__][line_position]", "__LINE_POSITION__" %>
+            <%= text_field_tag "quote_request[quote_items_attributes][__INDEX__][location_name]", nil, placeholder: "Example: Living room window" %>
+          </td>
+          <td><%= select_tag "quote_request[quote_items_attributes][__INDEX__][product_id]", options_for_select(@products.map { |product| [ product.name, product.id ] }), include_blank: "Select product" %></td>
+          <td><%= number_field_tag "quote_request[quote_items_attributes][__INDEX__][width_mm]", nil, min: 1 %></td>
+          <td><%= number_field_tag "quote_request[quote_items_attributes][__INDEX__][ceiling_drop_mm]", nil, min: 1 %></td>
+          <td><%= select_tag "quote_request[quote_items_attributes][__INDEX__][opening_type]", options_for_select(opening_options, "single_open") %></td>
+          <td><%= select_tag "quote_request[quote_items_attributes][__INDEX__][finished_floor_mode]", options_for_select(floor_finish_options, "just_off_floor") %></td>
+          <td><%= select_tag "quote_request[quote_items_attributes][__INDEX__][track_selected]", options_for_select(track_options, "shared") %></td>
+          <td><%= select_tag "quote_request[quote_items_attributes][__INDEX__][fixing]", options_for_select(fixing_options, "TF") %></td>
+          <td><%= number_field_tag "quote_request[quote_items_attributes][__INDEX__][quantity]", 1, min: 1 %></td>
+          <td><%= number_field_tag "quote_request[quote_items_attributes][__INDEX__][wand_quantity]", 0, min: 0 %></td>
+          <td><%= number_field_tag "quote_request[quote_items_attributes][__INDEX__][end_cap_quantity]", 0, min: 0 %></td>
+          <td><%= number_field_tag "quote_request[quote_items_attributes][__INDEX__][stopper_quantity]", 0, min: 0 %></td>
+          <td><%= number_field_tag "quote_request[quote_items_attributes][__INDEX__][wand_hook_quantity]", 0, min: 0 %></td>
+        </tr>
+      </template>
+      <p class="muted">Fixing type: choose the fixing used for this curtain line.</p>
+      <p class="muted">Floor finish affects factory drop calculations for each line.</p>
+    </div>
+
+    <div class="actions field--full">
+      <%= form.submit "Submit Order", class: "button button--primary" %>
+      <%= link_to "Back", admin_quote_requests_path, class: "button button--secondary" %>
+    </div>
+  <% end %>
+</section>

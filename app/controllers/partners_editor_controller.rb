@@ -24,7 +24,10 @@ class PartnersEditorController < ApplicationController
   end
 
   def update
-    case params[:editor_action].to_s
+    action = params[:editor_action].presence.to_s
+    action = "save" if action.blank?
+
+    case action
     when "save"
       save_draft_for_page!
       redirect_to editor_page_path_for(@page_key), notice: "Draft saved."

@@ -121,4 +121,19 @@ class PartnersEditorControllerTest < ActionDispatch::IntegrationTest
     setting.reload
     assert_equal "Saved Draft Title", setting.partners_page_content(preview: false).dig("texts", "hero_title")
   end
+
+  test "missing editor action defaults to save" do
+    sign_in users(:admin)
+    setting = AppSetting.current
+    payload = setting.partners_page_content(preview: false)
+    payload["texts"]["hero_title"] = "Default Save Action Heading"
+
+    patch update_page_editor_url(page: "partners"), params: {
+      page_payload_json: payload.to_json
+    }
+
+    assert_redirected_to edit_partners_page_url
+    setting.reload
+    assert_equal "Default Save Action Heading", setting.partners_page_content(preview: true).dig("texts", "hero_title")
+  end
 end

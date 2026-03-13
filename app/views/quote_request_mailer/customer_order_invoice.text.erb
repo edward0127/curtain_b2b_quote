@@ -1,0 +1,27 @@
+<%= OrderDocumentCopy.heading %>
+<%= OrderDocumentCopy.subtitle %>
+<%= OrderDocumentCopy.intro %>
+
+Order number: <%= @quotation.order_number %>
+Date: <%= l(@quotation.order_date, format: :long) %>
+Customer: <%= @quotation.customer_name %><%= @quotation.company_name.present? ? " (#{@quotation.company_name})" : "" %>
+Email / Phone: <%= @quotation.customer_email %><%= @quotation.customer_phone.present? ? " / #{@quotation.customer_phone}" : "" %>
+<% if @quotation.delivery_address.present? %>Delivery address: <%= @quotation.delivery_address %>
+<% end %><% if @quotation.pickup_method.present? %>Pickup / Delivery: <%= @quotation.pickup_method %>
+<% end %>
+Location | Description | Opening | Track | Total (ex GST)
+<% @quotation.rows.each do |row| %>
+- <%= row[:location] %> | <%= row[:description] %> | <%= row[:opening] %> | <%= row[:track] %> | <%= @quote_request.currency %> <%= format("%.2f", row[:total]) %>
+<% end %>
+
+TOTAL (ex GST): <%= @quote_request.currency %> <%= format("%.2f", @quotation.total_ex_gst) %>
+GST: <%= @quote_request.currency %> <%= format("%.2f", @quotation.gst) %>
+TOTAL (inc GST): <%= @quote_request.currency %> <%= format("%.2f", @quotation.total_inc_gst) %>
+
+Bank details
+Account name: <%= @quotation.bank_details[:account_name] %>
+Bank name: <%= @quotation.bank_details[:bank_name] %>
+BSB: <%= @quotation.bank_details[:bsb] %>
+Account number: <%= @quotation.bank_details[:account_number] %>
+Terms: <%= OrderDocumentCopy.terms %>
+<%= OrderDocumentCopy.footer %>

@@ -20,7 +20,62 @@
     <% end %>
   <% end %>
 
-  <h3>Mailgun SMTP</h3>
+  <h3>Business Settings</h3>
+  <div class="form-grid">
+    <div class="field field--full">
+      <%= form.label :pickup_address_default, "Default pickup address" %>
+      <%= form.text_field :pickup_address_default, required: true %>
+      <small>Shown in pickup emails and order communications.</small>
+    </div>
+
+    <div class="field field--full">
+      <%= form.label :delivery_note_default, "Default delivery note" %>
+      <%= form.text_field :delivery_note_default, required: true %>
+      <small>Shown in pickup/delivery communications.</small>
+    </div>
+  </div>
+
+  <h3>Invoice Bank Details</h3>
+  <p class="muted">These details are shown on customer invoice emails and invoice PDFs.</p>
+  <div class="form-grid">
+    <div class="field">
+      <%= form.label :bank_account_name, "Account name" %>
+      <%= form.text_field :bank_account_name %>
+    </div>
+
+    <div class="field">
+      <%= form.label :bank_name, "Bank name" %>
+      <%= form.text_field :bank_name %>
+    </div>
+
+    <div class="field">
+      <%= form.label :bank_bsb, "BSB" %>
+      <%= form.text_field :bank_bsb %>
+    </div>
+
+    <div class="field">
+      <%= form.label :bank_account_number, "Account number" %>
+      <%= form.text_field :bank_account_number %>
+    </div>
+  </div>
+
+  <h3>Portal Email Settings</h3>
+  <div class="form-grid">
+    <div class="field">
+      <%= form.label :mail_from_email %>
+      <%= form.email_field :mail_from_email, required: true %>
+      <small>Sender address shown on portal emails.</small>
+    </div>
+
+    <div class="field">
+      <%= form.label :quote_receiver_email, "Shared admin inbox email" %>
+      <%= form.email_field :quote_receiver_email, required: true %>
+      <small>Internal order notifications will be sent to this address.</small>
+    </div>
+  </div>
+
+  <h3>Advanced Email Delivery (Technical setup)</h3>
+  <p class="muted">These SMTP fields are technical and usually only need changes during email configuration.</p>
   <div class="form-grid">
     <div class="field">
       <%= form.label :mailgun_domain %>
@@ -49,20 +104,7 @@
   </div>
   <p class="muted">Leave SMTP password blank to keep the current value.</p>
 
-  <h3>Email Routing</h3>
-  <div class="form-grid">
-    <div class="field">
-      <%= form.label :mail_from_email %>
-      <%= form.email_field :mail_from_email, required: true %>
-    </div>
-
-    <div class="field">
-      <%= form.label :quote_receiver_email %>
-      <%= form.email_field :quote_receiver_email, required: true %>
-    </div>
-  </div>
-
-  <h3>Application URL</h3>
+  <h3>Portal URL</h3>
   <div class="form-grid">
     <div class="field">
       <%= form.label :app_host %>

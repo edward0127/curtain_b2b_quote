@@ -9,6 +9,19 @@
   </div>
 <% end %>
 
+<%
+  inventory_option_label = ->(item) { item.sku.present? ? "#{item.name} (#{item.sku})" : item.name }
+  inventory_mappings = [
+    [ :track_inventory_item_id, "Track inventory item", "track" ],
+    [ :hook_inventory_item_id, "Hook inventory item", "hook" ],
+    [ :bracket_inventory_item_id, "Bracket inventory item", "bracket" ],
+    [ :wand_inventory_item_id, "Wand inventory item", "wand" ],
+    [ :end_cap_inventory_item_id, "End cap inventory item", "end_cap" ],
+    [ :stopper_inventory_item_id, "Stopper inventory item", "stopper" ],
+    [ :wand_hook_inventory_item_id, "Wand hook inventory item", "wand_hook" ]
+  ]
+%>
+
 <%= form_with model: [ :admin, product ] do |form| %>
   <div class="form-grid">
     <div class="field">
@@ -22,13 +35,33 @@
     </div>
 
     <div class="field">
-      <%= form.label :base_price, "Base Price (AUD)" %>
+      <%= form.label :base_price, "Base price (AUD, legacy/manual pricing)" %>
       <%= form.number_field :base_price, step: 0.01, min: 0, required: true %>
+      <small>For matrix-priced products, live pricing comes from imported matrix rows.</small>
     </div>
 
     <div class="field">
       <%= form.label :pricing_mode %>
       <%= form.select :pricing_mode, Product.pricing_modes.keys.map { |value| [ value.humanize, value ] } %>
+    </div>
+
+    <div class="field">
+      <%= form.label :pricing_channel, "Channel" %>
+      <%= form.select :pricing_channel, options_for_select([ [ "B2B", "b2b" ], [ "B2C", "b2c" ] ], product.pricing_channel), include_blank: "Not set" %>
+      <small>This determines where the product can be ordered.</small>
+      <small>"Not set" is for legacy/manual products and is not intended for normal B2B/B2C ordering flows.</small>
+    </div>
+
+    <div class="field">
+      <%= form.label :product_type, "Matrix product type" %>
+      <%= form.text_field :product_type, placeholder: "Example: Sheer Curtain" %>
+      <small>Required for matrix-priced products.</small>
+    </div>
+
+    <div class="field">
+      <%= form.label :style_name, "Matrix style" %>
+      <%= form.text_field :style_name, placeholder: "Example: S Wave" %>
+      <small>Required for matrix-priced products.</small>
     </div>
 
     <div class="field field--full">
@@ -42,6 +75,28 @@
         Active product
       </label>
     </div>
+
+    <section class="field field--full">
+      <h3>Inventory Mappings</h3>
+      <p class="lead">Link this product template to the component stock it uses. The system will calculate and deduct track metres / hooks / brackets from these inventory items when an order is submitted.</p>
+
+      <div class="form-grid">
+        <% inventory_mappings.each do |field_name, label, component_type| %>
+          <div class="field">
+            <%= form.label field_name, label %>
+            <%= form.collection_select(
+              field_name,
+              InventoryItem.active.where(component_type: component_type).order(:name),
+              :id,
+              inventory_option_label,
+              { include_blank: "None" }
+            ) %>
+          </div>
+        <% end %>
+      </div>
+
+      <p class="lead">If a mapping is left as None, the system will not enforce stock for that component.</p>
+    </section>
   </div>
 
   <div class="actions">

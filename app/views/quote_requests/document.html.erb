@@ -1,7 +1,7 @@
 <section class="hero hero--compact quote-doc">
   <div>
-    <p class="eyebrow">Quote Document</p>
-    <h2><%= @quote_request.quote_template.heading %></h2>
+    <p class="eyebrow"><%= quote_or_order_label %> Document</p>
+    <h2><%= OrderDocumentCopy.heading %></h2>
     <p class="lead">
       <strong><%= @quote_request.quote_number %></strong>
       <% if @quote_request.customer_reference.present? %>
@@ -9,61 +9,89 @@
       <% end %>
     </p>
   </div>
-  <span class="status-pill status-pill--<%= @quote_request.status %>"><%= @quote_request.status.humanize %></span>
+  <span class="status-pill status-pill--<%= @quote_request.status %>"><%= @quote_request.display_status %></span>
 </section>
 
-<section class="panel">
-  <p><%= @quote_request.quote_template.intro.presence || "Thank you for your enquiry." %></p>
+<section class="panel quote-doc-sheet">
+  <p class="quote-doc-sheet__intro"><%= OrderDocumentCopy.intro %></p>
 
-  <div class="table-wrap">
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Line</th>
-          <th>Product</th>
-          <th>Dimensions</th>
-          <th>Qty</th>
-          <th>Unit Price</th>
-          <th>Line Total</th>
-        </tr>
-      </thead>
+  <% rows = [ @quote_request.quote_items.size, 12 ].max %>
+
+  <div class="order-lines-sheet order-lines-sheet--document">
+    <table class="order-lines-sheet__meta">
       <tbody>
-        <% @quote_request.quote_items.each_with_index do |item, index| %>
-          <tr>
-            <td><%= index + 1 %></td>
-            <td><%= item.product.name %></td>
-            <td>
-              <% if item.product.per_square_meter? %>
-                <%= item.width %> x <%= item.height %> cm
-              <% else %>
-                Unit priced
-              <% end %>
-            </td>
-            <td><%= item.quantity %></td>
-            <td><%= number_to_currency(item.unit_price, unit: "#{@quote_request.currency} ") %></td>
-            <td><%= number_to_currency(item.line_total, unit: "#{@quote_request.currency} ") %></td>
-          </tr>
-        <% end %>
-      </tbody>
-      <tfoot>
         <tr>
-          <th colspan="5">Quote Total</th>
-          <th><%= number_to_currency(@quote_request.total, unit: "#{@quote_request.currency} ") %></th>
+          <th>Date</th>
+          <td><%= l((@quote_request.submitted_at || @quote_request.created_at).to_date, format: :default) %></td>
         </tr>
-      </tfoot>
+        <tr>
+          <th>Address</th>
+          <td><%= @quote_request.delivery_address.presence || @quote_request.billing_address.presence || "-" %></td>
+        </tr>
+        <tr>
+          <th><%= quote_or_order_label %></th>
+          <td><%= @quote_request.quote_number.delete_prefix("Q-") %></td>
+        </tr>
+      </tbody>
     </table>
+
+    <div class="table-wrap">
+      <table class="order-lines-sheet__table">
+        <thead>
+          <tr class="order-lines-sheet__group-row">
+            <th colspan="4"></th>
+            <th colspan="3">(NO DEDUCTION)</th>
+            <th colspan="3">Tracks</th>
+          </tr>
+          <tr>
+            <th>#</th>
+            <th>Location</th>
+            <th>Style (S Wave / Pinch Pleat)</th>
+            <th>Material</th>
+            <th>Width</th>
+            <th>Drop</th>
+            <th>OW (1) or C/O (2)</th>
+            <th>Length</th>
+            <th>OW or C/O</th>
+            <th>Hooks</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% rows.times do |index| %>
+            <% item = @quote_request.quote_items[index] %>
+            <tr>
+              <td><%= index + 1 %></td>
+              <td><%= item&.location_name.presence || "" %></td>
+              <td><%= item.present? ? (item.product.style_name.presence || item.product.product_type.presence || "-") : "" %></td>
+              <td><%= item.present? ? [ item.material_name.presence || item.product.product_type.presence || item.product.name, item.material_number.presence ].compact.join(" ") : "" %></td>
+              <td><%= item.present? && item.width_mm.to_i.positive? ? item.width_mm : "" %></td>
+              <td><%= item.present? && item.ceiling_drop_mm.to_i.positive? ? item.ceiling_drop_mm : "" %></td>
+              <td><%= item.present? ? (item.opening_type == "double_open" ? 2 : 1) : "" %></td>
+              <td><%= item.present? && item.track_selected.present? && item.track_selected.to_s.casecmp("none") != 0 ? (item.width_mm.presence || "") : "" %></td>
+              <td><%= item.present? ? (item.opening_code.presence || (item.opening_type == "double_open" ? "C/O" : "OW")) : "" %></td>
+              <td><%= item.present? ? (item.hooks_display.presence || item.hooks_total.presence || "") : "" %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="order-lines-sheet__notes"><strong>Notes:</strong> <%= @quote_request.notes.presence || "" %></p>
+    <p class="order-lines-sheet__total"><strong><%= quote_or_order_label %> Total:</strong> <%= number_to_currency(@quote_request.total, unit: "#{@quote_request.currency} ") %></p>
   </div>
 
-  <p><strong>Valid Until:</strong> <%= l(@quote_request.valid_until, format: :long) %></p>
-  <p><%= @quote_request.quote_template.terms.presence || "Quote valid for 14 days unless otherwise stated." %></p>
-  <p><%= @quote_request.quote_template.footer.presence || "Please contact us for acceptance or any requested changes." %></p>
+  <div class="quote-doc-sheet__legal">
+    <p><strong>Valid Until:</strong> <%= l(@quote_request.valid_until, format: :long) %></p>
+    <p><%= OrderDocumentCopy.terms %></p>
+    <p><%= OrderDocumentCopy.footer %></p>
+  </div>
 </section>
 
 <div class="actions no-print">
   <button class="button button--secondary" onclick="window.print()">Print / Save as PDF</button>
   <% if current_user.admin? %>
-    <%= link_to "Back to Admin Quote", admin_quote_request_path(@quote_request), class: "button button--primary" %>
+    <%= link_to "Back to Admin #{quote_or_order_label}", admin_quote_request_path(@quote_request), class: "button button--primary" %>
   <% else %>
-    <%= link_to "Back to Quote", quote_request_path(@quote_request), class: "button button--primary" %>
+    <%= link_to "Back to #{quote_or_order_label}", quote_request_path(@quote_request), class: "button button--primary" %>
   <% end %>
 </div>

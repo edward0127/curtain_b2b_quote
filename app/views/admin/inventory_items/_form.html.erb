@@ -1,0 +1,49 @@
+<% if inventory_item.errors.any? %>
+  <div class="flash flash--alert">
+    <strong><%= pluralize(inventory_item.errors.count, "error") %> prevented saving:</strong>
+    <ul>
+      <% inventory_item.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<%= form_with model: [ :admin, inventory_item ], class: "form-grid" do |form| %>
+  <div class="field">
+    <%= form.label :name %>
+    <%= form.text_field :name, required: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :component_type %>
+    <%= form.select :component_type, InventoryItem.component_types.keys.map { |value| [ value.humanize, value ] }, required: true %>
+    <small>Choose what type of component this stock item is (e.g. Track, Hook, Bracket).</small>
+  </div>
+
+  <div class="field">
+    <%= form.label :sku %>
+    <%= form.text_field :sku %>
+  </div>
+
+  <div class="field">
+    <%= form.label :on_hand, "Current stock on hand" %>
+    <%= form.number_field :on_hand, min: 0, required: true %>
+    <small>This is the quantity currently available to allocate to orders.</small>
+  </div>
+
+  <div class="field">
+    <%= form.label :active %>
+    <%= form.check_box :active %>
+  </div>
+
+  <div class="field field--full">
+    <%= form.label :notes %>
+    <%= form.text_area :notes, rows: 4 %>
+  </div>
+
+  <div class="actions field--full">
+    <%= form.submit class: "button button--primary" %>
+    <%= link_to "Back", admin_inventory_items_path, class: "button button--secondary" %>
+  </div>
+<% end %>

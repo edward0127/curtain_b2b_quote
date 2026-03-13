@@ -1,12 +1,12 @@
 <section class="hero">
   <div>
     <p class="eyebrow">Dashboard</p>
-    <h2><%= current_user.admin? ? "Admin Control Center" : "Quote Overview" %></h2>
+    <h2><%= current_user.admin? ? "Admin Control Center" : "#{quote_or_order_label} Overview" %></h2>
     <p class="lead">
       <% if current_user.admin? %>
-        Manage customer access and monitor incoming quote activity in one place.
+        Manage customer access and monitor incoming <%= quote_or_order_label(capitalize: false) %> activity in one place.
       <% else %>
-        Track your quote requests and submit new curtain specifications quickly.
+        Track your <%= quote_or_order_label(count: 2, capitalize: false) %> and submit new curtain specifications quickly.
       <% end %>
     </p>
   </div>
@@ -20,27 +20,23 @@
         <p class="metric__value"><%= @customers.size %></p>
       </article>
       <article class="metric">
-        <p class="metric__label">Recent Quotes</p>
+        <p class="metric__label">Recent <%= quote_or_order_label(count: 2) %></p>
         <p class="metric__value"><%= @recent_quotes.size %></p>
       </article>
       <article class="metric">
         <p class="metric__label">Active Products</p>
         <p class="metric__value"><%= @active_products_count %></p>
       </article>
-      <article class="metric">
-        <p class="metric__label">Open Jobs</p>
-        <p class="metric__value"><%= @active_jobs_count %></p>
-      </article>
     </section>
 
     <section class="panel">
-      <h3>Recent Quote Requests</h3>
+      <h3>Recent Orders</h3>
       <div class="table-wrap">
         <table class="data-table">
           <thead>
             <tr>
               <th>ID</th>
-              <th>Quote #</th>
+              <th><%= quote_or_order_label %> #</th>
               <th>Customer</th>
               <th>Items</th>
               <th>Total</th>
@@ -56,10 +52,10 @@
                 <td><%= quote.user.email %></td>
                 <td><%= quote.line_items_count %></td>
                 <td><%= number_to_currency(quote.total, unit: "#{quote.currency} ") %></td>
-                <td><span class="status-pill status-pill--<%= quote.status %>"><%= quote.status.humanize %></span></td>
+                <td><span class="status-pill status-pill--<%= quote.status %>"><%= quote.display_status %></span></td>
                 <td class="table-actions">
                   <%= link_to "View", admin_quote_request_path(quote), class: "button button--secondary button--small" %>
-                  <%= link_to "PDF", document_admin_quote_request_path(quote, format: :pdf), class: "button button--primary button--small" %>
+                  <%= link_to "Invoice PDF", invoice_admin_quote_request_path(quote, format: :pdf), class: "button button--primary button--small" %>
                 </td>
               </tr>
             <% end %>
@@ -73,11 +69,11 @@
 <% else %>
   <section class="metric-grid">
     <article class="metric">
-      <p class="metric__label">Total Quotes</p>
+      <p class="metric__label">Total <%= quote_or_order_label(count: 2) %></p>
       <p class="metric__value"><%= @quote_history.size %></p>
     </article>
     <article class="metric">
-      <p class="metric__label">Recent Quotes</p>
+      <p class="metric__label">Recent <%= quote_or_order_label(count: 2) %></p>
       <p class="metric__value"><%= @recent_quotes.size %></p>
     </article>
     <article class="metric">

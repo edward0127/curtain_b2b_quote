@@ -1,0 +1,108 @@
+<section class="hero hero--compact">
+  <div>
+    <p class="eyebrow">B2B Shop</p>
+    <h2>Configure <%= @product.name %></h2>
+    <p class="lead">Configure one product line, then add it to your order cart.</p>
+    <p class="muted">Each line should represent one window/location.</p>
+  </div>
+  <div class="table-actions">
+    <%= link_to "Back to Shop", b2b_shop_path, class: "button button--secondary" %>
+    <%= link_to "View Cart", b2b_cart_path, class: "button button--primary" %>
+  </div>
+</section>
+
+<section class="panel">
+  <% opening_options = [
+    [ "Single open (opens to one side)", "single_open" ],
+    [ "Centre open / double open", "double_open" ]
+  ] %>
+  <% floor_options = [
+    [ "Just off floor", "just_off_floor" ],
+    [ "Puddled on floor", "puddled" ]
+  ] %>
+  <% track_options = @track_codes.map { |code| [ code.to_s.casecmp("shared").zero? ? "Shared track" : code, code ] } %>
+  <% track_options.unshift([ "No track", "none" ]) unless track_options.any? { |_, value| value.to_s == "none" } %>
+  <% fixing_options = [ [ "TF (top fix)", "TF" ], [ "FF (face fix)", "FF" ] ] %>
+  <%= form_with url: add_line_b2b_cart_path, method: :post do |form| %>
+    <%= hidden_field_tag "line[product_id]", @product.id %>
+    <div class="form-grid">
+      <div class="field">
+        <%= label_tag "line_location_name", "Location name" %>
+        <%= text_field_tag "line[location_name]", "", placeholder: "Example: Living room window" %>
+        <small>Describe where this line will be installed.</small>
+      </div>
+
+      <div class="field">
+        <%= label_tag "line_quantity", "Quantity" %>
+        <%= number_field_tag "line[quantity]", 1, min: 1, required: true %>
+      </div>
+
+      <div class="field">
+        <%= label_tag "line_width_mm", "Width (mm)" %>
+        <%= number_field_tag "line[width_mm]", nil, min: 1, required: true %>
+        <small>Enter millimetres, for example 2400.</small>
+      </div>
+
+      <div class="field">
+        <%= label_tag "line_ceiling_drop_mm", "Ceiling drop (mm)" %>
+        <%= number_field_tag "line[ceiling_drop_mm]", nil, min: 1, required: true %>
+        <small>Enter finished drop in millimetres, for example 2200.</small>
+      </div>
+
+      <div class="field">
+        <%= label_tag "line_opening_type", "Opening style" %>
+        <%= select_tag "line[opening_type]", options_for_select(opening_options, "single_open") %>
+      </div>
+
+      <div class="field">
+        <%= label_tag "line_finished_floor_mode", "Floor finish" %>
+        <%= select_tag "line[finished_floor_mode]", options_for_select(floor_options, "just_off_floor") %>
+      </div>
+
+      <div class="field">
+        <%= label_tag "line_track_selected", "Track option" %>
+        <%= select_tag "line[track_selected]", options_for_select(track_options, "shared") %>
+      </div>
+
+      <div class="field">
+        <%= label_tag "line_fixing", "Fixing type" %>
+        <%= select_tag "line[fixing]", options_for_select(fixing_options, "TF") %>
+        <small>Select the fixing type used for this curtain.</small>
+      </div>
+
+      <div class="field">
+        <%= label_tag "line_wand_quantity", "Wand quantity (optional)" %>
+        <%= number_field_tag "line[wand_quantity]", 0, min: 0 %>
+      </div>
+
+      <div class="field">
+        <%= label_tag "line_end_cap_quantity", "End cap quantity (optional)" %>
+        <%= number_field_tag "line[end_cap_quantity]", 0, min: 0 %>
+      </div>
+
+      <div class="field">
+        <%= label_tag "line_stopper_quantity", "Stopper quantity (optional)" %>
+        <%= number_field_tag "line[stopper_quantity]", 0, min: 0 %>
+      </div>
+
+      <div class="field">
+        <%= label_tag "line_wand_hook_quantity", "Wand hook quantity (optional)" %>
+        <%= number_field_tag "line[wand_hook_quantity]", 0, min: 0 %>
+      </div>
+
+      <div class="field field--full">
+        <%= label_tag "line_description", "Description" %>
+        <%= text_field_tag "line[description]", "", placeholder: "Optional internal note for this line" %>
+      </div>
+
+      <div class="field field--full">
+        <%= label_tag "line_width_notes", "Optional measurement note" %>
+        <%= text_field_tag "line[width_notes]", "" %>
+      </div>
+    </div>
+
+    <div class="actions">
+      <%= form.submit "Add to Cart", class: "button button--primary" %>
+    </div>
+  <% end %>
+</section>

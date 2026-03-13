@@ -1,0 +1,117 @@
+<section class="hero hero--compact">
+  <div>
+    <p class="eyebrow">Factory Sheet</p>
+    <h2>To Chinese Factory</h2>
+    <p class="lead">ORDER FORM 2026 export for <strong><%= @quote_request.quote_number %></strong>.</p>
+  </div>
+  <div class="table-actions">
+    <%= link_to "Download PDF", to_chinese_factory_admin_quote_request_path(@quote_request, format: :pdf), class: "button button--primary" %>
+    <%= link_to "Back to Order", admin_quote_request_path(@quote_request), class: "button button--secondary" %>
+  </div>
+</section>
+
+<section class="panel factory-sheet-panel">
+  <div class="factory-sheet-header-grid">
+    <div><strong>Date (&#26085;&#26399;)</strong></div>
+    <div><%= l((@quote_request.submitted_at || @quote_request.created_at).to_date, format: :default) %></div>
+    <div><strong>Customer (&#23458;&#25143;)</strong></div>
+    <div><%= @quote_request.customer_name.presence || @quote_request.user.email %></div>
+    <div><strong>Quote (&#21333;&#21495;)</strong></div>
+    <div><%= @quote_request.quote_number %></div>
+  </div>
+
+  <% rows = [ @quote_request.quote_items.to_a, Array.new(11) ].map(&:length).max %>
+  <% rows = [ rows, 11 ].min %>
+
+  <div class="table-wrap">
+    <table class="factory-sheet-table factory-sheet-table--fabric">
+      <thead>
+        <tr class="factory-sheet-table__section-row">
+          <th colspan="12">Fabric details (TO GZ FACTORY)</th>
+        </tr>
+        <tr>
+          <th>No.</th>
+          <th>Location (&#20301;&#23376;)</th>
+          <th>Style (&#27454;&#24335;)<br>&#34503;&#24418;/&#38889;&#21746;</th>
+          <th>Material<br>(&#24067;&#26009;)<br>&#32433;&#31383;/&#36974;&#20809;</th>
+          <th>Number<br>(&#24067;&#26009;&#32534;&#21495;)</th>
+          <th>LV Name</th>
+          <th>Width (&#23485;)</th>
+          <th>Drop (&#39640;)</th>
+          <th>Finished distance from floor (Just off/Puddled)</th>
+          <th>&#21333;&#24320; (1) / &#21452;&#24320; (2)</th>
+          <th>&#39640;&#28201;&#23450;&#21046;</th>
+          <th>Total Clips (&#38057;&#23376;)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% rows.times do |index| %>
+          <% item = @quote_request.quote_items[index] %>
+          <tr>
+            <td><%= index + 1 %></td>
+            <td><%= item&.location_name.presence || "-" %></td>
+            <td><%= item.present? ? (item.product.style_name.presence || item.product.product_type.presence || "-") : "" %></td>
+            <td><%= item.present? ? (item.material_name.presence || item.product.product_type.presence || item.product.name) : "" %></td>
+            <td><%= item&.material_number.presence || "-" %></td>
+            <td><%= item&.lv_name.presence || "-" %></td>
+            <td><%= item.present? && item.width_mm.to_i.positive? ? item.width_mm : "-" %></td>
+            <td><%= item.present? ? (item.factory_drop_mm.presence || item.ceiling_drop_mm.presence || "-") : "-" %></td>
+            <td>
+              <% if item&.finished_floor_mode == "puddled" %>
+                Puddled
+              <% elsif item&.finished_floor_mode == "just_off_floor" %>
+                Just off
+              <% else %>
+                -
+              <% end %>
+            </td>
+            <td><%= item.present? ? (item.opening_type == "double_open" ? 2 : 1) : "-" %></td>
+            <td><%= item&.high_temp_custom.presence || "-" %></td>
+            <td><%= item.present? ? (item.hooks_display.presence || item.hooks_total.presence || "-") : "-" %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-wrap factory-sheet-table-wrap--spaced">
+    <table class="factory-sheet-table factory-sheet-table--track">
+      <thead>
+        <tr class="factory-sheet-table__section-row">
+          <th colspan="6">Track details (TO LOCAL FACTORY)</th>
+        </tr>
+        <tr>
+          <th>Opening</th>
+          <th>FF or TF</th>
+          <th>Backets</th>
+          <th>Width Notes</th>
+          <th>Wand (Y/N)</th>
+          <th>Ceiling Drop</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% rows.times do |index| %>
+          <% item = @quote_request.quote_items[index] %>
+          <tr>
+            <td><%= item.present? ? (item.opening_code.presence || (item.opening_type == "double_open" ? "C/O" : "OW")) : "" %></td>
+            <td><%= item&.fixing.presence || "" %></td>
+            <td><%= item.present? && item.brackets_total.to_i.positive? ? item.brackets_total : "" %></td>
+            <td><%= item&.width_notes.presence || "" %></td>
+            <td>
+              <% if item.present? && item.wand_quantity.to_i.positive? %>
+                <%= item.wand_quantity %>
+              <% elsif item&.wand_required %>
+                Y
+              <% else %>
+                ""
+              <% end %>
+            </td>
+            <td><%= item.present? && item.ceiling_drop_mm.to_i.positive? ? item.ceiling_drop_mm : "" %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="factory-sheet-notes"><strong>Notes (&#22791;&#27880;):</strong> <%= @quote_request.notes.presence || "" %></p>
+</section>

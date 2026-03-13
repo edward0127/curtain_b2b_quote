@@ -1,17 +1,15 @@
 # Preview all emails at http://localhost:3000/rails/mailers/quote_request_mailer
 class QuoteRequestMailerPreview < ActionMailer::Preview
-  # Preview this email at http://localhost:3000/rails/mailers/quote_request_mailer/new_quote_request
-  def new_quote_request
-    quote = QuoteRequest.includes(:user, :quote_template, quote_items: :product).first
-    return QuoteRequestMailer.new_quote_request(quote) if quote.present?
+  # Preview this email at http://localhost:3000/rails/mailers/quote_request_mailer/customer_order_invoice
+  def customer_order_invoice
+    quote = QuoteRequest.includes(:user, quote_items: :product).first
+    return QuoteRequestMailer.customer_order_invoice(quote) if quote.present?
 
     user = User.first || User.new(email: "preview@example.com")
-    template = QuoteTemplate.default_template || QuoteTemplate.new(name: "preview", heading: "Preview Quote")
     product = Product.first || Product.new(name: "Preview Product", base_price: 50, pricing_mode: :per_square_meter)
     fallback_quote = QuoteRequest.new(
       id: 1001,
       user: user,
-      quote_template: template,
       quote_number: "Q-20260221-10001",
       customer_reference: "PREVIEW-REF",
       currency: "AUD",
@@ -21,8 +19,8 @@ class QuoteRequestMailerPreview < ActionMailer::Preview
       quantity: 1,
       subtotal: 100,
       total: 100,
-      notes: "Preview quote",
-      status: :submitted
+      notes: "Preview order",
+      status: :order_processing
     )
     fallback_quote.quote_items.build(
       product: product,
@@ -36,6 +34,6 @@ class QuoteRequestMailerPreview < ActionMailer::Preview
     )
 
     quote = fallback_quote
-    QuoteRequestMailer.new_quote_request(quote)
+    QuoteRequestMailer.customer_order_invoice(quote)
   end
 end

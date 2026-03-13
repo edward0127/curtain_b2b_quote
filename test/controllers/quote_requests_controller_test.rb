@@ -9,15 +9,32 @@ class QuoteRequestsControllerTest < ActionDispatch::IntegrationTest
     assert_select "a[href='#{document_quote_request_path(quote_requests(:one), format: :pdf)}']", text: "PDF"
   end
 
-  test "b2b customer can create multi item quote request" do
+  test "index shows invoice pdf label for order workflow rows" do
+    quote_requests(:one).update!(status: :order_processing)
     sign_in users(:customer)
 
-    assert_difference("QuoteRequest.count", 1) do
+    get quote_requests_url
+    assert_response :success
+    assert_select "a[href='#{document_quote_request_path(quote_requests(:one), format: :pdf)}']", text: "Invoice PDF"
+  end
+
+  test "show displays invoice pdf label for order workflow when orders v2 is enabled" do
+    quote_requests(:one).update!(status: :order_processing)
+    sign_in users(:customer)
+
+    get quote_request_url(quote_requests(:one))
+    assert_response :success
+    assert_select "a[href='#{document_quote_request_path(quote_requests(:one), format: :pdf)}']", text: "Invoice PDF"
+  end
+
+  test "create quote route redirects to b2b shop" do
+    sign_in users(:customer)
+
+    assert_no_difference("QuoteRequest.count") do
       post quote_requests_url, params: {
         quote_request: {
           customer_reference: "PO-NEW-01",
           valid_until: 14.days.from_now.to_date.to_s,
-          quote_template_id: quote_templates(:standard).id,
           notes: "Test quote",
           quote_items_attributes: {
             "0" => {
@@ -33,9 +50,14 @@ class QuoteRequestsControllerTest < ActionDispatch::IntegrationTest
       }
     end
 
-    created_quote = QuoteRequest.order(:id).last
-    assert_equal 1, created_quote.quote_items.count
-    assert_redirected_to quote_request_url(created_quote)
+    assert_redirected_to b2b_shop_url
+  end
+
+  test "new quote route redirects to b2b shop" do
+    sign_in users(:customer)
+
+    get new_quote_request_url
+    assert_redirected_to b2b_shop_url
   end
 
   test "admin cannot access quote form" do
@@ -52,7 +74,6 @@ class QuoteRequestsControllerTest < ActionDispatch::IntegrationTest
       role: :b2b_customer
     )
     foreign_quote = another_customer.quote_requests.create!(
-      quote_template: quote_templates(:standard),
       quote_number: "Q-20260221-90001",
       customer_reference: "PRIVATE-1",
       currency: "AUD",
@@ -103,5 +124,15 @@ class QuoteRequestsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_equal "application/pdf", response.media_type
     assert @response.body.start_with?("%PDF-1.4")
+  end
+
+  test "renders invoice pdf for orders when orders v2 is enabled" do
+    quote_requests(:one).update!(status: :order_processing, submitted_at: Time.current)
+    sign_in users(:customer)
+
+    get document_quote_request_url(quote_requests(:one), format: :pdf)
+    assert_response :success
+    assert_equal "application/pdf", response.media_type
+    assert_includes @response.body, "INVOICE / ORDER"
   end
 end

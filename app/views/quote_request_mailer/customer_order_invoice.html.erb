@@ -1,0 +1,98 @@
+<h2 style="margin: 0 0 6px; font-size: 24px; line-height: 1.25; color: #123447;"><%= OrderDocumentCopy.heading %></h2>
+<p style="margin: 0 0 6px; font-size: 12px; color: #4d6575;"><%= OrderDocumentCopy.subtitle %></p>
+<p style="margin: 0 0 16px; font-size: 14px; color: #4d6575;">
+  <%= OrderDocumentCopy.intro %>
+</p>
+
+<table role="presentation" width="100%" style="border-collapse: collapse; margin-bottom: 16px;">
+  <tbody>
+    <tr>
+      <td style="padding: 4px 0; width: 180px; color: #4d6575; font-size: 13px;">Order number</td>
+      <td style="padding: 4px 0; color: #123447; font-size: 13px;"><strong><%= @quotation.order_number %></strong></td>
+    </tr>
+    <tr>
+      <td style="padding: 4px 0; color: #4d6575; font-size: 13px;">Date</td>
+      <td style="padding: 4px 0; color: #123447; font-size: 13px;"><%= l(@quotation.order_date, format: :long) %></td>
+    </tr>
+    <tr>
+      <td style="padding: 4px 0; color: #4d6575; font-size: 13px;">Customer</td>
+      <td style="padding: 4px 0; color: #123447; font-size: 13px;">
+        <%= @quotation.customer_name %>
+        <% if @quotation.company_name.present? %>
+          (<%= @quotation.company_name %>)
+        <% end %>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding: 4px 0; color: #4d6575; font-size: 13px;">Email / Phone</td>
+      <td style="padding: 4px 0; color: #123447; font-size: 13px;">
+        <%= @quotation.customer_email %>
+        <% if @quotation.customer_phone.present? %>
+          / <%= @quotation.customer_phone %>
+        <% end %>
+      </td>
+    </tr>
+    <% if @quotation.delivery_address.present? %>
+      <tr>
+        <td style="padding: 4px 0; color: #4d6575; font-size: 13px;">Delivery address</td>
+        <td style="padding: 4px 0; color: #123447; font-size: 13px;"><%= @quotation.delivery_address %></td>
+      </tr>
+    <% end %>
+    <% if @quotation.pickup_method.present? %>
+      <tr>
+        <td style="padding: 4px 0; color: #4d6575; font-size: 13px;">Pickup / Delivery</td>
+        <td style="padding: 4px 0; color: #123447; font-size: 13px;"><%= @quotation.pickup_method %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<table role="presentation" width="100%" style="border-collapse: collapse; margin-bottom: 16px;">
+  <thead>
+    <tr>
+      <th align="left" style="padding: 8px; border-bottom: 1px solid #d9e5ec; color: #4d6575; font-size: 12px;">Location</th>
+      <th align="left" style="padding: 8px; border-bottom: 1px solid #d9e5ec; color: #4d6575; font-size: 12px;">Description</th>
+      <th align="left" style="padding: 8px; border-bottom: 1px solid #d9e5ec; color: #4d6575; font-size: 12px;">Opening</th>
+      <th align="left" style="padding: 8px; border-bottom: 1px solid #d9e5ec; color: #4d6575; font-size: 12px;">Track</th>
+      <th align="right" style="padding: 8px; border-bottom: 1px solid #d9e5ec; color: #4d6575; font-size: 12px;">Total (ex GST)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @quotation.rows.each do |row| %>
+      <tr>
+        <td style="padding: 8px; border-bottom: 1px solid #edf3f7; font-size: 13px; color: #123447;"><%= row[:location] %></td>
+        <td style="padding: 8px; border-bottom: 1px solid #edf3f7; font-size: 13px; color: #123447;"><%= row[:description] %></td>
+        <td style="padding: 8px; border-bottom: 1px solid #edf3f7; font-size: 13px; color: #123447;"><%= row[:opening] %></td>
+        <td style="padding: 8px; border-bottom: 1px solid #edf3f7; font-size: 13px; color: #123447;"><%= row[:track] %></td>
+        <td align="right" style="padding: 8px; border-bottom: 1px solid #edf3f7; font-size: 13px; color: #123447;"><%= number_to_currency(row[:total], unit: "#{@quote_request.currency} ") %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<table role="presentation" width="100%" style="border-collapse: collapse; margin-bottom: 16px;">
+  <tbody>
+    <tr>
+      <td align="right" style="padding: 4px 0; color: #4d6575; font-size: 13px; width: 75%;">TOTAL (ex GST)</td>
+      <td align="right" style="padding: 4px 0; color: #123447; font-size: 13px; width: 25%;"><strong><%= number_to_currency(@quotation.total_ex_gst, unit: "#{@quote_request.currency} ") %></strong></td>
+    </tr>
+    <tr>
+      <td align="right" style="padding: 4px 0; color: #4d6575; font-size: 13px;">GST</td>
+      <td align="right" style="padding: 4px 0; color: #123447; font-size: 13px;"><%= number_to_currency(@quotation.gst, unit: "#{@quote_request.currency} ") %></td>
+    </tr>
+    <tr>
+      <td align="right" style="padding: 4px 0; color: #4d6575; font-size: 13px;">TOTAL (inc GST)</td>
+      <td align="right" style="padding: 4px 0; color: #123447; font-size: 13px;"><strong><%= number_to_currency(@quotation.total_inc_gst, unit: "#{@quote_request.currency} ") %></strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<div style="padding-top: 10px; border-top: 1px solid #d9e5ec;">
+  <p style="margin: 0 0 6px; color: #123447; font-size: 13px;"><strong>Bank details</strong></p>
+  <p style="margin: 0; color: #4d6575; font-size: 13px;">Account name: <%= @quotation.bank_details[:account_name] %></p>
+  <p style="margin: 0; color: #4d6575; font-size: 13px;">Bank name: <%= @quotation.bank_details[:bank_name] %></p>
+  <p style="margin: 0; color: #4d6575; font-size: 13px;">BSB: <%= @quotation.bank_details[:bsb] %></p>
+  <p style="margin: 0; color: #4d6575; font-size: 13px;">Account number: <%= @quotation.bank_details[:account_number] %></p>
+  <p style="margin: 8px 0 0; color: #4d6575; font-size: 13px;"><strong>Terms:</strong> <%= OrderDocumentCopy.terms %></p>
+  <p style="margin: 4px 0 0; color: #4d6575; font-size: 13px;"><%= OrderDocumentCopy.footer %></p>
+</div>

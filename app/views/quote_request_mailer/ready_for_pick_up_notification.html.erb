@@ -1,0 +1,15 @@
+<h2 style="margin: 0 0 8px; font-size: 22px; color: #123447;">Order Ready for Pick Up</h2>
+<p style="margin: 0 0 8px; font-size: 14px; color: #4d6575;">
+  Your order <strong><%= @quote_request.quote_number %></strong> is ready for pick up.
+</p>
+
+<p style="margin: 0 0 8px; font-size: 14px; color: #123447;">
+  <strong>Pickup address:</strong> <%= @pickup_address %>
+</p>
+<p style="margin: 0 0 14px; font-size: 14px; color: #123447;">
+  <strong>Delivery note:</strong> <%= @delivery_note %>
+</p>
+
+<p style="margin: 0; font-size: 14px; color: #4d6575;">
+  Please contact us if you need delivery arranged instead.
+</p>

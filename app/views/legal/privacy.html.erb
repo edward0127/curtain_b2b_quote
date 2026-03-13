@@ -9,13 +9,13 @@
 <section class="panel legal-doc">
   <h3>1. Information We Collect</h3>
   <p>
-    We collect business account information (name, email, role), quote request details,
+    We collect business account information (name, email, role), order details,
     and operational metadata required to provide the portal.
   </p>
 
   <h3>2. How We Use Information</h3>
   <p>
-    Information is used to authenticate users, process quote requests, send transactional messages,
+    Information is used to authenticate users, process orders, send transactional messages,
     and maintain system security and performance.
   </p>
 
@@ -44,6 +44,6 @@
 
   <h3>7. Contact</h3>
   <p>
-    Privacy requests can be sent to: <a href="mailto:edward0127@hotmail.com">edward0127@hotmail.com</a>.
+    Privacy requests can be sent to: <%= mail_to AppSetting.fetch(:quote_receiver_email), AppSetting.fetch(:quote_receiver_email) %>.
   </p>
 </section>

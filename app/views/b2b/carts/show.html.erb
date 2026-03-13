@@ -1,0 +1,125 @@
+<section class="hero hero--compact">
+  <div>
+    <p class="eyebrow">B2B Cart</p>
+    <h2>Order Cart</h2>
+    <p class="lead">Review pricing snapshots, stock-adjusted quantities, and submit your order.</p>
+  </div>
+  <%= link_to "Continue Shopping", b2b_shop_path, class: "button button--secondary" %>
+</section>
+
+<% if @cart_warnings.any? %>
+  <div class="flash flash--notice">
+    <strong>Some quantities were adjusted.</strong>
+    <p>We updated some quantities because available component stock is limited.</p>
+    <ul>
+      <% @cart_warnings.each do |warning| %>
+        <li><%= warning %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<% if @cart_errors.any? %>
+  <div class="flash flash--alert">
+    <strong>Please review these items before checkout.</strong>
+    <ul>
+      <% @cart_errors.each do |error| %>
+        <li><%= error %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<section class="panel">
+  <% if @cart.empty? %>
+    <p class="muted">Your cart is empty.</p>
+    <div class="actions">
+      <%= link_to "Go to Shop", b2b_shop_path, class: "button button--primary" %>
+    </div>
+  <% else %>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Location</th>
+            <th>Product</th>
+            <th>Width x Drop (mm)</th>
+            <th>Track</th>
+            <th>Qty</th>
+            <th>Unit</th>
+            <th>Total</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @cart.lines.each do |line| %>
+            <tr>
+              <td><%= line["location_name"].presence || "-" %></td>
+              <td><%= line["product_name"] %></td>
+              <td><%= line["width_mm"] %> x <%= line["ceiling_drop_mm"] %></td>
+              <% track_label = case line["track_selected"].to_s.strip.downcase
+              when "shared" then "Shared track"
+              when "none" then "No track"
+              else line["track_selected"].presence || "-"
+              end %>
+              <td><%= track_label %></td>
+              <td>
+                <%= form_with url: update_line_b2b_cart_path(line_id: line["id"]), method: :patch, class: "inline-form" do %>
+                  <%= number_field_tag "line[quantity]", line["quantity"], min: 1, style: "width: 84px;" %>
+                  <%= submit_tag "Update", class: "button button--secondary button--small" %>
+                <% end %>
+              </td>
+              <td><%= number_to_currency(line["unit_price"], unit: "AUD ") %></td>
+              <td><%= number_to_currency(line["line_total"], unit: "AUD ") %></td>
+              <td class="table-actions">
+                <%= button_to "Remove", remove_line_b2b_cart_path(line_id: line["id"]), method: :delete, class: "button button--danger button--small", form: { class: "inline-form", data: { turbo_confirm: "Remove this line?" } } %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+        <tfoot>
+          <tr>
+            <th colspan="6">Order Total</th>
+            <th><%= number_to_currency(@cart_total, unit: "AUD ") %></th>
+            <th></th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <h3>Checkout details</h3>
+    <%= form_with url: checkout_b2b_cart_path, method: :post, class: "form-grid" do %>
+      <div class="field">
+        <%= label_tag "checkout_customer_reference", "Order reference" %>
+        <%= text_field_tag "checkout[customer_reference]", "" %>
+      </div>
+
+      <div class="field">
+        <%= label_tag "checkout_pickup_method", "How would you like to receive this order?" %>
+        <%= select_tag "checkout[pickup_method]", options_for_select(QuoteRequest.pickup_methods.keys.map { |value| [ value.humanize, value ] }, "delivery") %>
+      </div>
+
+      <div class="field field--full">
+        <%= label_tag "checkout_delivery_address", "Delivery address" %>
+        <%= text_area_tag "checkout[delivery_address]", "", rows: 3 %>
+        <small>Required if this order will be delivered.</small>
+      </div>
+
+      <div class="field field--full">
+        <%= label_tag "checkout_billing_address", "Billing address" %>
+        <%= text_area_tag "checkout[billing_address]", "", rows: 3 %>
+        <small>Optional if same as your usual account details.</small>
+      </div>
+
+      <div class="field field--full">
+        <%= label_tag "checkout_notes", "Additional notes" %>
+        <%= text_area_tag "checkout[notes]", "", rows: 3 %>
+        <small>Orders are charged to your account by default.</small>
+      </div>
+
+      <div class="actions field--full">
+        <%= submit_tag "Submit order", class: "button button--primary" %>
+      </div>
+    <% end %>
+  <% end %>
+</section>

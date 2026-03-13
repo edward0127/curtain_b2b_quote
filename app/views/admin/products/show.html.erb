@@ -6,66 +6,52 @@
   </div>
   <div class="table-actions">
     <%= link_to "Edit Product", edit_admin_product_path(@product), class: "button button--secondary" %>
-    <%= link_to "New Pricing Rule", new_admin_product_pricing_rule_path(@product), class: "button button--primary" %>
   </div>
 </section>
+
+<% if @product.active? && @product.matrix_priced_template? && !@product.matrix_price_ready? %>
+  <div class="flash flash--alert">
+    This product is active, but no imported matrix pricing is currently available for its channel/type/style.
+    It will not be usable in normal ordering flows until pricing is imported.
+  </div>
+<% end %>
 
 <section class="detail-grid">
   <article class="detail-card">
     <h3>Product Details</h3>
+    <% channel_label = case @product.pricing_channel.to_s.strip.downcase
+    when "b2b" then "B2B"
+    when "b2c" then "B2C"
+    else "Not set"
+    end %>
     <p><strong>SKU</strong> <span><%= @product.sku.presence || "-" %></span></p>
     <p><strong>Pricing mode</strong> <span><%= @product.pricing_mode.humanize %></span></p>
+    <p><strong>Channel</strong> <span><%= channel_label %></span></p>
+    <p><strong>Product type</strong> <span><%= @product.product_type.presence || "-" %></span></p>
+    <p><strong>Style</strong> <span><%= @product.style_name.presence || "-" %></span></p>
     <p><strong>Base price</strong> <span><%= number_to_currency(@product.base_price, unit: "AUD ") %></span></p>
     <p><strong>Status</strong> <span><%= @product.active? ? "Active" : "Inactive" %></span></p>
   </article>
   <article class="detail-card">
     <h3>Usage</h3>
-    <p><strong>Quote items</strong> <span><%= @product.quote_items.count %></span></p>
+    <p><strong><%= quote_or_order_label(count: 2) %> items</strong> <span><%= @product.quote_items.count %></span></p>
     <p><strong>Pricing rules</strong> <span><%= @pricing_rules.count %></span></p>
   </article>
-</section>
 
-<section class="panel">
-  <h3>Pricing Rules</h3>
-  <div class="table-wrap">
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Priority</th>
-          <th>Condition</th>
-          <th>Adjustment</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @pricing_rules.each do |rule| %>
-          <tr>
-            <td><%= rule.name %></td>
-            <td><%= rule.priority %></td>
-            <td>
-              Area <%= rule.min_area || "*" %>-<%= rule.max_area || "*" %> sqm,
-              Qty <%= rule.min_quantity || "*" %>-<%= rule.max_quantity || "*" %>
-            </td>
-            <td>
-              <% case rule.adjustment_type %>
-              <% when "percentage" %>
-                <%= rule.adjustment_value %>% 
-              <% when "fixed_amount" %>
-                <%= number_to_currency(rule.adjustment_value, unit: "AUD ") %>
-              <% when "set_unit_price" %>
-                Set <%= number_to_currency(rule.adjustment_value, unit: "AUD ") %>
-              <% end %>
-            </td>
-            <td><%= rule.active? ? "Active" : "Inactive" %></td>
-            <td class="table-actions">
-              <%= link_to "Edit", edit_admin_product_pricing_rule_path(@product, rule), class: "button button--secondary button--small" %>
-              <%= button_to "Delete", admin_product_pricing_rule_path(@product, rule), method: :delete, class: "button button--danger button--small", form: { class: "inline-form", data: { turbo_confirm: "Delete this pricing rule?" } } %>
-            </td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
-  </div>
+  <article class="detail-card">
+    <h3>Inventory Mappings</h3>
+    <% mappings = [
+      [ "Track", @product.track_inventory_item ],
+      [ "Hook", @product.hook_inventory_item ],
+      [ "Bracket", @product.bracket_inventory_item ],
+      [ "Wand", @product.wand_inventory_item ],
+      [ "End cap", @product.end_cap_inventory_item ],
+      [ "Stopper", @product.stopper_inventory_item ],
+      [ "Wand hook", @product.wand_hook_inventory_item ]
+    ] %>
+    <% mappings.each do |label, item| %>
+      <% item_label = item.present? ? (item.sku.present? ? "#{item.name} (#{item.sku})" : item.name) : "None" %>
+      <p><strong><%= label %></strong> <span><%= item_label %></span></p>
+    <% end %>
+  </article>
 </section>

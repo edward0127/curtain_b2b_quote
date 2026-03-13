@@ -1,0 +1,31 @@
+<h2 style="margin: 0 0 6px; font-size: 22px; color: #123447;">New Order Submitted <%= @quote_request.quote_number %></h2>
+<p style="margin: 0 0 14px; color: #4d6575; font-size: 14px;">
+  Customer contact: <strong><%= @customer_contact %></strong><br>
+  Customer mode: <strong><%= @quote_request.customer_mode.upcase %></strong><br>
+  Submitted at: <strong><%= l(@quote_request.submitted_at || @quote_request.created_at, format: :long) %></strong>
+</p>
+
+<table role="presentation" width="100%" style="border-collapse: collapse; margin-bottom: 16px;">
+  <thead>
+    <tr>
+      <th align="left" style="padding: 8px; border-bottom: 1px solid #d9e5ec; color: #4d6575; font-size: 12px;">Location</th>
+      <th align="left" style="padding: 8px; border-bottom: 1px solid #d9e5ec; color: #4d6575; font-size: 12px;">Product</th>
+      <th align="left" style="padding: 8px; border-bottom: 1px solid #d9e5ec; color: #4d6575; font-size: 12px;">Qty</th>
+      <th align="left" style="padding: 8px; border-bottom: 1px solid #d9e5ec; color: #4d6575; font-size: 12px;">Line Total</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @quote_request.quote_items.each do |item| %>
+      <tr>
+        <td style="padding: 8px; border-bottom: 1px solid #edf3f7; font-size: 13px; color: #123447;"><%= item.location_name.presence || "-" %></td>
+        <td style="padding: 8px; border-bottom: 1px solid #edf3f7; font-size: 13px; color: #123447;"><%= item.product.name %></td>
+        <td style="padding: 8px; border-bottom: 1px solid #edf3f7; font-size: 13px; color: #123447;"><%= item.quantity %></td>
+        <td style="padding: 8px; border-bottom: 1px solid #edf3f7; font-size: 13px; color: #123447;"><%= number_to_currency(item.line_total, unit: "#{@quote_request.currency} ") %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<p style="margin: 0; font-size: 14px; color: #123447;">
+  <strong>Total:</strong> <%= number_to_currency(@quote_request.total, unit: "#{@quote_request.currency} ") %>
+</p>

@@ -47,9 +47,15 @@ class Admin::SettingsController < ApplicationController
       :mailgun_smtp_port,
       :mail_from_email,
       :quote_receiver_email,
+      :bank_account_name,
+      :bank_name,
+      :bank_bsb,
+      :bank_account_number,
       :app_host,
       :app_port,
       :app_protocol,
+      :pickup_address_default,
+      :delivery_note_default,
       :public_heading_font,
       :public_body_font
     )

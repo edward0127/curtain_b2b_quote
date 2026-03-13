@@ -1,15 +1,16 @@
 <section class="hero hero--compact">
   <div>
     <p class="eyebrow">Admin</p>
-    <h2>Quote Workflow</h2>
-    <p class="lead">Manage pipeline status, templates, and job conversion.</p>
+    <h2><%= quote_or_order_label %> Workflow</h2>
+    <p class="lead">Manage pipeline status and order processing.</p>
   </div>
+  <%= link_to "Create Order", new_admin_quote_request_path, class: "button button--primary" %>
 </section>
 
 <section class="tabs">
   <%= link_to "All", admin_quote_requests_path, class: [ "tab", (@status_filter.blank? ? "tab--active" : nil) ].compact.join(" ") %>
-  <% QuoteRequest.statuses.keys.each do |status_key| %>
-    <%= link_to status_key.humanize, admin_quote_requests_path(status: status_key), class: [ "tab", (@status_filter == status_key ? "tab--active" : nil) ].compact.join(" ") %>
+  <% (QuoteRequest.statuses.keys - [ "converted_to_job" ]).each do |status_key| %>
+    <%= link_to QuoteRequest.status_label_for(status_key), admin_quote_requests_path(status: status_key), class: [ "tab", (@status_filter == status_key ? "tab--active" : nil) ].compact.join(" ") %>
   <% end %>
 </section>
 
@@ -18,12 +19,11 @@
     <table class="data-table">
       <thead>
         <tr>
-          <th>Quote #</th>
+          <th><%= quote_or_order_label %> #</th>
           <th>Customer</th>
           <th>Items</th>
           <th>Total</th>
           <th>Status</th>
-          <th>Job</th>
           <th>Created</th>
           <th>Actions</th>
         </tr>
@@ -35,12 +35,11 @@
             <td><%= quote.user.email %></td>
             <td><%= quote.line_items_count %></td>
             <td><%= number_to_currency(quote.total, unit: "#{quote.currency} ") %></td>
-            <td><span class="status-pill status-pill--<%= quote.status %>"><%= quote.status.humanize %></span></td>
-            <td><%= quote.job&.job_number || "-" %></td>
+            <td><span class="status-pill status-pill--<%= quote.status %>"><%= quote.display_status %></span></td>
             <td><%= l(quote.created_at, format: :short) %></td>
             <td class="table-actions">
               <%= link_to "View", admin_quote_request_path(quote), class: "button button--secondary button--small" %>
-              <%= link_to "PDF", document_admin_quote_request_path(quote, format: :pdf), class: "button button--primary button--small" %>
+              <%= link_to "Invoice PDF", invoice_admin_quote_request_path(quote, format: :pdf), class: "button button--primary button--small" %>
             </td>
           </tr>
         <% end %>

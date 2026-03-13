@@ -20,17 +20,24 @@ Rails.application.routes.draw do
     end
     resource :settings, only: [ :edit, :update ]
     resources :products do
+      member do
+        get :preview_price
+        post :preview_price
+      end
       resources :pricing_rules, except: [ :index, :show ]
     end
-    resources :quote_templates, except: [ :show ]
-    resources :quote_requests, only: [ :index, :show, :update ] do
+    resources :inventory_items do
+      patch :adjust_stock, on: :member
+    end
+    resources :pricebook_imports, only: [ :index, :new, :create ]
+    resources :quote_requests, only: [ :index, :new, :create, :show, :update ] do
       member do
         patch :update_status
-        post :convert_to_job
         get :document
+        get :invoice
+        get :to_chinese_factory
       end
     end
-    resources :jobs, only: [ :index, :show, :update ]
   end
 
   resource :impersonation, only: [ :destroy ]
@@ -38,6 +45,16 @@ Rails.application.routes.draw do
   get "privacy", to: "legal#privacy"
 
   get "dashboard", to: "dashboard#show", as: :dashboard
+  namespace :b2b do
+    get "shop", to: "shop#index"
+    get "shop/:id", to: "shop#show", as: :shop_product
+    resource :cart, only: [ :show ], controller: "carts" do
+      post :add_line
+      patch "lines/:line_id", action: :update_line, as: :update_line
+      delete "lines/:line_id", action: :remove_line, as: :remove_line
+      post :checkout
+    end
+  end
   resources :quote_requests, only: [ :index, :new, :create, :show ] do
     member do
       get :document

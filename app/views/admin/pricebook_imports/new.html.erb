@@ -1,0 +1,21 @@
+<section class="hero hero--compact">
+  <div>
+    <p class="eyebrow">Admin</p>
+    <h2>Upload Pricebook</h2>
+    <p class="lead">Upload the latest WHOLESALE Quote Form Tailored - J000.xlsx to import product templates, matrix pricing, and shared track tiers.</p>
+  </div>
+</section>
+
+<section class="panel">
+  <%= form_with scope: :pricebook_import, url: admin_pricebook_imports_path, method: :post, multipart: true, class: "form-grid" do |form| %>
+    <div class="field field--full">
+      <%= form.label :file, "Pricebook (.xlsx)" %>
+      <%= form.file_field :file, accept: ".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", required: true %>
+    </div>
+
+    <div class="actions field--full">
+      <%= form.submit "Import Pricebook", class: "button button--primary" %>
+      <%= link_to "Back", admin_pricebook_imports_path, class: "button button--secondary" %>
+    </div>
+  <% end %>
+</section>
