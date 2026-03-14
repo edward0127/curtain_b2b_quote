@@ -87,12 +87,36 @@ class Admin::QuoteRequestsControllerTest < ActionDispatch::IntegrationTest
     assert_select "table.admin-order-lines-table tbody tr", count: 9
   end
 
-  test "admin index hides converted to job status tab" do
+  test "admin index only shows order workflow status tabs" do
     sign_in users(:admin)
 
     get admin_quote_requests_url
     assert_response :success
+    assert_select "a.tab", text: "All"
+    assert_select "a.tab", text: "Order Processing"
+    assert_select "a.tab", text: "Ready For Pick Up"
+    assert_select "a.tab", text: "Completed"
+    assert_select "a.tab", text: "Cancelled"
+    assert_select "a.tab", text: "Submitted", count: 0
+    assert_select "a.tab", text: "Reviewed", count: 0
+    assert_select "a.tab", text: "Priced", count: 0
+    assert_select "a.tab", text: "Sent To Customer", count: 0
+    assert_select "a.tab", text: "Approved", count: 0
+    assert_select "a.tab", text: "Rejected", count: 0
     assert_select "a.tab", text: "Converted To Job", count: 0
+  end
+
+  test "admin index all view excludes legacy statuses" do
+    sign_in users(:admin)
+    order_quote = quote_requests(:one)
+    order_quote.update!(status: :order_processing, submitted_at: Time.current)
+    legacy_quote = quote_requests(:two)
+    legacy_quote.update!(status: :reviewed, submitted_at: nil)
+
+    get admin_quote_requests_url
+    assert_response :success
+    assert_includes @response.body, order_quote.quote_number
+    assert_not_includes @response.body, legacy_quote.quote_number
   end
 
   test "admin can create and submit b2c order with stock deduction and emails" do

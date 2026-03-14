@@ -8,8 +8,14 @@ class Admin::QuoteRequestsController < ApplicationController
   before_action :load_order_builder_collections, only: %i[ new create ]
 
   def index
+    allowed_statuses = QuoteRequest::ORDER_WORKFLOW_STATUSES
     @status_filter = params[:status].presence
-    @quote_requests = QuoteRequest.includes(:user, quote_items: :product).recent_first
+    @status_filter = nil unless allowed_statuses.include?(@status_filter)
+
+    @quote_requests = QuoteRequest.includes(:user, quote_items: :product)
+      .recent_first
+      .where(status: allowed_statuses)
+      .where.not(submitted_at: nil)
     @quote_requests = @quote_requests.where(status: @status_filter) if @status_filter.present?
   end
 

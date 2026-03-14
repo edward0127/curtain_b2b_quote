@@ -9,7 +9,7 @@
 
 <section class="tabs">
   <%= link_to "All", admin_quote_requests_path, class: [ "tab", (@status_filter.blank? ? "tab--active" : nil) ].compact.join(" ") %>
-  <% (QuoteRequest.statuses.keys - [ "converted_to_job" ]).each do |status_key| %>
+  <% QuoteRequest::ORDER_WORKFLOW_STATUSES.each do |status_key| %>
     <%= link_to QuoteRequest.status_label_for(status_key), admin_quote_requests_path(status: status_key), class: [ "tab", (@status_filter == status_key ? "tab--active" : nil) ].compact.join(" ") %>
   <% end %>
 </section>

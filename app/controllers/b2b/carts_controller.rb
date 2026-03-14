@@ -28,6 +28,9 @@ class B2b::CartsController < B2b::BaseController
     notice_message = "Item added to cart."
     notice_message = "#{notice_message} #{result.warning}" if result.warning.present?
     redirect_to b2b_cart_path, notice: notice_message
+  rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved => e
+    Rails.logger.error("B2B cart add_line failed for user ##{current_user.id}: #{e.class} - #{e.message}")
+    redirect_back fallback_location: b2b_shop_path, alert: "Could not update your cart. Please try again."
   end
 
   def update_line
@@ -83,7 +86,13 @@ class B2b::CartsController < B2b::BaseController
       return
     end
 
-    quote_request = build_quote_request_from_cart
+    quote_request = @cart.quote_request
+    if quote_request.blank?
+      redirect_to b2b_cart_path, alert: "Could not load your cart. Please add items again."
+      return
+    end
+
+    apply_checkout_details!(quote_request)
 
     begin
       ActiveRecord::Base.transaction do
@@ -106,7 +115,12 @@ class B2b::CartsController < B2b::BaseController
   private
 
   def load_cart
-    @cart = Orders::SessionCart.new(session: session)
+    @cart = Orders::SessionCart.new(session: session, user: current_user)
+  rescue StandardError => e
+    Rails.logger.error("B2B cart load failed for user ##{current_user.id}: #{e.class} - #{e.message}")
+    session.delete(Orders::SessionCart::SESSION_KEY)
+    session.delete("orders_v2_b2b_cart")
+    @cart = Orders::SessionCart.new(session: session, user: current_user)
   end
 
   def add_line_params
@@ -192,11 +206,11 @@ class B2b::CartsController < B2b::BaseController
     [ warnings, errors ]
   end
 
-  def build_quote_request_from_cart
+  def apply_checkout_details!(quote_request)
     order_params = checkout_params
     pickup_method = QuoteRequest.pickup_methods.key?(order_params[:pickup_method].to_s) ? order_params[:pickup_method] : "delivery"
 
-    quote_request = current_user.quote_requests.new(
+    quote_request.assign_attributes(
       customer_mode: :b2b,
       customer_name: current_user.email,
       customer_email: current_user.email,
@@ -206,53 +220,9 @@ class B2b::CartsController < B2b::BaseController
       billing_address: order_params[:billing_address],
       notes: order_params[:notes].presence || "Charge to account",
       status: :order_processing,
-      submitted_at: Time.current,
-      valid_until: 14.days.from_now.to_date
+      submitted_at: quote_request.submitted_at || Time.current,
+      valid_until: quote_request.valid_until || 14.days.from_now.to_date
     )
-
-    @cart.lines.each_with_index do |line, index|
-      product = Product.find(line["product_id"])
-
-      quote_request.quote_items.build(
-        product: product,
-        line_position: index + 1,
-        description: line["description"],
-        quantity: line["quantity"].to_i,
-        area_sqm: line["area_sqm"].to_d,
-        unit_price: line["unit_price"].to_d,
-        line_total: line["line_total"].to_d,
-        applied_rule_names: "Matrix pricing",
-        width: (line["width_mm"].to_d / 10).round(2),
-        height: (line["ceiling_drop_mm"].to_d / 10).round(2),
-        location_name: line["location_name"],
-        track_selected: line["track_selected"],
-        fixing: line["fixing"],
-        opening_type: line["opening_type"],
-        opening_code: line["opening_code"],
-        width_mm: line["width_mm"].to_i,
-        ceiling_drop_mm: line["ceiling_drop_mm"].to_i,
-        finished_floor_mode: line["finished_floor_mode"],
-        factory_drop_mm: line["factory_drop_mm"].to_i,
-        material_name: line["material_name"],
-        material_number: line["material_number"],
-        lv_name: line["lv_name"],
-        high_temp_custom: line["high_temp_custom"],
-        width_notes: line["width_notes"],
-        wand_required: ActiveModel::Type::Boolean.new.cast(line["wand_required"]),
-        wand_quantity: line["wand_quantity"].to_i,
-        end_cap_quantity: line["end_cap_quantity"].to_i,
-        stopper_quantity: line["stopper_quantity"].to_i,
-        wand_hook_quantity: line["wand_hook_quantity"].to_i,
-        curtain_price: line["curtain_price"].to_d,
-        track_price: line["track_price"].to_d,
-        hooks_display: line["hooks_display"],
-        hooks_total: line["hooks_total"].to_i,
-        brackets_total: line["brackets_total"].to_i,
-        track_metres_required: line["track_metres_required"].to_i
-      )
-    end
-
-    quote_request
   end
 
   def append_email_result(notice_message, quote_request)

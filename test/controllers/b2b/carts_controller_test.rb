@@ -41,22 +41,28 @@ class B2b::CartsControllerTest < ActionDispatch::IntegrationTest
     bracket = InventoryItem.create!(name: "Bracket", component_type: :bracket, on_hand: 200)
     @product.update!(track_inventory_item: track, hook_inventory_item: hook, bracket_inventory_item: bracket)
 
-    post add_line_b2b_cart_url, params: {
-      line: {
-        product_id: @product.id,
-        location_name: "Living Room",
-        width_mm: 3830,
-        ceiling_drop_mm: 2410,
-        opening_type: "single_open",
-        finished_floor_mode: "just_off_floor",
-        track_selected: "M",
-        fixing: "TF",
-        quantity: 2
-      }
-    }
-    assert_redirected_to b2b_cart_url
-
     assert_difference("QuoteRequest.count", 1) do
+      post add_line_b2b_cart_url, params: {
+        line: {
+          product_id: @product.id,
+          location_name: "Living Room",
+          width_mm: 3830,
+          ceiling_drop_mm: 2410,
+          opening_type: "single_open",
+          finished_floor_mode: "just_off_floor",
+          track_selected: "M",
+          fixing: "TF",
+          quantity: 2
+        }
+      }
+    end
+    assert_redirected_to b2b_cart_url
+    draft_cart = QuoteRequest.order(:id).last
+    assert_nil draft_cart.submitted_at
+    assert_equal "order_processing", draft_cart.status
+    assert_equal 1, draft_cart.quote_items.count
+
+    assert_no_difference("QuoteRequest.count") do
       assert_difference("ActionMailer::Base.deliveries.size", 2) do
         post checkout_b2b_cart_url, params: {
           checkout: {
@@ -67,10 +73,11 @@ class B2b::CartsControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
-    created = QuoteRequest.order(:id).last
+    created = draft_cart.reload
     assert_redirected_to quote_request_url(created)
     assert_equal "order_processing", created.status
     assert_equal users(:customer).email, created.customer_email
+    assert_not_nil created.submitted_at
     assert_equal 2, created.quote_items.first.quantity
 
     assert_equal 12, track.reload.on_hand
@@ -85,22 +92,25 @@ class B2b::CartsControllerTest < ActionDispatch::IntegrationTest
     bracket = InventoryItem.create!(name: "Bracket", component_type: :bracket, on_hand: 200)
     @product.update!(track_inventory_item: track, hook_inventory_item: hook, bracket_inventory_item: bracket)
 
-    post add_line_b2b_cart_url, params: {
-      line: {
-        product_id: @product.id,
-        location_name: "Bedroom",
-        width_mm: 3830,
-        ceiling_drop_mm: 2410,
-        opening_type: "single_open",
-        finished_floor_mode: "just_off_floor",
-        track_selected: "M",
-        fixing: "TF",
-        quantity: 2
+    assert_difference("QuoteRequest.count", 1) do
+      post add_line_b2b_cart_url, params: {
+        line: {
+          product_id: @product.id,
+          location_name: "Bedroom",
+          width_mm: 3830,
+          ceiling_drop_mm: 2410,
+          opening_type: "single_open",
+          finished_floor_mode: "just_off_floor",
+          track_selected: "M",
+          fixing: "TF",
+          quantity: 2
+        }
       }
-    }
+    end
     assert_redirected_to b2b_cart_url
 
-    assert_difference("QuoteRequest.count", 1) do
+    draft_cart = QuoteRequest.order(:id).last
+    assert_no_difference("QuoteRequest.count") do
       post checkout_b2b_cart_url, params: {
         checkout: {
           pickup_method: "delivery"
@@ -108,7 +118,7 @@ class B2b::CartsControllerTest < ActionDispatch::IntegrationTest
       }
     end
 
-    created = QuoteRequest.order(:id).last
+    created = draft_cart.reload
     assert_equal 1, created.quote_items.first.quantity
     assert_equal 28, hook.reload.on_hand
   end
@@ -162,5 +172,125 @@ class B2b::CartsControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to b2b_shop_product_url(matrixless_product)
     assert_match(/No matrix price is available for this product and size/i, flash[:alert])
+  end
+
+  test "checkout form uses submit loading state wiring" do
+    sign_in users(:customer)
+
+    post add_line_b2b_cart_url, params: {
+      line: {
+        product_id: @product.id,
+        location_name: "Living Room",
+        width_mm: 2500,
+        ceiling_drop_mm: 2200,
+        opening_type: "single_open",
+        finished_floor_mode: "just_off_floor",
+        track_selected: "M",
+        fixing: "TF",
+        quantity: 1
+      }
+    }
+    assert_redirected_to b2b_cart_url
+
+    get b2b_cart_url
+    assert_response :success
+    assert_select "form[data-controller='submit-state']"
+    assert_select "button[data-submit-state-target='button']"
+    assert_select "span[data-submit-state-target='label']", text: "Submit order"
+    assert_select "span[data-submit-state-target='spinner']"
+  end
+
+  test "b2b customer can add different products across shopping steps without cookie overflow" do
+    sign_in users(:customer)
+
+    second_product = products(:blackout_panel)
+    second_product.update!(
+      active: true,
+      pricing_channel: "b2b",
+      product_type: "Sheer Curtain",
+      style_name: "S Wave"
+    )
+
+    post add_line_b2b_cart_url, params: {
+      line: {
+        product_id: @product.id,
+        location_name: "Living Room",
+        width_mm: 2500,
+        ceiling_drop_mm: 2200,
+        opening_type: "single_open",
+        finished_floor_mode: "just_off_floor",
+        track_selected: "M",
+        fixing: "TF",
+        quantity: 1
+      }
+    }
+    assert_redirected_to b2b_cart_url
+    first_cookie_size = cookies["_curtain_b2b_quote_session"].to_s.bytesize
+
+    get b2b_shop_url
+    assert_response :success
+
+    post add_line_b2b_cart_url, params: {
+      line: {
+        product_id: second_product.id,
+        location_name: "Bedroom",
+        width_mm: 2800,
+        ceiling_drop_mm: 2300,
+        opening_type: "single_open",
+        finished_floor_mode: "just_off_floor",
+        track_selected: "M",
+        fixing: "TF",
+        quantity: 1
+      }
+    }
+    assert_redirected_to b2b_cart_url
+
+    draft_cart = users(:customer).quote_requests.where(status: :order_processing, submitted_at: nil).order(:id).last
+    assert_not_nil draft_cart
+    assert_equal 2, draft_cart.quote_items.count
+    assert_equal [ @product.id, second_product.id ].sort, draft_cart.quote_items.order(:id).pluck(:product_id).sort
+
+    second_cookie_size = cookies["_curtain_b2b_quote_session"].to_s.bytesize
+    assert_operator second_cookie_size, :<, 4096
+    assert_operator(second_cookie_size - first_cookie_size, :<, 512)
+  end
+
+  test "adding the same product again keeps cart stable" do
+    sign_in users(:customer)
+
+    post add_line_b2b_cart_url, params: {
+      line: {
+        product_id: @product.id,
+        location_name: "Living Room",
+        width_mm: 2500,
+        ceiling_drop_mm: 2200,
+        opening_type: "single_open",
+        finished_floor_mode: "just_off_floor",
+        track_selected: "M",
+        fixing: "TF",
+        quantity: 1
+      }
+    }
+    assert_redirected_to b2b_cart_url
+
+    post add_line_b2b_cart_url, params: {
+      line: {
+        product_id: @product.id,
+        location_name: "Study",
+        width_mm: 2600,
+        ceiling_drop_mm: 2100,
+        opening_type: "single_open",
+        finished_floor_mode: "just_off_floor",
+        track_selected: "M",
+        fixing: "TF",
+        quantity: 1
+      }
+    }
+    assert_redirected_to b2b_cart_url
+
+    draft_cart = users(:customer).quote_requests.where(status: :order_processing, submitted_at: nil).order(:id).last
+    assert_not_nil draft_cart
+    assert_equal 2, draft_cart.quote_items.count
+    assert_equal [ @product.id ], draft_cart.quote_items.distinct.pluck(:product_id)
   end
 end

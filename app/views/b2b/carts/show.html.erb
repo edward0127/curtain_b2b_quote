@@ -88,7 +88,7 @@
     </div>
 
     <h3>Checkout details</h3>
-    <%= form_with url: checkout_b2b_cart_path, method: :post, class: "form-grid" do %>
+    <%= form_with url: checkout_b2b_cart_path, method: :post, class: "form-grid", data: { controller: "submit-state", action: "turbo:submit-start->submit-state#start turbo:submit-end->submit-state#end", submit_state_submitting_label_value: "Submitting...", submit_state_submitting_message_value: "Submitting order. Please wait..." } do %>
       <div class="field">
         <%= label_tag "checkout_customer_reference", "Order reference" %>
         <%= text_field_tag "checkout[customer_reference]", "" %>
@@ -118,7 +118,11 @@
       </div>
 
       <div class="actions field--full">
-        <%= submit_tag "Submit order", class: "button button--primary" %>
+        <button type="submit" class="button button--primary button--with-spinner" data-submit-state-target="button">
+          <span data-submit-state-target="label">Submit order</span>
+          <span class="button__spinner" data-submit-state-target="spinner" hidden></span>
+        </button>
+        <p class="form-status" data-submit-state-target="message" role="status" aria-live="polite"></p>
       </div>
     <% end %>
   <% end %>
