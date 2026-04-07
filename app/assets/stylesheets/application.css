@@ -1114,7 +1114,7 @@ h3 {
 
 .public-nav__link {
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 6px;
   padding: 0.44rem 0.72rem;
   color: var(--ink);
   background: rgba(255, 255, 255, 0.78);
@@ -2209,7 +2209,7 @@ h3 {
 }
 
 .public-brand__logo {
-  width: 132px;
+  width: 156px;
   filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.45));
 }
 
@@ -2485,7 +2485,7 @@ h3 {
   }
 
   .public-brand__logo {
-    width: 108px;
+    width: 124px;
   }
 
   .public-page--public-pages-home .flash-stack--public {
@@ -3617,22 +3617,27 @@ h3 {
 
 .public-topbar .public-nav__link,
 .public-topbar.public-topbar--scrolled .public-nav__link {
-  color: #fff6e9;
-  border-color: rgba(248, 233, 208, 0.3);
-  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 246, 233, 0.84);
+  border-color: transparent;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  transition: color 140ms ease, opacity 140ms ease;
 }
 
 .public-topbar .public-nav__link:hover,
 .public-topbar.public-topbar--scrolled .public-nav__link:hover {
-  border-color: rgba(248, 233, 208, 0.52);
-  background: rgba(255, 255, 255, 0.18);
+  color: #fffaf2;
+  border-color: transparent;
+  background: transparent;
 }
 
 .public-topbar .public-nav__link--active,
 .public-topbar.public-topbar--scrolled .public-nav__link--active {
-  color: #2f261d;
+  color: #f6ddbf;
   border-color: transparent;
-  background: linear-gradient(155deg, #f6ddbf, #f0cfa5);
+  background: transparent;
+  font-weight: 700;
 }
 
 .flash-stack--public {

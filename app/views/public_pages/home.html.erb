@@ -19,15 +19,6 @@
     <p class="lv-kicker">LIGHT VUE</p>
     <h1 style="<%= public_text_style(home_styles, "hero_title") %>"><%= home_texts.fetch("hero_title", site_setting(:public_home_hero_title)) %></h1>
     <p class="lv-lead" style="<%= public_text_style(home_styles, "hero_lead") %>"><%= home_texts.fetch("hero_lead", site_setting(:public_home_hero_lead)) %></p>
-    <ul class="lv-hero__signals">
-      <li>Wholesale pricing</li>
-      <li>Reliable lead times</li>
-      <li>Consistent finish</li>
-    </ul>
-    <div class="lv-actions">
-      <%= link_to site_setting(:public_cta_contact_label), "#get-in-touch", class: "lv-pill", data: { turbo: false } %>
-      <%= link_to site_setting(:public_cta_login_label), new_user_session_path, class: "lv-pill lv-pill--dark", data: { turbo_frame: "_top" } %>
-    </div>
   </article>
 </section>
 
