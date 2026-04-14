@@ -6,7 +6,6 @@ class B2b::ShopController < B2b::BaseController
   end
 
   def show
-    @track_codes = ([ "shared" ] + TrackPriceTier.distinct.order(:track_name).pluck(:track_name)).uniq
   end
 
   private

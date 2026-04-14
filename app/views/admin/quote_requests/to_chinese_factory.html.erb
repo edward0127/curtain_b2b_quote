@@ -32,7 +32,7 @@
         <tr>
           <th>No.</th>
           <th>Location (&#20301;&#23376;)</th>
-          <th>Style (&#27454;&#24335;)<br>&#34503;&#24418;/&#38889;&#21746;</th>
+          <th><%= safe_join(@quote_request.factory_style_heading_label(multiline: true).split("\n"), tag.br) %></th>
           <th>Material<br>(&#24067;&#26009;)<br>&#32433;&#31383;/&#36974;&#20809;</th>
           <th>Number<br>(&#24067;&#26009;&#32534;&#21495;)</th>
           <th>LV Name</th>
@@ -49,25 +49,17 @@
           <% item = @quote_request.quote_items[index] %>
           <tr>
             <td><%= index + 1 %></td>
-            <td><%= item&.location_name.presence || "-" %></td>
-            <td><%= item.present? ? (item.product.style_name.presence || item.product.product_type.presence || "-") : "" %></td>
-            <td><%= item.present? ? (item.material_name.presence || item.product.product_type.presence || item.product.name) : "" %></td>
+            <td><%= item&.line_location_label || "-" %></td>
+            <td><%= item&.style_label(blank: "") || "" %></td>
+            <td><%= item&.material_label(blank: "") || "" %></td>
             <td><%= item&.material_number.presence || "-" %></td>
             <td><%= item&.lv_name.presence || "-" %></td>
-            <td><%= item.present? && item.width_mm.to_i.positive? ? item.width_mm : "-" %></td>
-            <td><%= item.present? ? (item.factory_drop_mm.presence || item.ceiling_drop_mm.presence || "-") : "-" %></td>
-            <td>
-              <% if item&.finished_floor_mode == "puddled" %>
-                Puddled
-              <% elsif item&.finished_floor_mode == "just_off_floor" %>
-                Just off
-              <% else %>
-                -
-              <% end %>
-            </td>
-            <td><%= item.present? ? (item.opening_type == "double_open" ? 2 : 1) : "-" %></td>
+            <td><%= item&.width_mm_label || "-" %></td>
+            <td><%= item&.factory_drop_mm_label || "-" %></td>
+            <td><%= item&.finished_floor_label || "-" %></td>
+            <td><%= item&.opening_count_label || "-" %></td>
             <td><%= item&.high_temp_custom.presence || "-" %></td>
-            <td><%= item.present? ? (item.hooks_display.presence || item.hooks_total.presence || "-") : "-" %></td>
+            <td><%= item&.hooks_label || "-" %></td>
           </tr>
         <% end %>
       </tbody>
@@ -78,7 +70,7 @@
     <table class="factory-sheet-table factory-sheet-table--track">
       <thead>
         <tr class="factory-sheet-table__section-row">
-          <th colspan="6">Track details (TO LOCAL FACTORY)</th>
+          <th colspan="6"><%= @quote_request.factory_details_section_title %></th>
         </tr>
         <tr>
           <th>Opening</th>
@@ -93,20 +85,12 @@
         <% rows.times do |index| %>
           <% item = @quote_request.quote_items[index] %>
           <tr>
-            <td><%= item.present? ? (item.opening_code.presence || (item.opening_type == "double_open" ? "C/O" : "OW")) : "" %></td>
+            <td><%= item&.opening_code_label(blank: "") || "" %></td>
             <td><%= item&.fixing.presence || "" %></td>
-            <td><%= item.present? && item.brackets_total.to_i.positive? ? item.brackets_total : "" %></td>
+            <td><%= item&.brackets_label(blank: "") || "" %></td>
             <td><%= item&.width_notes.presence || "" %></td>
-            <td>
-              <% if item.present? && item.wand_quantity.to_i.positive? %>
-                <%= item.wand_quantity %>
-              <% elsif item&.wand_required %>
-                Y
-              <% else %>
-                ""
-              <% end %>
-            </td>
-            <td><%= item.present? && item.ceiling_drop_mm.to_i.positive? ? item.ceiling_drop_mm : "" %></td>
+            <td><%= item&.wand_label(blank: "") || "" %></td>
+            <td><%= item&.ceiling_drop_mm_label(blank: "") || "" %></td>
           </tr>
         <% end %>
       </tbody>

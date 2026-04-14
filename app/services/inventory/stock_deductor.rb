@@ -1,7 +1,6 @@
 module Inventory
   class StockDeductor
     COMPONENT_REQUIREMENTS = {
-      track_inventory_item_id: :track_metres_required,
       hook_inventory_item_id: :hooks_total,
       bracket_inventory_item_id: :brackets_total,
       wand_inventory_item_id: :wand_quantity,

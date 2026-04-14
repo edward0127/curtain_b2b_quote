@@ -7,8 +7,6 @@
   <span class="status-pill status-pill--<%= @quote_request.status %>"><%= @quote_request.display_status %></span>
 </section>
 
-<% order_workflow_quote = QuoteRequest::ORDER_WORKFLOW_STATUSES.include?(@quote_request.status) %>
-
 <section class="panel">
   <div class="panel-head">
     <h3><%= quote_or_order_label %> Metadata</h3>
@@ -41,7 +39,7 @@
 <section class="panel">
   <h3>Workflow Actions</h3>
 
-  <% if QuoteRequest::ORDER_WORKFLOW_STATUSES.include?(@quote_request.status) %>
+  <% if @quote_request.order_workflow? %>
     <%= form_with url: update_status_admin_quote_request_path(@quote_request), method: :patch, class: "form-grid" do %>
       <div class="field">
         <%= label_tag :status, "Order status" %>
@@ -62,66 +60,5 @@
 
 <section class="panel">
   <h3><%= quote_or_order_label(count: @quote_request.quote_items.size) %> Line Items</h3>
-
-  <div class="order-lines-sheet">
-    <table class="order-lines-sheet__meta">
-      <tbody>
-        <tr>
-          <th>Date</th>
-          <td><%= l((@quote_request.submitted_at || @quote_request.created_at).to_date, format: :default) %></td>
-        </tr>
-        <tr>
-          <th>Address</th>
-          <td><%= @quote_request.delivery_address.presence || @quote_request.billing_address.presence || "-" %></td>
-        </tr>
-        <tr>
-          <th><%= order_workflow_quote ? "Order" : "Quote" %></th>
-          <td><%= @quote_request.quote_number.delete_prefix("Q-") %></td>
-        </tr>
-      </tbody>
-    </table>
-
-    <div class="table-wrap">
-      <table class="order-lines-sheet__table">
-        <thead>
-          <tr class="order-lines-sheet__group-row">
-            <th colspan="4"></th>
-            <th colspan="3">(NO DEDUCTION)</th>
-            <th colspan="3">Tracks</th>
-          </tr>
-          <tr>
-            <th>#</th>
-            <th>Location</th>
-            <th>Style (S Wave / Pinch Pleat)</th>
-            <th>Material</th>
-            <th>Width</th>
-            <th>Drop</th>
-            <th>OW (1) or C/O (2)</th>
-            <th>Length</th>
-            <th>OW or C/O</th>
-            <th>Hooks</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% @quote_request.quote_items.each_with_index do |item, index| %>
-            <tr>
-              <td><%= index + 1 %></td>
-              <td><%= item.location_name.presence || "-" %></td>
-              <td><%= item.product.style_name.presence || item.product.product_type.presence || "-" %></td>
-              <td><%= [item.material_name.presence || item.product.product_type.presence || item.product.name, item.material_number.presence].compact.join(" ") %></td>
-              <td><%= item.width_mm.presence || "-" %></td>
-              <td><%= item.ceiling_drop_mm.presence || "-" %></td>
-              <td><%= item.opening_type == "double_open" ? 2 : 1 %></td>
-              <td><%= item.track_selected.present? && item.track_selected.to_s.casecmp("none") != 0 ? (item.width_mm.presence || "-") : "-" %></td>
-              <td><%= item.opening_code.presence || (item.opening_type == "double_open" ? "C/O" : "OW") %></td>
-              <td><%= item.hooks_display.presence || item.hooks_total.presence || "-" %></td>
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
-    </div>
-
-    <p class="order-lines-sheet__notes"><strong>Notes:</strong> <%= @quote_request.notes.presence || "" %></p>
-    <p class="order-lines-sheet__total"><strong><%= quote_or_order_label %> Total:</strong> <%= number_to_currency(@quote_request.total, unit: "#{@quote_request.currency} ") %></p>
-  </div>
+  <%= render "quote_requests/order_lines_sheet", quote_request: @quote_request, meta_label: (@quote_request.order_workflow? ? "Order" : "Quote") %>
 </section>

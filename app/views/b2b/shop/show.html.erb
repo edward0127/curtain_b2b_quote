@@ -3,7 +3,7 @@
     <p class="eyebrow">B2B Shop</p>
     <h2>Configure <%= @product.name %></h2>
     <p class="lead">Configure one product line, then add it to your order cart.</p>
-    <p class="muted">Each line should represent one window/location.</p>
+    <p class="muted">Each line should represent one window/location. Curtain pricing already includes track for the active April 2026 flow.</p>
   </div>
   <div class="table-actions">
     <%= link_to "Back to Shop", b2b_shop_path, class: "button button--secondary" %>
@@ -20,8 +20,6 @@
     [ "Just off floor", "just_off_floor" ],
     [ "Puddled on floor", "puddled" ]
   ] %>
-  <% track_options = @track_codes.map { |code| [ code.to_s.casecmp("shared").zero? ? "Shared track" : code, code ] } %>
-  <% track_options.unshift([ "No track", "none" ]) unless track_options.any? { |_, value| value.to_s == "none" } %>
   <% fixing_options = [ [ "TF (top fix)", "TF" ], [ "FF (face fix)", "FF" ] ] %>
   <%= form_with url: add_line_b2b_cart_path, method: :post do |form| %>
     <%= hidden_field_tag "line[product_id]", @product.id %>
@@ -57,11 +55,6 @@
       <div class="field">
         <%= label_tag "line_finished_floor_mode", "Floor finish" %>
         <%= select_tag "line[finished_floor_mode]", options_for_select(floor_options, "just_off_floor") %>
-      </div>
-
-      <div class="field">
-        <%= label_tag "line_track_selected", "Track option" %>
-        <%= select_tag "line[track_selected]", options_for_select(track_options, "shared") %>
       </div>
 
       <div class="field">

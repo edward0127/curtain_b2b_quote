@@ -9,19 +9,18 @@ module Inventory
       keyword_init: true
     )
 
-    def initialize(width_mm:, opening_type:, ceiling_drop_mm:, finished_floor_mode:, track_selected: nil)
+    def initialize(width_mm:, opening_type:, ceiling_drop_mm:, finished_floor_mode:)
       @width_mm = width_mm.to_i
       @opening_type = opening_type.to_s
       @ceiling_drop_mm = ceiling_drop_mm.to_i
       @finished_floor_mode = finished_floor_mode.to_s
-      @track_selected = track_selected.to_s.strip
     end
 
     def calculate
       hooks_total, hooks_display = hooks_values
 
       Result.new(
-        track_metres_required: track_metres_required,
+        track_metres_required: 0,
         brackets_total: [ 2, (width_mm / 500.0).floor ].max,
         hooks_total: hooks_total,
         hooks_display: hooks_display,
@@ -31,13 +30,7 @@ module Inventory
 
     private
 
-    attr_reader :width_mm, :opening_type, :ceiling_drop_mm, :finished_floor_mode, :track_selected
-
-    def track_metres_required
-      return 0 if track_selected.casecmp("none").zero?
-
-      (width_mm / 1000.0).ceil
-    end
+    attr_reader :width_mm, :opening_type, :ceiling_drop_mm, :finished_floor_mode
 
     def hooks_values
       if opening_type == "double_open"

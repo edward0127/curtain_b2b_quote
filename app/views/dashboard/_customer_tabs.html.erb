@@ -28,7 +28,7 @@
           </thead>
           <tbody>
             <% @quote_history.each do |quote| %>
-              <% order_workflow_quote = QuoteRequest::ORDER_WORKFLOW_STATUSES.include?(quote.status) %>
+              <% order_workflow_quote = quote.order_workflow? %>
               <tr>
                 <td><%= link_to quote.id, quote_request_path(quote), data: { turbo_frame: "_top" } %></td>
                 <td><%= quote.quote_number %></td>

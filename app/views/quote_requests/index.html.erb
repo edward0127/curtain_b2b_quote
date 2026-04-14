@@ -2,7 +2,7 @@
   <div>
     <p class="eyebrow"><%= quote_or_order_label(count: 2) %></p>
     <h2>My <%= quote_or_order_label(count: 2) %></h2>
-    <p class="lead">Track status, totals, and generated documents.</p>
+    <p class="lead">Review status, totals, and generated documents.</p>
   </div>
   <%= link_to "Start New Order", b2b_shop_path, class: "button button--primary" %>
 </section>
@@ -23,7 +23,7 @@
       </thead>
       <tbody>
         <% @quote_requests.each do |quote| %>
-          <% order_workflow_quote = QuoteRequest::ORDER_WORKFLOW_STATUSES.include?(quote.status) %>
+          <% order_workflow_quote = quote.order_workflow? %>
           <tr>
             <td><%= link_to quote.id, quote_request_path(quote) %></td>
             <td><%= quote.quote_number %></td>

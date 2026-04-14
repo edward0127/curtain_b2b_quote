@@ -16,16 +16,12 @@
   <% else %>
     <p class="muted">No matrix rows imported for this product yet.</p>
   <% end %>
+  <p class="muted">Active April 2026 matrix prices already include track.</p>
 
   <%= form_with url: preview_price_admin_product_path(@product), method: :get, scope: :preview, class: "form-grid" do |form| %>
     <div class="field">
       <%= form.label :customer_mode, "Customer mode" %>
       <%= form.select :customer_mode, options_for_select([ [ "B2B", "b2b" ], [ "B2C", "b2c" ] ], @preview_input["customer_mode"]) %>
-    </div>
-
-    <div class="field">
-      <%= form.label :track_selected, "Track selected" %>
-      <%= form.select :track_selected, options_for_select([ [ "Yes", "1" ], [ "No", "0" ] ], @preview_input["track_selected"]) %>
     </div>
 
     <div class="field">
@@ -53,8 +49,7 @@
         Last preview request:
         mode <strong><%= @preview_input["customer_mode"].to_s.upcase %></strong>,
         width <strong><%= @preview_input["width_mm"].presence || "-" %></strong> mm,
-        drop <strong><%= @preview_input["drop_mm"].presence || "-" %></strong> mm,
-        track <strong><%= ActiveModel::Type::Boolean.new.cast(@preview_input["track_selected"]) ? "Yes" : "No" %></strong>.
+        drop <strong><%= @preview_input["drop_mm"].presence || "-" %></strong> mm.
       </p>
     <% else %>
       <p class="muted">Submit the form above to calculate a price preview.</p>
@@ -69,7 +64,6 @@
         <article class="detail-card">
           <h3>Ex GST</h3>
           <p><strong>Curtain price</strong> <span><%= number_to_currency(@preview_result[:curtain_price], unit: "AUD ") %></span></p>
-          <p><strong>Track price</strong> <span><%= number_to_currency(@preview_result[:track_price], unit: "AUD ") %></span></p>
           <p><strong>Line total</strong> <span><%= number_to_currency(@preview_result[:line_total], unit: "AUD ") %></span></p>
         </article>
         <article class="detail-card">

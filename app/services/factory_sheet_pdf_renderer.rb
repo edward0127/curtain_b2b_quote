@@ -24,7 +24,7 @@ class FactorySheetPdfRenderer
   FIRST_TABLE_COLUMNS = [
     { key: :line_no, label: "No.", width: 22, align: :center },
     { key: :location, label: "Location\n(\u4f4d\u5b50)", width: 72, align: :left },
-    { key: :style, label: "Style\n(\u6b3e\u5f0f)\n\u86c7\u5f62/\u97e9\u54f2", width: 78, align: :left },
+    { key: :style, label: nil, width: 78, align: :left },
     { key: :material, label: "Material\n(\u5e03\u6599)\n\u7eb1\u7a97/\u906e\u5149", width: 72, align: :left },
     { key: :number, label: "Number\n(\u5e03\u6599\u7f16\u53f7)", width: 66, align: :center },
     { key: :lv_name, label: "LV Name", width: 60, align: :left },
@@ -87,7 +87,7 @@ class FactorySheetPdfRenderer
     top_y = draw_section_table(
       top_y: top_y,
       title: "Fabric details (TO GZ FACTORY)",
-      columns: FIRST_TABLE_COLUMNS,
+      columns: first_table_columns,
       rows: first_rows
     )
 
@@ -96,7 +96,7 @@ class FactorySheetPdfRenderer
     second_rows = build_second_table_rows
     top_y = draw_section_table(
       top_y: top_y,
-      title: "Track details (TO LOCAL FACTORY)",
+      title: quote_request.factory_details_section_title,
       columns: SECOND_TABLE_COLUMNS,
       rows: second_rows
     )
@@ -218,17 +218,17 @@ class FactorySheetPdfRenderer
     quote_request.quote_items.first(FIXED_ROWS).each_with_index.map do |item, index|
       {
         line_no: (index + 1).to_s,
-        location: item.location_name.presence || "-",
-        style: item.product.style_name.presence || item.product.product_type.presence || "-",
-        material: item.material_name.presence || item.product.product_type.presence || item.product.name,
+        location: item.line_location_label,
+        style: item.style_label,
+        material: item.material_label,
         number: item.material_number.presence || "-",
         lv_name: item.lv_name.presence || "-",
-        width: numeric_value(item.width_mm),
-        drop: numeric_value(item.factory_drop_mm.presence || item.ceiling_drop_mm),
-        finished: finished_floor_value(item),
-        single_double: item.opening_type == "double_open" ? "2" : "1",
+        width: item.width_mm_label,
+        drop: item.factory_drop_mm_label,
+        finished: item.finished_floor_label,
+        single_double: item.opening_count_label,
         high_temp: item.high_temp_custom.presence || "-",
-        clips: item.hooks_display.presence || numeric_value(item.hooks_total)
+        clips: item.hooks_label
       }
     end
   end
@@ -236,13 +236,21 @@ class FactorySheetPdfRenderer
   def build_second_table_rows
     quote_request.quote_items.first(FIXED_ROWS).map do |item|
       {
-        opening: item.opening_code.presence || default_opening_code(item),
+        opening: item.opening_code_label(blank: "-"),
         fixing: item.fixing.presence || "-",
-        brackets: numeric_value(item.brackets_total),
+        brackets: item.brackets_label(blank: "-"),
         width_notes: item.width_notes.presence || "-",
-        wand: wand_value(item),
-        ceiling_drop: numeric_value(item.ceiling_drop_mm)
+        wand: item.wand_label,
+        ceiling_drop: item.ceiling_drop_mm_label(blank: "-")
       }
+    end
+  end
+
+  def first_table_columns
+    @first_table_columns ||= FIRST_TABLE_COLUMNS.map do |column|
+      next column unless column[:key] == :style
+
+      column.merge(label: quote_request.factory_style_heading_label(multiline: true))
     end
   end
 
@@ -281,29 +289,6 @@ class FactorySheetPdfRenderer
     text.to_s.each_char.sum do |char|
       char.ascii_only? ? (size * 0.52) : (size * 0.95)
     end
-  end
-
-  def finished_floor_value(item)
-    return "Puddled" if item.finished_floor_mode == "puddled"
-    return "Just off" if item.finished_floor_mode == "just_off_floor"
-
-    "-"
-  end
-
-  def wand_value(item)
-    return item.wand_quantity.to_i.to_s if item.wand_quantity.to_i.positive?
-    return "Y" if item.wand_required
-
-    "-"
-  end
-
-  def default_opening_code(item)
-    item.opening_type == "double_open" ? "C/O" : "OW"
-  end
-
-  def numeric_value(value)
-    numeric = value.to_i
-    numeric.positive? ? numeric.to_s : "-"
   end
 
   def customer_label

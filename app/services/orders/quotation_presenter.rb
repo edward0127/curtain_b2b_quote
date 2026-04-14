@@ -62,6 +62,14 @@ module Orders
       (total_ex_gst + gst).round(2)
     end
 
+    def show_track_details?
+      quote_request.show_track_details?
+    end
+
+    def legacy_track_details?
+      show_track_details?
+    end
+
     def bank_details
       {
         account_name: setting_or_env(:bank_account_name, "BANK_ACCOUNT_NAME"),
@@ -77,10 +85,10 @@ module Orders
 
     def primary_row_for(item)
       {
-        location: item.location_name.presence || "-",
-        description: line_description(item),
-        opening: item.opening_code.presence || "-",
-        track: track_code(item),
+        location: item.line_location_label,
+        description: item.product_line_label,
+        opening: item.opening_code_label(blank: "-"),
+        track: item.separate_track_code(blank: ""),
         total: item.line_total.to_d
       }
     end
@@ -91,26 +99,13 @@ module Orders
         next if quantity <= 0
 
         rows << {
-          location: item.location_name.presence || "-",
+          location: item.line_location_label,
           description: "#{label} x #{quantity}",
           opening: "",
           track: "",
           total: 0.to_d
         }
       end
-    end
-
-    def line_description(item)
-      base = item.product.product_type.presence || item.product.name
-      style = item.product.style_name.presence
-      [ base, style ].compact.join(" - ")
-    end
-
-    def track_code(item)
-      track = item.track_selected.to_s.strip
-      return "" if track.blank? || track.casecmp("none").zero?
-
-      track
     end
 
     def setting_or_env(setting_key, env_key)

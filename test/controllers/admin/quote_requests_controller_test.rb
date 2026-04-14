@@ -27,40 +27,31 @@ class Admin::QuoteRequestsControllerTest < ActionDispatch::IntegrationTest
       active: true
     )
 
-    PriceMatrixEntry.find_or_create_by!(
+    PriceMatrixEntry.where(channel: "b2b", product_name: "Sheer Curtain", style_name: "S Wave").delete_all
+    PriceMatrixEntry.create!(
       channel: "b2b",
       product_name: "Sheer Curtain",
       style_name: "S Wave",
       width_band_min_mm: 0,
       width_band_max_mm: 6000,
       drop_band_min_mm: 0,
-      drop_band_max_mm: 4000
-    ) do |entry|
-      entry.price = 274.4
-      entry.currency = "AUD"
-    end
+      drop_band_max_mm: 4000,
+      price: 274.4,
+      currency: "AUD"
+    )
 
-    PriceMatrixEntry.find_or_create_by!(
+    PriceMatrixEntry.where(channel: "b2c", product_name: "Sheer Curtain", style_name: "S Wave").delete_all
+    PriceMatrixEntry.create!(
       channel: "b2c",
       product_name: "Sheer Curtain",
       style_name: "S Wave",
       width_band_min_mm: 0,
       width_band_max_mm: 6000,
       drop_band_min_mm: 0,
-      drop_band_max_mm: 4000
-    ) do |entry|
-      entry.price = 274.4
-      entry.currency = "AUD"
-    end
-
-    TrackPriceTier.find_or_create_by!(
-      track_name: "M",
-      width_band_min_mm: 0,
-      width_band_max_mm: 6000
-    ) do |tier|
-      tier.price = 130
-      tier.currency = "AUD"
-    end
+      drop_band_max_mm: 4000,
+      price: 274.4,
+      currency: "AUD"
+    )
   end
 
   test "new admin order page is b2c only" do
@@ -76,6 +67,8 @@ class Admin::QuoteRequestsControllerTest < ActionDispatch::IntegrationTest
     assert_select "input[type='hidden'][name='quote_request[customer_mode]'][value='b2c']"
     assert_select "table.admin-order-lines-table tbody tr", minimum: 6
     assert_select "select[name*='[finished_floor_mode]']"
+    assert_select "select[name*='[track_selected]']", count: 0
+    assert_no_match(/Track option/, @response.body)
     assert_select "button[data-action='admin-order-lines#addLine']", text: "Add another line"
   end
 
@@ -121,7 +114,7 @@ class Admin::QuoteRequestsControllerTest < ActionDispatch::IntegrationTest
 
   test "admin can create and submit b2c order with stock deduction and emails" do
     sign_in users(:admin)
-    track = InventoryItem.create!(name: "Track", component_type: :track, on_hand: 20)
+    track = InventoryItem.create!(name: "Track", component_type: :track, on_hand: 0)
     hook = InventoryItem.create!(name: "Hook", component_type: :hook, on_hand: 500)
     bracket = InventoryItem.create!(name: "Bracket", component_type: :bracket, on_hand: 200)
     @b2c_product.update!(track_inventory_item: track, hook_inventory_item: hook, bracket_inventory_item: bracket)
@@ -148,7 +141,6 @@ class Admin::QuoteRequestsControllerTest < ActionDispatch::IntegrationTest
                 ceiling_drop_mm: 2410,
                 opening_type: "single_open",
                 finished_floor_mode: "puddled",
-                track_selected: "M",
                 fixing: "TF",
                 quantity: 2
               }
@@ -170,11 +162,13 @@ class Admin::QuoteRequestsControllerTest < ActionDispatch::IntegrationTest
     assert_equal 2, item.quantity
     assert_equal "puddled", item.finished_floor_mode
     assert_equal 2410, item.factory_drop_mm
+    assert_nil item.track_selected
+    assert_equal 0, item.track_metres_required
     assert_equal BigDecimal("274.4"), item.curtain_price.to_d
-    assert_equal BigDecimal("130.0"), item.track_price.to_d
-    assert_equal BigDecimal("808.8"), item.line_total.to_d
+    assert_equal BigDecimal("0"), item.track_price.to_d
+    assert_equal BigDecimal("548.8"), item.line_total.to_d
 
-    assert_equal 12, track.reload.on_hand
+    assert_equal 0, track.reload.on_hand
     assert_equal 356, hook.reload.on_hand
     assert_equal 186, bracket.reload.on_hand
 
@@ -185,7 +179,7 @@ class Admin::QuoteRequestsControllerTest < ActionDispatch::IntegrationTest
 
   test "insufficient stock auto adjusts quantity with warning" do
     sign_in users(:admin)
-    track = InventoryItem.create!(name: "Track", component_type: :track, on_hand: 20)
+    track = InventoryItem.create!(name: "Track", component_type: :track, on_hand: 0)
     hook = InventoryItem.create!(name: "Hook", component_type: :hook, on_hand: 100)
     bracket = InventoryItem.create!(name: "Bracket", component_type: :bracket, on_hand: 200)
     @b2c_product.update!(track_inventory_item: track, hook_inventory_item: hook, bracket_inventory_item: bracket)
@@ -205,7 +199,6 @@ class Admin::QuoteRequestsControllerTest < ActionDispatch::IntegrationTest
             width_mm: 3830,
             ceiling_drop_mm: 2410,
             opening_type: "single_open",
-            track_selected: "M",
             fixing: "TF",
             quantity: 2
           }
@@ -217,6 +210,7 @@ class Admin::QuoteRequestsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to admin_quote_request_url(created)
     assert_match(/adjusted/i, flash[:notice])
     assert_equal 1, created.quote_items.first.quantity
+    assert_equal 0, track.reload.on_hand
     assert_equal 28, hook.reload.on_hand
   end
 
@@ -240,7 +234,6 @@ class Admin::QuoteRequestsControllerTest < ActionDispatch::IntegrationTest
               width_mm: 3830,
               ceiling_drop_mm: 2410,
               opening_type: "single_open",
-              track_selected: "M",
               fixing: "TF",
               quantity: 1
             }
@@ -271,7 +264,6 @@ class Admin::QuoteRequestsControllerTest < ActionDispatch::IntegrationTest
               width_mm: 3000,
               ceiling_drop_mm: 2400,
               opening_type: "single_open",
-              track_selected: "M",
               fixing: "TF",
               quantity: 1
             }
@@ -296,6 +288,8 @@ class Admin::QuoteRequestsControllerTest < ActionDispatch::IntegrationTest
     get to_chinese_factory_admin_quote_request_url(quote)
     assert_response :success
     assert_includes @response.body, "Fabric details (TO GZ FACTORY)"
+    assert_includes @response.body, "Installation / accessory details (TO LOCAL FACTORY)"
+    assert_not_includes @response.body, "Track details (TO LOCAL FACTORY)"
 
     get to_chinese_factory_admin_quote_request_url(quote, format: :pdf)
     assert_response :success
@@ -322,7 +316,6 @@ class Admin::QuoteRequestsControllerTest < ActionDispatch::IntegrationTest
               width_mm: 3830,
               ceiling_drop_mm: 2410,
               opening_type: "single_open",
-              track_selected: "M",
               fixing: "TF",
               quantity: 1
             }
@@ -361,7 +354,6 @@ class Admin::QuoteRequestsControllerTest < ActionDispatch::IntegrationTest
               width_mm: 3830,
               ceiling_drop_mm: 2410,
               opening_type: "single_open",
-              track_selected: "M",
               fixing: "TF",
               quantity: 1
             }
@@ -382,6 +374,11 @@ class Admin::QuoteRequestsControllerTest < ActionDispatch::IntegrationTest
     get admin_quote_request_url(quote)
     assert_response :success
     assert_select "table.order-lines-sheet__meta th", text: "Order"
+    assert_no_match(/>Tracks</, @response.body)
+    assert_no_match(/>Length</, @response.body)
+    assert_no_match(/Style \(S Wave \/ Pinch Pleat\)/, @response.body)
+    assert_match(/>Style</, @response.body)
+    assert_match(/>Opening Code</, @response.body)
   end
 
   test "admin show keeps quote heading in metadata table outside order workflow" do
@@ -392,6 +389,19 @@ class Admin::QuoteRequestsControllerTest < ActionDispatch::IntegrationTest
     get admin_quote_request_url(quote)
     assert_response :success
     assert_select "table.order-lines-sheet__meta th", text: "Quote"
+  end
+
+  test "admin show preserves legacy track columns for historical records" do
+    sign_in users(:admin)
+    quote = quote_requests(:one)
+    quote.quote_items.first.update!(track_selected: "M", track_price: 130, track_metres_required: 4)
+
+    get admin_quote_request_url(quote)
+    assert_response :success
+    assert_match(/>Tracks</, @response.body)
+    assert_match(/>Length</, @response.body)
+    assert_match(/Style \(S Wave \/ Pinch Pleat\)/, @response.body)
+    assert_match(/>OW or C\/O</, @response.body)
   end
 
   test "status update to ready for pick up sends pickup email only for pickup orders" do

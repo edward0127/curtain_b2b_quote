@@ -228,7 +228,7 @@ module Orders
         width: (width_mm.to_d / 10).round(2),
         height: (ceiling_drop_mm.to_d / 10).round(2),
         location_name: line["location_name"],
-        track_selected: line["track_selected"],
+        track_selected: line["track_selected"].presence,
         fixing: line["fixing"],
         opening_type: QuoteItem.opening_types.key?(opening_type) ? opening_type : "single_open",
         opening_code: line["opening_code"],

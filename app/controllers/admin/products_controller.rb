@@ -4,7 +4,11 @@ class Admin::ProductsController < ApplicationController
   before_action :set_product, only: %i[ show edit update destroy preview_price ]
 
   def index
-    @products = Product.includes(:pricing_rules).alphabetical
+    @show_archived_imported = params[:show_archived_imported].to_s == "1"
+    @archived_imported_count = Product.archived_imported_pricebook_templates.count
+    product_scope = Product.includes(:pricing_rules).alphabetical
+    product_scope = product_scope.visible_in_admin_default_list unless @show_archived_imported
+    @products = product_scope
     matrix_combos = PriceMatrixEntry.distinct.pluck(:channel, :product_name, :style_name)
 
     @pricing_labels = @products.each_with_object({}) do |product, labels|
@@ -35,17 +39,11 @@ class Admin::ProductsController < ApplicationController
     return unless preview_submitted?
 
     @preview_submitted = true
-
     @preview_input = default_preview_input.merge(preview_price_params.to_h)
-    if @preview_input.blank?
-      @preview_error = "Please enter customer mode, width, and drop to preview pricing."
-      return
-    end
 
     width_mm = parse_positive_integer(@preview_input["width_mm"])
     drop_mm = parse_positive_integer(@preview_input["drop_mm"])
     customer_mode = normalized_customer_mode(@preview_input["customer_mode"])
-    track_requested = truthy?(@preview_input["track_selected"])
 
     if width_mm.nil? || drop_mm.nil?
       @preview_error = "Width and drop must be positive integers."
@@ -56,8 +54,7 @@ class Admin::ProductsController < ApplicationController
       customer_mode: customer_mode,
       product: @product,
       width_mm: width_mm,
-      drop_mm: drop_mm,
-      track_selected: preview_track_code(width_mm)
+      drop_mm: drop_mm
     ).calculate
 
     if calculator_result.curtain_price.to_d <= 0
@@ -69,14 +66,11 @@ class Admin::ProductsController < ApplicationController
       return
     end
 
-    curtain_price = calculator_result.curtain_price.to_d.round(2)
-    track_price = track_requested ? calculator_result.track_price.to_d.round(2) : 0.to_d
-    line_total = (curtain_price + track_price).round(2)
+    line_total = calculator_result.line_total.to_d.round(2)
     gst = (line_total * BigDecimal("0.1")).round(2)
 
     @preview_result = {
-      curtain_price: curtain_price,
-      track_price: track_price,
+      curtain_price: calculator_result.curtain_price.to_d.round(2),
       line_total: line_total,
       gst: gst,
       total_inc_gst: (line_total + gst).round(2)
@@ -152,7 +146,7 @@ class Admin::ProductsController < ApplicationController
     preview_params = ActionController::Parameters.new(preview_params.to_h) if preview_params.is_a?(Hash)
     preview_params = ActionController::Parameters.new({}) if preview_params.blank?
 
-    preview_params.permit(:customer_mode, :width_mm, :drop_mm, :track_selected)
+    preview_params.permit(:customer_mode, :width_mm, :drop_mm)
   end
 
   def default_preview_input
@@ -160,7 +154,6 @@ class Admin::ProductsController < ApplicationController
 
     {
       "customer_mode" => default_mode,
-      "track_selected" => "1",
       "width_mm" => "",
       "drop_mm" => ""
     }
@@ -178,15 +171,6 @@ class Admin::ProductsController < ApplicationController
     return "b2c" if value.to_s == "b2c"
 
     "b2b"
-  end
-
-  def preview_track_code(width_mm)
-    scoped = TrackPriceTier.where("width_band_min_mm <= ? AND width_band_max_mm >= ?", width_mm, width_mm)
-    scoped.where(track_name: "shared").pick(:track_name) || scoped.order(:track_name).pick(:track_name) || "shared"
-  end
-
-  def truthy?(value)
-    ActiveModel::Type::Boolean.new.cast(value)
   end
 
   def preview_submitted?

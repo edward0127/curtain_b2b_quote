@@ -17,8 +17,7 @@ module Orders
         width_mm: width_mm,
         opening_type: opening_type,
         ceiling_drop_mm: ceiling_drop_mm,
-        finished_floor_mode: finished_floor_mode,
-        track_selected: track_selected
+        finished_floor_mode: finished_floor_mode
       ).calculate
 
       max_quantity = Inventory::MaxQuantityCalculator.new(
@@ -35,8 +34,7 @@ module Orders
         customer_mode: customer_mode,
         product: product,
         width_mm: width_mm,
-        drop_mm: ceiling_drop_mm,
-        track_selected: track_selected
+        drop_mm: ceiling_drop_mm
       ).calculate
       if pricing.curtain_price.to_d <= 0
         return Result.new(error: "No matrix price is available for this product and size.")
@@ -59,7 +57,7 @@ module Orders
           "finished_floor_mode" => finished_floor_mode,
           "opening_type" => opening_type,
           "opening_code" => cleaned_string(:opening_code),
-          "track_selected" => track_selected,
+          "track_selected" => "",
           "fixing" => fixing,
           "width_notes" => cleaned_string(:width_notes),
           "material_name" => cleaned_string(:material_name),
@@ -113,14 +111,6 @@ module Orders
       QuoteItem.finished_floor_modes.key?(raw) ? raw : "just_off_floor"
     end
 
-    def track_selected
-      selected = cleaned_string(:track_selected)
-      return "shared" if selected.blank?
-      return "none" if selected.casecmp("none").zero?
-
-      selected
-    end
-
     def fixing
       raw = cleaned_string(:fixing).upcase
       %w[FF TF].include?(raw) ? raw : "TF"
@@ -132,7 +122,6 @@ module Orders
 
     def requirement_per_unit(requirements)
       {
-        track_metres_required: requirements.track_metres_required,
         hooks_total: requirements.hooks_total,
         brackets_total: requirements.brackets_total,
         wand_quantity: accessory_quantity(:wand_quantity),

@@ -9,6 +9,16 @@
   </div>
 </section>
 
+<% if @product.imported_pricebook_template? %>
+  <div class="flash flash--notice">
+    <% if @product.archived_imported_pricebook_template? %>
+      This archived PB template is preserved for historical quotes and orders. It remains hidden from the default product list unless archived PB templates are explicitly shown.
+    <% else %>
+      This PB template is importer-managed by the April 2026 Curtain Pricing workbook. Active pricing comes from imported matrix rows rather than a manual base-price workflow.
+    <% end %>
+  </div>
+<% end %>
+
 <% if @product.active? && @product.matrix_priced_template? && !@product.matrix_price_ready? %>
   <div class="flash flash--alert">
     This product is active, but no imported matrix pricing is currently available for its channel/type/style.
@@ -19,6 +29,13 @@
 <section class="detail-grid">
   <article class="detail-card">
     <h3>Product Details</h3>
+    <% status_label = if @product.archived_imported_pricebook_template?
+      "Archived PB template"
+    elsif @product.active?
+      "Active"
+    else
+      "Inactive"
+    end %>
     <% channel_label = case @product.pricing_channel.to_s.strip.downcase
     when "b2b" then "B2B"
     when "b2c" then "B2C"
@@ -30,7 +47,7 @@
     <p><strong>Product type</strong> <span><%= @product.product_type.presence || "-" %></span></p>
     <p><strong>Style</strong> <span><%= @product.style_name.presence || "-" %></span></p>
     <p><strong>Base price</strong> <span><%= number_to_currency(@product.base_price, unit: "AUD ") %></span></p>
-    <p><strong>Status</strong> <span><%= @product.active? ? "Active" : "Inactive" %></span></p>
+    <p><strong>Status</strong> <span><%= status_label %></span></p>
   </article>
   <article class="detail-card">
     <h3>Usage</h3>
@@ -40,8 +57,8 @@
 
   <article class="detail-card">
     <h3>Inventory Mappings</h3>
-    <% mappings = [
-      [ "Track", @product.track_inventory_item ],
+    <p class="muted">Active April 2026 order flow checks component stock for hooks, brackets, wands, end caps, stoppers, and wand hooks. Track mapping is retained only for legacy compatibility.</p>
+    <% active_mappings = [
       [ "Hook", @product.hook_inventory_item ],
       [ "Bracket", @product.bracket_inventory_item ],
       [ "Wand", @product.wand_inventory_item ],
@@ -49,9 +66,15 @@
       [ "Stopper", @product.stopper_inventory_item ],
       [ "Wand hook", @product.wand_hook_inventory_item ]
     ] %>
-    <% mappings.each do |label, item| %>
+    <% active_mappings.each do |label, item| %>
       <% item_label = item.present? ? (item.sku.present? ? "#{item.name} (#{item.sku})" : item.name) : "None" %>
       <p><strong><%= label %></strong> <span><%= item_label %></span></p>
     <% end %>
+    <% track_item_label = if @product.track_inventory_item.present?
+      @product.track_inventory_item.sku.present? ? "#{@product.track_inventory_item.name} (#{@product.track_inventory_item.sku})" : @product.track_inventory_item.name
+    else
+      "None"
+    end %>
+    <p><strong>Legacy track mapping</strong> <span><%= track_item_label %></span></p>
   </article>
 </section>

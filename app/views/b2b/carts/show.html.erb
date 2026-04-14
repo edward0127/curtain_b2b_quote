@@ -44,7 +44,6 @@
             <th>Location</th>
             <th>Product</th>
             <th>Width x Drop (mm)</th>
-            <th>Track</th>
             <th>Qty</th>
             <th>Unit</th>
             <th>Total</th>
@@ -57,12 +56,6 @@
               <td><%= line["location_name"].presence || "-" %></td>
               <td><%= line["product_name"] %></td>
               <td><%= line["width_mm"] %> x <%= line["ceiling_drop_mm"] %></td>
-              <% track_label = case line["track_selected"].to_s.strip.downcase
-              when "shared" then "Shared track"
-              when "none" then "No track"
-              else line["track_selected"].presence || "-"
-              end %>
-              <td><%= track_label %></td>
               <td>
                 <%= form_with url: update_line_b2b_cart_path(line_id: line["id"]), method: :patch, class: "inline-form" do %>
                   <%= number_field_tag "line[quantity]", line["quantity"], min: 1, style: "width: 84px;" %>
@@ -79,7 +72,7 @@
         </tbody>
         <tfoot>
           <tr>
-            <th colspan="6">Order Total</th>
+            <th colspan="5">Order Total</th>
             <th><%= number_to_currency(@cart_total, unit: "AUD ") %></th>
             <th></th>
           </tr>

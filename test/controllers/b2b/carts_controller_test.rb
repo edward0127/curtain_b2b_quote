@@ -11,32 +11,23 @@ class B2b::CartsControllerTest < ActionDispatch::IntegrationTest
       pricing_channel: "b2b"
     )
 
-    PriceMatrixEntry.find_or_create_by!(
+    PriceMatrixEntry.where(channel: "b2b", product_name: "Sheer Curtain", style_name: "S Wave").delete_all
+    PriceMatrixEntry.create!(
       channel: "b2b",
       product_name: "Sheer Curtain",
       style_name: "S Wave",
       width_band_min_mm: 0,
       width_band_max_mm: 6000,
       drop_band_min_mm: 0,
-      drop_band_max_mm: 4000
-    ) do |entry|
-      entry.price = 274.4
-      entry.currency = "AUD"
-    end
-
-    TrackPriceTier.find_or_create_by!(
-      track_name: "M",
-      width_band_min_mm: 0,
-      width_band_max_mm: 6000
-    ) do |tier|
-      tier.price = 130
-      tier.currency = "AUD"
-    end
+      drop_band_max_mm: 4000,
+      price: 274.4,
+      currency: "AUD"
+    )
   end
 
   test "b2b customer can add cart line and checkout order" do
     sign_in users(:customer)
-    track = InventoryItem.create!(name: "Track", component_type: :track, on_hand: 20)
+    track = InventoryItem.create!(name: "Track", component_type: :track, on_hand: 0)
     hook = InventoryItem.create!(name: "Hook", component_type: :hook, on_hand: 500)
     bracket = InventoryItem.create!(name: "Bracket", component_type: :bracket, on_hand: 200)
     @product.update!(track_inventory_item: track, hook_inventory_item: hook, bracket_inventory_item: bracket)
@@ -50,7 +41,6 @@ class B2b::CartsControllerTest < ActionDispatch::IntegrationTest
           ceiling_drop_mm: 2410,
           opening_type: "single_open",
           finished_floor_mode: "just_off_floor",
-          track_selected: "M",
           fixing: "TF",
           quantity: 2
         }
@@ -78,16 +68,21 @@ class B2b::CartsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "order_processing", created.status
     assert_equal users(:customer).email, created.customer_email
     assert_not_nil created.submitted_at
-    assert_equal 2, created.quote_items.first.quantity
+    item = created.quote_items.first
+    assert_equal 2, item.quantity
+    assert_nil item.track_selected
+    assert_equal 0, item.track_metres_required
+    assert_equal BigDecimal("0"), item.track_price.to_d
+    assert_equal BigDecimal("548.8"), item.line_total.to_d
 
-    assert_equal 12, track.reload.on_hand
+    assert_equal 0, track.reload.on_hand
     assert_equal 356, hook.reload.on_hand
     assert_equal 186, bracket.reload.on_hand
   end
 
   test "checkout auto adjusts quantity when stock is insufficient" do
     sign_in users(:customer)
-    track = InventoryItem.create!(name: "Track", component_type: :track, on_hand: 20)
+    track = InventoryItem.create!(name: "Track", component_type: :track, on_hand: 0)
     hook = InventoryItem.create!(name: "Hook", component_type: :hook, on_hand: 100)
     bracket = InventoryItem.create!(name: "Bracket", component_type: :bracket, on_hand: 200)
     @product.update!(track_inventory_item: track, hook_inventory_item: hook, bracket_inventory_item: bracket)
@@ -101,7 +96,6 @@ class B2b::CartsControllerTest < ActionDispatch::IntegrationTest
           ceiling_drop_mm: 2410,
           opening_type: "single_open",
           finished_floor_mode: "just_off_floor",
-          track_selected: "M",
           fixing: "TF",
           quantity: 2
         }
@@ -120,6 +114,7 @@ class B2b::CartsControllerTest < ActionDispatch::IntegrationTest
 
     created = draft_cart.reload
     assert_equal 1, created.quote_items.first.quantity
+    assert_equal 0, track.reload.on_hand
     assert_equal 28, hook.reload.on_hand
   end
 
@@ -137,7 +132,6 @@ class B2b::CartsControllerTest < ActionDispatch::IntegrationTest
         ceiling_drop_mm: 2410,
         opening_type: "single_open",
         finished_floor_mode: "just_off_floor",
-        track_selected: "M",
         fixing: "TF",
         quantity: 1
       }
@@ -164,7 +158,6 @@ class B2b::CartsControllerTest < ActionDispatch::IntegrationTest
         ceiling_drop_mm: 2410,
         opening_type: "single_open",
         finished_floor_mode: "just_off_floor",
-        track_selected: "M",
         fixing: "TF",
         quantity: 1
       }
@@ -185,7 +178,6 @@ class B2b::CartsControllerTest < ActionDispatch::IntegrationTest
         ceiling_drop_mm: 2200,
         opening_type: "single_open",
         finished_floor_mode: "just_off_floor",
-        track_selected: "M",
         fixing: "TF",
         quantity: 1
       }
@@ -195,6 +187,7 @@ class B2b::CartsControllerTest < ActionDispatch::IntegrationTest
     get b2b_cart_url
     assert_response :success
     assert_select "form[data-controller='submit-state']"
+    assert_select "th", text: "Track", count: 0
     assert_select "button[data-submit-state-target='button']"
     assert_select "span[data-submit-state-target='label']", text: "Submit order"
     assert_select "span[data-submit-state-target='spinner']"
@@ -219,7 +212,6 @@ class B2b::CartsControllerTest < ActionDispatch::IntegrationTest
         ceiling_drop_mm: 2200,
         opening_type: "single_open",
         finished_floor_mode: "just_off_floor",
-        track_selected: "M",
         fixing: "TF",
         quantity: 1
       }
@@ -238,7 +230,6 @@ class B2b::CartsControllerTest < ActionDispatch::IntegrationTest
         ceiling_drop_mm: 2300,
         opening_type: "single_open",
         finished_floor_mode: "just_off_floor",
-        track_selected: "M",
         fixing: "TF",
         quantity: 1
       }
@@ -266,7 +257,6 @@ class B2b::CartsControllerTest < ActionDispatch::IntegrationTest
         ceiling_drop_mm: 2200,
         opening_type: "single_open",
         finished_floor_mode: "just_off_floor",
-        track_selected: "M",
         fixing: "TF",
         quantity: 1
       }
@@ -281,7 +271,6 @@ class B2b::CartsControllerTest < ActionDispatch::IntegrationTest
         ceiling_drop_mm: 2100,
         opening_type: "single_open",
         finished_floor_mode: "just_off_floor",
-        track_selected: "M",
         fixing: "TF",
         quantity: 1
       }

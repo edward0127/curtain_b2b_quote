@@ -11,8 +11,7 @@
 
 <%
   inventory_option_label = ->(item) { item.sku.present? ? "#{item.name} (#{item.sku})" : item.name }
-  inventory_mappings = [
-    [ :track_inventory_item_id, "Track inventory item", "track" ],
+  active_inventory_mappings = [
     [ :hook_inventory_item_id, "Hook inventory item", "hook" ],
     [ :bracket_inventory_item_id, "Bracket inventory item", "bracket" ],
     [ :wand_inventory_item_id, "Wand inventory item", "wand" ],
@@ -78,10 +77,10 @@
 
     <section class="field field--full">
       <h3>Inventory Mappings</h3>
-      <p class="lead">Link this product template to the component stock it uses. The system will calculate and deduct track metres / hooks / brackets from these inventory items when an order is submitted.</p>
+      <p class="lead">Link this product template to the component stock it uses. Active April 2026 order flow uses hooks, brackets, wands, end caps, stoppers, and wand hooks. Separate track pricing and deduction are now legacy-only.</p>
 
       <div class="form-grid">
-        <% inventory_mappings.each do |field_name, label, component_type| %>
+        <% active_inventory_mappings.each do |field_name, label, component_type| %>
           <div class="field">
             <%= form.label field_name, label %>
             <%= form.collection_select(
@@ -96,6 +95,18 @@
       </div>
 
       <p class="lead">If a mapping is left as None, the system will not enforce stock for that component.</p>
+
+      <div class="field field--full">
+        <%= form.label :track_inventory_item_id, "Legacy track inventory item" %>
+        <%= form.collection_select(
+          :track_inventory_item_id,
+          InventoryItem.active.where(component_type: :track).order(:name),
+          :id,
+          inventory_option_label,
+          { include_blank: "None" }
+        ) %>
+        <small>Optional. Keep this only if historical records still need the legacy track association. New active orders ignore separate track pricing and stock deduction.</small>
+      </div>
     </section>
   </div>
 

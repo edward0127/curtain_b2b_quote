@@ -133,7 +133,6 @@ class B2b::CartsController < B2b::BaseController
       :finished_floor_mode,
       :opening_type,
       :opening_code,
-      :track_selected,
       :fixing,
       :quantity,
       :wand_required,
@@ -157,7 +156,6 @@ class B2b::CartsController < B2b::BaseController
       :end_cap_quantity,
       :stopper_quantity,
       :wand_hook_quantity,
-      :track_selected,
       :opening_type,
       :finished_floor_mode,
       :fixing

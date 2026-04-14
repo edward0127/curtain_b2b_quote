@@ -50,6 +50,44 @@ class QuoteRequestTest < ActiveSupport::TestCase
     assert quote.can_transition_to?(:order_processing)
   end
 
+  test "factory details title switches between active and legacy presentation" do
+    quote = quote_requests(:one)
+    item = quote.quote_items.first
+
+    item.update!(width_mm: 3830, ceiling_drop_mm: 2410, curtain_price: 440, track_price: 0, track_metres_required: 0)
+    assert quote.reload.active_curtain_only_pricing?
+    assert_equal "Installation / accessory details (TO LOCAL FACTORY)", quote.factory_details_section_title
+
+    item.update!(track_selected: "M", track_price: 130, track_metres_required: 4)
+    assert quote.reload.show_track_details?
+    assert_equal "Track details (TO LOCAL FACTORY)", quote.factory_details_section_title
+  end
+
+  test "document heading helpers adapt between active and legacy records" do
+    quote = quote_requests(:one)
+    item = quote.quote_items.first
+
+    item.update!(width_mm: 3830, ceiling_drop_mm: 2410, curtain_price: 440, track_price: 0, track_metres_required: 0)
+    quote.reload
+
+    assert_equal "Style", quote.style_heading_label
+    assert_equal "Openings (1 / 2)", quote.opening_count_heading_label
+    assert_nil quote.track_group_heading
+    assert_nil quote.track_length_heading_label
+    assert_equal "Opening Code", quote.opening_code_heading_label
+    assert_equal "Style\n(\u6b3e\u5f0f)\n\u86c7\u5f62", quote.factory_style_heading_label(multiline: true)
+
+    item.update!(track_selected: "M", track_price: 130, track_metres_required: 4)
+    quote.reload
+
+    assert_equal "Style (S Wave / Pinch Pleat)", quote.style_heading_label
+    assert_equal "OW (1) or C/O (2)", quote.opening_count_heading_label
+    assert_equal "Tracks", quote.track_group_heading
+    assert_equal "Length", quote.track_length_heading_label
+    assert_equal "OW or C/O", quote.opening_code_heading_label
+    assert_equal "Style\n(\u6b3e\u5f0f)\n\u86c7\u5f62/\u97e9\u54f2", quote.factory_style_heading_label(multiline: true)
+  end
+
   private
 
   def build_quote(customer_mode:, company_name:, status: :submitted)

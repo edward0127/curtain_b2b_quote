@@ -9,7 +9,6 @@ module Inventory
     )
 
     REQUIREMENT_MAP = {
-      track_inventory_item: :track_metres_required,
       hook_inventory_item: :hooks_total,
       bracket_inventory_item: :brackets_total,
       wand_inventory_item: :wand_quantity,

@@ -10,27 +10,18 @@ class Admin::ProductsControllerTest < ActionDispatch::IntegrationTest
       base_price: 0
     )
 
-    PriceMatrixEntry.find_or_create_by!(
+    PriceMatrixEntry.where(channel: "b2b", product_name: "Sheer Curtain", style_name: "S Wave").delete_all
+    PriceMatrixEntry.create!(
       channel: "b2b",
       product_name: "Sheer Curtain",
       style_name: "S Wave",
       width_band_min_mm: 0,
       width_band_max_mm: 6000,
       drop_band_min_mm: 0,
-      drop_band_max_mm: 4000
-    ) do |entry|
-      entry.price = 274.4
-      entry.currency = "AUD"
-    end
-
-    TrackPriceTier.find_or_create_by!(
-      track_name: "shared",
-      width_band_min_mm: 0,
-      width_band_max_mm: 6000
-    ) do |tier|
-      tier.price = 130
-      tier.currency = "AUD"
-    end
+      drop_band_max_mm: 4000,
+      price: 274.4,
+      currency: "AUD"
+    )
   end
 
   test "products index shows pricing label instead of base price amount" do
@@ -86,6 +77,7 @@ class Admin::ProductsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes @response.body, "\"Not set\" is for legacy/manual products"
     assert_includes @response.body, "For matrix-priced products, live pricing comes from imported matrix rows."
+    assert_includes @response.body, "New active orders ignore separate track pricing and stock deduction."
   end
 
   test "admin can update product pricing channel and matrix fields" do
@@ -134,14 +126,15 @@ class Admin::ProductsControllerTest < ActionDispatch::IntegrationTest
       preview: {
         customer_mode: "b2b",
         width_mm: "3830",
-        drop_mm: "2410",
-        track_selected: "1"
+        drop_mm: "2410"
       }
     }
 
     assert_response :success
     assert_includes @response.body, "Line total"
-    assert_includes @response.body, "AUD 404.40"
+    assert_includes @response.body, "AUD 274.40"
+    assert_select "select[name='preview[track_selected]']", count: 0
+    assert_no_match(/Track price/, @response.body)
   end
 
   test "preview defaults customer mode to product pricing channel" do
@@ -160,8 +153,7 @@ class Admin::ProductsControllerTest < ActionDispatch::IntegrationTest
       preview: {
         customer_mode: "b2b",
         width_mm: "99999",
-        drop_mm: "99999",
-        track_selected: "1"
+        drop_mm: "99999"
       }
     }
 
@@ -176,8 +168,7 @@ class Admin::ProductsControllerTest < ActionDispatch::IntegrationTest
       preview: {
         customer_mode: "b2b",
         width_mm: "0",
-        drop_mm: "-1",
-        track_selected: "1"
+        drop_mm: "-1"
       }
     }
 
@@ -197,8 +188,7 @@ class Admin::ProductsControllerTest < ActionDispatch::IntegrationTest
       preview: {
         customer_mode: "b2c",
         width_mm: "3830",
-        drop_mm: "2410",
-        track_selected: "1"
+        drop_mm: "2410"
       }
     }
 
@@ -241,6 +231,42 @@ class Admin::ProductsControllerTest < ActionDispatch::IntegrationTest
     assert_equal wand_hook_item.id, @product.wand_hook_inventory_item_id
   end
 
+  test "default index hides inactive imported pb templates but still shows other inactive products" do
+    sign_in users(:admin)
+
+    archived_imported = Product.create!(
+      name: "Archived Imported PB",
+      sku: "PB-B2B-ARCHIVED-SHEER-S-WAVE",
+      description: "Archived imported template",
+      base_price: 0,
+      pricing_mode: :per_unit,
+      pricing_channel: "b2b",
+      product_type: "Sheer Curtain",
+      style_name: "S Wave",
+      active: false
+    )
+    inactive_manual = Product.create!(
+      name: "Inactive Manual Product",
+      sku: "MANUAL-INACTIVE-001",
+      description: "Inactive manual product",
+      base_price: 10,
+      pricing_mode: :per_unit,
+      active: false
+    )
+
+    get admin_products_url
+    assert_response :success
+    assert_not_includes @response.body, archived_imported.name
+    assert_includes @response.body, inactive_manual.name
+    assert_includes @response.body, "Show Archived PB Templates (1)"
+
+    get admin_products_url(show_archived_imported: 1)
+    assert_response :success
+    assert_includes @response.body, archived_imported.name
+    assert_includes @response.body, "preserved for older quotes and orders"
+    assert_includes @response.body, "Archived PB template"
+  end
+
   test "product detail page shows channel type and style" do
     sign_in users(:admin)
 
@@ -261,5 +287,25 @@ class Admin::ProductsControllerTest < ActionDispatch::IntegrationTest
     get admin_product_url(@product)
     assert_response :success
     assert_includes @response.body, "no imported matrix pricing is currently available"
+  end
+
+  test "archived imported product detail explains historical preservation" do
+    sign_in users(:admin)
+    archived_imported = Product.create!(
+      name: "Archived Imported PB",
+      sku: "PB-B2B-ARCHIVED-SHEER-S-WAVE",
+      description: "Archived imported template",
+      base_price: 0,
+      pricing_mode: :per_unit,
+      pricing_channel: "b2b",
+      product_type: "Sheer Curtain",
+      style_name: "S Wave",
+      active: false
+    )
+
+    get admin_product_url(archived_imported)
+    assert_response :success
+    assert_includes @response.body, "preserved for historical quotes and orders"
+    assert_includes @response.body, "Legacy track mapping"
   end
 end

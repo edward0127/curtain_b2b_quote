@@ -19,7 +19,7 @@ class Admin::PricebookImportsController < ApplicationController
 
     import = PricebookImport.create!(
       imported_by_user: current_user,
-      import_type: "wholesale_j000",
+      import_type: Pricebook::CurtainPricingImporter::IMPORT_TYPE,
       source_filename: uploaded_file.original_filename.to_s
     )
     import.start!
@@ -32,7 +32,7 @@ class Admin::PricebookImportsController < ApplicationController
 
     raise ArgumentError, "Uploaded file could not be read." if file_path.blank?
 
-    result = Pricebook::WholesaleJ000Importer.new(
+    result = Pricebook::CurtainPricingImporter.new(
       file_path: file_path,
       source_filename: uploaded_file.original_filename.to_s,
       imported_by: current_user
@@ -45,7 +45,7 @@ class Admin::PricebookImportsController < ApplicationController
       log_output: result.log_output
     )
 
-    redirect_to admin_pricebook_imports_path, notice: "Pricebook imported successfully."
+    redirect_to admin_pricebook_imports_path, notice: "Pricebook imported successfully using the active Curtain Pricing workbook format."
   rescue StandardError => e
     import&.fail!(error_message: e.message, log_output: e.full_message)
     redirect_to admin_pricebook_imports_path, alert: "Pricebook import failed: #{e.message}"

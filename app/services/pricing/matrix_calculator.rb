@@ -5,28 +5,26 @@ module Pricing
   class MatrixCalculator
     Result = Struct.new(:curtain_price, :track_price, :line_total, keyword_init: true)
 
-    def initialize(customer_mode:, product:, width_mm:, drop_mm:, track_selected:)
+    def initialize(customer_mode:, product:, width_mm:, drop_mm:)
       @customer_mode = customer_mode.to_s
       @product = product
       @width_mm = width_mm.to_i
       @drop_mm = drop_mm.to_i
-      @track_selected = track_selected.to_s.strip
     end
 
     def calculate
       curtain_price = selected_matrix_entry&.price.to_d || 0.to_d
-      track_price = selected_track_tier&.price.to_d || 0.to_d
 
       Result.new(
         curtain_price: curtain_price.round(2),
-        track_price: track_price.round(2),
-        line_total: (curtain_price + track_price).round(2)
+        track_price: 0.to_d,
+        line_total: curtain_price.round(2)
       )
     end
 
     private
 
-    attr_reader :customer_mode, :product, :width_mm, :drop_mm, :track_selected
+    attr_reader :customer_mode, :product, :width_mm, :drop_mm
 
     def selected_matrix_entry
       base_scope = PriceMatrixEntry.where(channel: normalized_channel, product_name: normalized_product_name)
@@ -35,26 +33,6 @@ module Pricing
 
       style_scope = base_scope.where(style_name: normalized_style_name)
       style_scope.first || base_scope.where(style_name: "").first || base_scope.first
-    end
-
-    def selected_track_tier
-      return nil if no_track_selected?
-
-      scope = TrackPriceTier.where("width_band_min_mm <= ? AND width_band_max_mm >= ?", width_mm, width_mm)
-      selected_code = normalized_track_selected
-      return scope.where(track_name: selected_code).first if scope.where(track_name: selected_code).exists?
-
-      scope.where(track_name: "shared").first || scope.first
-    end
-
-    def no_track_selected?
-      track_selected.casecmp("none").zero?
-    end
-
-    def normalized_track_selected
-      return "shared" if track_selected.blank?
-
-      track_selected
     end
 
     def normalized_channel

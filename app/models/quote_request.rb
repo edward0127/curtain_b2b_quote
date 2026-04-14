@@ -111,6 +111,55 @@ class QuoteRequest < ApplicationRecord
     self.class.status_label_for(status)
   end
 
+  def order_workflow?
+    ORDER_WORKFLOW_STATUSES.include?(status)
+  end
+
+  def show_track_details?
+    quote_items.any?(&:show_track_details?)
+  end
+
+  alias_method :legacy_track_details?, :show_track_details?
+
+  def active_curtain_only_pricing?
+    quote_items.any? && quote_items.all?(&:active_curtain_only_pricing?)
+  end
+
+  def legacy_document_labels?
+    show_track_details? || quote_items.any?(&:pinch_pleat_style?)
+  end
+
+  def style_heading_label
+    legacy_document_labels? ? "Style (S Wave / Pinch Pleat)" : "Style"
+  end
+
+  def factory_style_heading_label(multiline: false)
+    legacy_label = multiline ? "Style\n(\u6b3e\u5f0f)\n\u86c7\u5f62/\u97e9\u54f2" : "Style (\u6b3e\u5f0f) \u86c7\u5f62/\u97e9\u54f2"
+    active_label = multiline ? "Style\n(\u6b3e\u5f0f)\n\u86c7\u5f62" : "Style (\u6b3e\u5f0f) \u86c7\u5f62"
+
+    legacy_document_labels? ? legacy_label : active_label
+  end
+
+  def opening_count_heading_label
+    legacy_document_labels? ? "OW (1) or C/O (2)" : "Openings (1 / 2)"
+  end
+
+  def track_group_heading
+    "Tracks" if show_track_details?
+  end
+
+  def track_length_heading_label
+    show_track_details? ? "Length" : nil
+  end
+
+  def opening_code_heading_label
+    legacy_document_labels? ? "OW or C/O" : "Opening Code"
+  end
+
+  def factory_details_section_title
+    show_track_details? ? "Track details (TO LOCAL FACTORY)" : "Installation / accessory details (TO LOCAL FACTORY)"
+  end
+
   def self.status_label_for(status_key)
     key = status_key.to_s
     return "Unknown" if key.blank?

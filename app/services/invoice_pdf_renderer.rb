@@ -98,13 +98,22 @@ class InvoicePdfRenderer
   end
 
   def draw_items_table(top_y)
-    columns = [
-      { label: "Location", width: 78 },
-      { label: "Description", width: 220 },
-      { label: "Opening", width: 66 },
-      { label: "Track", width: 44 },
-      { label: "Total (ex GST)", width: 115 }
-    ]
+    columns = if quotation.show_track_details?
+      [
+        { key: :location, label: "Location", width: 78 },
+        { key: :description, label: "Description", width: 220 },
+        { key: :opening, label: "Opening", width: 66 },
+        { key: :track, label: "Track", width: 44 },
+        { key: :total, label: "Total (ex GST)", width: 115 }
+      ]
+    else
+      [
+        { key: :location, label: "Location", width: 78 },
+        { key: :description, label: "Description", width: 264 },
+        { key: :opening, label: "Opening", width: 66 },
+        { key: :total, label: "Total (ex GST)", width: 115 }
+      ]
+    end
 
     header_height = 22
     row_height = 18
@@ -135,11 +144,14 @@ class InvoicePdfRenderer
 
     visible_rows.each_with_index do |row, index|
       baseline = top_y - header_height - (index * row_height) - 12
-      add_text(column_starts[0] + 6, baseline, truncate(row[:location], 16), size: 9)
-      add_text(column_starts[1] + 6, baseline, truncate(row[:description], 42), size: 9)
-      add_text(column_starts[2] + 6, baseline, truncate(row[:opening], 10), size: 9)
-      add_text(column_starts[3] + 6, baseline, truncate(row[:track], 6), size: 9)
-      add_text_right(column_ends[4] - 6, baseline, money(row[:total]), size: 9, bold: true)
+      columns.each_with_index do |column, column_index|
+        if column[:key] == :total
+          add_text_right(column_ends[column_index] - 6, baseline, money(row[:total]), size: 9, bold: true)
+        else
+          max_chars = column[:key] == :description ? (quotation.show_track_details? ? 42 : 50) : 16
+          add_text(column_starts[column_index] + 6, baseline, truncate(row[column[:key]], max_chars), size: 9)
+        end
+      end
     end
 
     if has_omitted

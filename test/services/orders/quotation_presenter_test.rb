@@ -1,13 +1,24 @@
 require "test_helper"
 
 class Orders::QuotationPresenterTest < ActiveSupport::TestCase
-  test "track column is blank when item uses explicit no track" do
+  test "new active records do not expose legacy track details" do
     quote_item = quote_items(:one_line_one)
-    quote_item.update!(track_selected: "none", width_mm: 1205, ceiling_drop_mm: 2000)
+    quote_item.update!(width_mm: 3830, ceiling_drop_mm: 2410, curtain_price: 440, track_price: 0, track_metres_required: 0)
+    presenter = Orders::QuotationPresenter.new(quote_item.quote_request)
+
+    assert_not presenter.show_track_details?
+    assert_equal "OW", presenter.rows.first[:opening]
+    assert_equal "", presenter.rows.first[:track]
+  end
+
+  test "legacy records still expose track details" do
+    quote_item = quote_items(:one_line_one)
+    quote_item.update!(width_mm: 3830, ceiling_drop_mm: 2410, track_selected: "M", track_price: 130, track_metres_required: 4)
 
     presenter = Orders::QuotationPresenter.new(quote_item.quote_request)
 
-    assert_equal "", presenter.rows.first[:track]
+    assert presenter.show_track_details?
+    assert_equal "M", presenter.rows.first[:track]
   end
 
   test "bank details use app settings when configured" do

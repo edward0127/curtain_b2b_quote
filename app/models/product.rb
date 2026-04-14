@@ -1,4 +1,5 @@
 class Product < ApplicationRecord
+  PRICEBOOK_TEMPLATE_SKU_PREFIX = "PB-".freeze
   PRICING_CHANNELS = %w[b2b b2c].freeze
 
   has_many :pricing_rules, -> { order(:priority, :id) }, dependent: :destroy
@@ -21,6 +22,9 @@ class Product < ApplicationRecord
 
   scope :active, -> { where(active: true) }
   scope :alphabetical, -> { order(:name) }
+  scope :imported_pricebook_templates, -> { where("products.sku LIKE ?", "#{PRICEBOOK_TEMPLATE_SKU_PREFIX}%") }
+  scope :archived_imported_pricebook_templates, -> { imported_pricebook_templates.where(active: false) }
+  scope :visible_in_admin_default_list, -> { where.not(id: archived_imported_pricebook_templates.select(:id)) }
   scope :orderable_for_channel, ->(channel) do
     normalized = channel.to_s.downcase
 
@@ -51,6 +55,14 @@ class Product < ApplicationRecord
 
   def legacy_custom_curtain?
     name.to_s.casecmp("Custom Curtain Legacy").zero?
+  end
+
+  def imported_pricebook_template?
+    sku.to_s.start_with?(PRICEBOOK_TEMPLATE_SKU_PREFIX)
+  end
+
+  def archived_imported_pricebook_template?
+    imported_pricebook_template? && !active?
   end
 
   def matrix_lookup_name

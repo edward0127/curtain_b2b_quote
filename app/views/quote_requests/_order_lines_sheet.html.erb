@@ -1,0 +1,76 @@
+<% items = quote_request.quote_items.to_a %>
+<% blank_value = local_assigns.fetch(:blank_value, "-").to_s %>
+<% meta_label = local_assigns.fetch(:meta_label, quote_request.order_workflow? ? "Order" : "Quote") %>
+<% minimum_rows = local_assigns.fetch(:minimum_rows, 0).to_i %>
+<% row_count = [items.size, minimum_rows].max %>
+<% show_track_details = quote_request.show_track_details? %>
+<% sheet_class = local_assigns[:sheet_class].to_s.strip %>
+
+<div class="order-lines-sheet<%= " #{sheet_class}" if sheet_class.present? %>">
+  <table class="order-lines-sheet__meta">
+    <tbody>
+      <tr>
+        <th>Date</th>
+        <td><%= l((quote_request.submitted_at || quote_request.created_at).to_date, format: :default) %></td>
+      </tr>
+      <tr>
+        <th>Address</th>
+        <td><%= quote_request.delivery_address.presence || quote_request.billing_address.presence || blank_value %></td>
+      </tr>
+      <tr>
+        <th><%= meta_label %></th>
+        <td><%= quote_request.quote_number.delete_prefix("Q-") %></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="table-wrap">
+    <table class="order-lines-sheet__table">
+      <thead>
+        <% if show_track_details %>
+          <tr class="order-lines-sheet__group-row">
+            <th colspan="4"></th>
+            <th colspan="3">(NO DEDUCTION)</th>
+            <th colspan="3"><%= quote_request.track_group_heading %></th>
+          </tr>
+        <% end %>
+        <tr>
+          <th>#</th>
+          <th>Location</th>
+          <th><%= quote_request.style_heading_label %></th>
+          <th>Material</th>
+          <th>Width</th>
+          <th>Drop</th>
+          <th><%= quote_request.opening_count_heading_label %></th>
+          <% if show_track_details %>
+            <th><%= quote_request.track_length_heading_label %></th>
+          <% end %>
+          <th><%= quote_request.opening_code_heading_label %></th>
+          <th>Hooks</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% row_count.times do |index| %>
+          <% item = items[index] %>
+          <tr>
+            <td><%= index + 1 %></td>
+            <td><%= item&.line_location_label(blank: blank_value) || blank_value %></td>
+            <td><%= item&.style_label(blank: blank_value) || blank_value %></td>
+            <td><%= item&.material_with_number_label(blank: blank_value) || blank_value %></td>
+            <td><%= item&.width_mm_label(blank: blank_value) || blank_value %></td>
+            <td><%= item&.ceiling_drop_mm_label(blank: blank_value) || blank_value %></td>
+            <td><%= item&.opening_count_label(blank: blank_value) || blank_value %></td>
+            <% if show_track_details %>
+              <td><%= item&.track_length_label(blank: blank_value) || blank_value %></td>
+            <% end %>
+            <td><%= item&.opening_code_label(blank: blank_value) || blank_value %></td>
+            <td><%= item&.hooks_label(blank: blank_value) || blank_value %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="order-lines-sheet__notes"><strong>Notes:</strong> <%= quote_request.notes.presence || "" %></p>
+  <p class="order-lines-sheet__total"><strong><%= quote_or_order_label %> Total:</strong> <%= number_to_currency(quote_request.total, unit: "#{quote_request.currency} ") %></p>
+</div>

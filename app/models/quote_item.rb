@@ -24,6 +24,105 @@ class QuoteItem < ApplicationRecord
     product&.per_square_meter?
   end
 
+  def legacy_separate_track?
+    return true if track_price.to_d.positive?
+    return true if track_metres_required.to_i.positive?
+
+    separate_track_code.present?
+  end
+
+  alias_method :legacy_track_details?, :legacy_separate_track?
+  alias_method :show_track_details?, :legacy_separate_track?
+
+  def active_curtain_only_pricing?
+    order_snapshot? && !show_track_details?
+  end
+
+  def line_location_label(blank: "-")
+    location_name.presence || blank
+  end
+
+  def product_line_label(blank: "-")
+    base = product&.product_type.presence || product&.name.presence
+    label = [ base, product&.style_name.presence ].compact.join(" - ")
+    label.presence || blank
+  end
+
+  def style_label(blank: "-")
+    product&.style_name.presence || product&.product_type.presence || blank
+  end
+
+  def pinch_pleat_style?
+    product&.style_name.to_s.casecmp("Pinch Pleat").zero? ||
+      style_label(blank: "").casecmp("Pinch Pleat").zero?
+  end
+
+  def material_label(blank: "-")
+    material_name.presence || product&.product_type.presence || product&.name.presence || blank
+  end
+
+  def material_with_number_label(blank: "-")
+    label = [ material_label(blank: nil), material_number.presence ].compact.join(" ")
+    label.presence || blank
+  end
+
+  def width_mm_label(blank: "-")
+    positive_number_label(width_mm, blank: blank)
+  end
+
+  def ceiling_drop_mm_label(blank: "-")
+    positive_number_label(ceiling_drop_mm, blank: blank)
+  end
+
+  def factory_drop_mm_label(blank: "-")
+    positive_number_label(factory_drop_mm.presence || ceiling_drop_mm, blank: blank)
+  end
+
+  def finished_floor_label(blank: "-")
+    case finished_floor_mode
+    when "puddled" then "Puddled"
+    when "just_off_floor" then "Just off"
+    else blank
+    end
+  end
+
+  def opening_count_label(blank: "-")
+    return blank if opening_type.blank?
+
+    opening_type == "double_open" ? "2" : "1"
+  end
+
+  def opening_code_label(blank: "")
+    code = opening_code.presence || default_opening_code
+    code.presence || blank
+  end
+
+  def separate_track_code(blank: "")
+    track = normalized_track_selected
+    track.presence || blank
+  end
+
+  def track_length_label(blank: "")
+    return blank unless show_track_details?
+
+    width_mm_label(blank: blank)
+  end
+
+  def hooks_label(blank: "-")
+    hooks_display.presence || hooks_total.presence || blank
+  end
+
+  def brackets_label(blank: "")
+    positive_number_label(brackets_total, blank: blank)
+  end
+
+  def wand_label(blank: "-")
+    return wand_quantity.to_i.to_s if wand_quantity.to_i.positive?
+    return "Y" if wand_required
+
+    blank
+  end
+
   private
 
   def normalize_quantity
@@ -53,7 +152,25 @@ class QuoteItem < ApplicationRecord
     ((width.to_d * height.to_d) / 10_000).round(3)
   end
 
-  def order_v2_snapshot?
+  def order_snapshot?
     width_mm.present? && ceiling_drop_mm.present?
+  end
+
+  alias_method :order_v2_snapshot?, :order_snapshot?
+
+  def normalized_track_selected
+    selected = track_selected.to_s.strip
+    return "" if selected.blank? || selected.casecmp("none").zero?
+
+    selected
+  end
+
+  def default_opening_code
+    opening_type == "double_open" ? "C/O" : "OW"
+  end
+
+  def positive_number_label(value, blank:)
+    numeric = value.to_i
+    numeric.positive? ? numeric.to_s : blank
   end
 end

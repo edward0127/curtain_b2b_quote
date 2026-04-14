@@ -1,3 +1,5 @@
+<% show_track_details = @quotation.show_track_details? %>
+
 <%= OrderDocumentCopy.heading %>
 <%= OrderDocumentCopy.subtitle %>
 <%= OrderDocumentCopy.intro %>
@@ -9,9 +11,9 @@ Email / Phone: <%= @quotation.customer_email %><%= @quotation.customer_phone.pre
 <% if @quotation.delivery_address.present? %>Delivery address: <%= @quotation.delivery_address %>
 <% end %><% if @quotation.pickup_method.present? %>Pickup / Delivery: <%= @quotation.pickup_method %>
 <% end %>
-Location | Description | Opening | Track | Total (ex GST)
+Location | Description | Opening<%= show_track_details ? " | Track" : "" %> | Total (ex GST)
 <% @quotation.rows.each do |row| %>
-- <%= row[:location] %> | <%= row[:description] %> | <%= row[:opening] %> | <%= row[:track] %> | <%= @quote_request.currency %> <%= format("%.2f", row[:total]) %>
+- <%= row[:location] %> | <%= row[:description] %> | <%= row[:opening] %><%= show_track_details ? " | #{row[:track]}" : "" %> | <%= @quote_request.currency %> <%= format("%.2f", row[:total]) %>
 <% end %>
 
 TOTAL (ex GST): <%= @quote_request.currency %> <%= format("%.2f", @quotation.total_ex_gst) %>

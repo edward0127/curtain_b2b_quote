@@ -2,12 +2,14 @@
   <div>
     <p class="eyebrow">Admin</p>
     <h2>Pricebook Imports</h2>
-    <p class="lead">Upload WHOLESALE Quote Form Tailored - J000.xlsx to refresh matrix pricing and shared track tiers.</p>
+    <p class="lead">Upload the April 2026-style single-sheet workbook to refresh the active PB matrix pricing.</p>
   </div>
   <%= link_to "Upload Pricebook", new_admin_pricebook_import_path, class: "button button--primary" %>
 </section>
 
 <section class="panel">
+  <p class="muted">New imports use the single <code>Curtain Pricing</code> sheet only. Future workbook updates should keep the same layout and change values only. Legacy track-tier history is retained automatically but kept out of the main import summary unless older data exists.</p>
+
   <div class="table-wrap">
     <table class="data-table">
       <thead>
@@ -18,7 +20,6 @@
           <th>By</th>
           <th>Products</th>
           <th>Matrix Rows</th>
-          <th>Track Tiers</th>
           <th>Details</th>
         </tr>
       </thead>
@@ -31,13 +32,15 @@
             <td><%= import.imported_by_user.email %></td>
             <td><%= import.products_updated_count %></td>
             <td><%= import.price_matrix_entries_count %></td>
-            <td><%= import.track_price_tiers_count %></td>
             <td>
               <% if import.failed? %>
                 <strong>Failed:</strong>
                 <%= import.error_message %>
               <% elsif import.log_output.present? %>
                 <%= simple_format(import.log_output) %>
+                <% if import.track_price_tiers_count.to_i.positive? %>
+                  <p class="muted" style="margin: 0.5rem 0 0;">Legacy track-tier history retained: <%= import.track_price_tiers_count %></p>
+                <% end %>
               <% else %>
                 -
               <% end %>

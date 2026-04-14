@@ -2,11 +2,13 @@
   <div>
     <p class="eyebrow">Admin</p>
     <h2>Upload Pricebook</h2>
-    <p class="lead">Upload the latest WHOLESALE Quote Form Tailored - J000.xlsx to import product templates, matrix pricing, and shared track tiers.</p>
+    <p class="lead">Upload the April 2026-style single-sheet workbook to import the active PB templates and matrix pricing.</p>
   </div>
 </section>
 
 <section class="panel">
+  <p class="muted">Expected format: one <code>Curtain Pricing</code> sheet in the April 2026 layout. Keep the sheet structure the same for future imports and update values only. Any retained legacy track-tier history should stay at <code>0</code> for new workbook imports.</p>
+
   <%= form_with scope: :pricebook_import, url: admin_pricebook_imports_path, method: :post, multipart: true, class: "form-grid" do |form| %>
     <div class="field field--full">
       <%= form.label :file, "Pricebook (.xlsx)" %>

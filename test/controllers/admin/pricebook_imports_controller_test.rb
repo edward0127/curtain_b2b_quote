@@ -8,13 +8,26 @@ class Admin::PricebookImportsControllerTest < ActionDispatch::IntegrationTest
 
     get admin_pricebook_imports_url
     assert_response :success
+    assert_includes @response.body, "Curtain Pricing"
+    assert_includes @response.body, "Legacy track-tier history is retained automatically"
+    assert_not_includes @response.body, "Dormant Track Tiers"
   end
 
-  test "admin can upload and import wholesale j000 workbook" do
+  test "admin sees april 2026 workbook guidance on new import page" do
+    sign_in users(:admin)
+
+    get new_admin_pricebook_import_url
+    assert_response :success
+    assert_includes @response.body, "April 2026 layout"
+    assert_includes @response.body, "update values only"
+    assert_includes @response.body, "legacy track-tier history"
+  end
+
+  test "admin can upload and import curtain pricing workbook" do
     sign_in users(:admin)
 
     uploaded = fixture_file_upload(
-      "wholesale_j000.xlsx",
+      "pricing_april_2026.xlsx",
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       :binary
     )
@@ -26,8 +39,12 @@ class Admin::PricebookImportsControllerTest < ActionDispatch::IntegrationTest
     import = PricebookImport.order(:id).last
     assert_redirected_to admin_pricebook_imports_url
     assert import.succeeded?, "expected succeeded import, got status=#{import.status} error=#{import.error_message}"
-    assert_operator import.price_matrix_entries_count, :>, 0
-    assert_operator import.track_price_tiers_count, :>, 0
+    assert_equal Pricebook::CurtainPricingImporter::IMPORT_TYPE, import.import_type
+    assert_equal 4, import.products_updated_count
+    assert_equal 240, import.price_matrix_entries_count
+    assert_equal 0, import.track_price_tiers_count
+    follow_redirect!
+    assert_includes @response.body, "active Curtain Pricing workbook format"
   end
 
   test "b2b customer cannot access imports page" do

@@ -177,7 +177,6 @@ class Admin::QuoteRequestsController < ApplicationController
 
   def load_order_builder_collections
     @products = Product.orderable_for_channel("b2c")
-    @track_codes = available_track_codes
   end
 
   def build_order_items(quote_request)
@@ -189,8 +188,7 @@ class Admin::QuoteRequestsController < ApplicationController
         line_position: existing_count + offset + 1,
         quantity: 1,
         opening_type: :single_open,
-        finished_floor_mode: :just_off_floor,
-        track_selected: "shared"
+        finished_floor_mode: :just_off_floor
       )
     end
   end
@@ -235,7 +233,6 @@ class Admin::QuoteRequestsController < ApplicationController
       requested_quantity = [ attrs["quantity"].to_i, 1 ].max
       opening_type = attrs["opening_type"].presence || "single_open"
       finished_floor_mode = attrs["finished_floor_mode"].presence || "just_off_floor"
-      track_selected = normalized_track_selected(attrs["track_selected"])
 
       if width_mm <= 0 || ceiling_drop_mm <= 0
         quote_request.errors.add(:base, "Line #{next_position}: width and drop must be greater than 0.")
@@ -246,12 +243,10 @@ class Admin::QuoteRequestsController < ApplicationController
         width_mm: width_mm,
         opening_type: opening_type,
         ceiling_drop_mm: ceiling_drop_mm,
-        finished_floor_mode: finished_floor_mode,
-        track_selected: track_selected
+        finished_floor_mode: finished_floor_mode
       ).calculate
 
       per_unit_requirements = {
-        track_metres_required: requirements.track_metres_required,
         hooks_total: requirements.hooks_total,
         brackets_total: requirements.brackets_total,
         wand_quantity: attrs["wand_quantity"].to_i,
@@ -280,8 +275,7 @@ class Admin::QuoteRequestsController < ApplicationController
         customer_mode: quote_request.customer_mode,
         product: product,
         width_mm: width_mm,
-        drop_mm: ceiling_drop_mm,
-        track_selected: track_selected
+        drop_mm: ceiling_drop_mm
       ).calculate
       if pricing.curtain_price.to_d <= 0
         quote_request.errors.add(:base, "Line #{next_position}: No matrix price is available for this product and size.")
@@ -303,7 +297,7 @@ class Admin::QuoteRequestsController < ApplicationController
         width: (width_mm.to_d / 10).round(2),
         height: (ceiling_drop_mm.to_d / 10).round(2),
         location_name: attrs["location_name"],
-        track_selected: track_selected,
+        track_selected: nil,
         fixing: attrs["fixing"],
         opening_type: opening_type,
         opening_code: attrs["opening_code"],
@@ -342,18 +336,6 @@ class Admin::QuoteRequestsController < ApplicationController
 
   def truthy?(value)
     %w[1 true yes y on].include?(value.to_s.strip.downcase)
-  end
-
-  def available_track_codes
-    ([ "shared" ] + TrackPriceTier.distinct.order(:track_name).pluck(:track_name)).uniq
-  end
-
-  def normalized_track_selected(value)
-    selected = value.to_s.strip
-    return "shared" if selected.blank?
-    return "none" if selected.casecmp("none").zero?
-
-    selected
   end
 
   def order_workflow_status_change?(target_status)

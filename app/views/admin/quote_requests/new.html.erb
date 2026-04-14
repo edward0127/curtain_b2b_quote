@@ -77,7 +77,7 @@
 
     <div class="field field--full" data-controller="admin-order-lines">
       <h3>Order Lines</h3>
-      <p class="muted">Add one row for each window/location in the order.</p>
+      <p class="muted">Add one row for each window/location in the order. Curtain pricing already includes track for the active April 2026 flow.</p>
       <p class="muted">Enter width/drop in millimetres (for example, width 2400 and drop 2200).</p>
       <% line_count = @quote_request.quote_items.reject(&:marked_for_destruction?).size %>
       <p>
@@ -94,8 +94,6 @@
         [ "Just off floor", "just_off_floor" ],
         [ "Puddled on floor", "puddled" ]
       ] %>
-      <% track_options = @track_codes.map { |value| [ value.to_s.casecmp("shared").zero? ? "Shared track" : value, value ] } %>
-      <% track_options.unshift([ "No track", "none" ]) unless track_options.any? { |_, value| value.to_s == "none" } %>
       <% fixing_options = [ [ "TF (top fix)", "TF" ], [ "FF (face fix)", "FF" ] ] %>
       <div class="table-wrap">
         <table class="data-table admin-order-lines-table">
@@ -107,7 +105,6 @@
               <th>Drop (mm)</th>
               <th>Opening style</th>
               <th>Floor finish</th>
-              <th>Track option</th>
               <th>Fixing type</th>
               <th>Qty</th>
               <th>Wand qty (optional)</th>
@@ -128,7 +125,6 @@
                 <td><%= item_fields.number_field :ceiling_drop_mm, min: 1 %></td>
                 <td><%= item_fields.select :opening_type, opening_options %></td>
                 <td><%= item_fields.select :finished_floor_mode, floor_finish_options, { selected: (item_fields.object.finished_floor_mode.presence || "just_off_floor") } %></td>
-                <td><%= item_fields.select :track_selected, track_options, { selected: (item_fields.object.track_selected.presence || "shared") } %></td>
                 <td><%= item_fields.select :fixing, fixing_options %></td>
                 <td><%= item_fields.number_field :quantity, min: 1, value: item_fields.object.quantity || 1 %></td>
                 <td><%= item_fields.number_field :wand_quantity, min: 0, value: item_fields.object.wand_quantity || 0 %></td>
@@ -151,7 +147,6 @@
           <td><%= number_field_tag "quote_request[quote_items_attributes][__INDEX__][ceiling_drop_mm]", nil, min: 1 %></td>
           <td><%= select_tag "quote_request[quote_items_attributes][__INDEX__][opening_type]", options_for_select(opening_options, "single_open") %></td>
           <td><%= select_tag "quote_request[quote_items_attributes][__INDEX__][finished_floor_mode]", options_for_select(floor_finish_options, "just_off_floor") %></td>
-          <td><%= select_tag "quote_request[quote_items_attributes][__INDEX__][track_selected]", options_for_select(track_options, "shared") %></td>
           <td><%= select_tag "quote_request[quote_items_attributes][__INDEX__][fixing]", options_for_select(fixing_options, "TF") %></td>
           <td><%= number_field_tag "quote_request[quote_items_attributes][__INDEX__][quantity]", 1, min: 1 %></td>
           <td><%= number_field_tag "quote_request[quote_items_attributes][__INDEX__][wand_quantity]", 0, min: 0 %></td>

@@ -47,6 +47,6 @@ class QuoteRequestsController < ApplicationController
   end
 
   def use_invoice_pdf_renderer?(quote_request)
-    QuoteRequest::ORDER_WORKFLOW_STATUSES.include?(quote_request.status)
+    quote_request.order_workflow?
   end
 end

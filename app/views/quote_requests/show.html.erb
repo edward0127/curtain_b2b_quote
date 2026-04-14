@@ -7,7 +7,7 @@
   <span class="status-pill status-pill--<%= @quote_request.status %>"><%= @quote_request.display_status %></span>
 </section>
 
-<% order_workflow_quote = QuoteRequest::ORDER_WORKFLOW_STATUSES.include?(@quote_request.status) %>
+<% order_workflow_quote = @quote_request.order_workflow? %>
 
 <section class="detail-grid">
   <article class="detail-card">

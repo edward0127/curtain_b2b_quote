@@ -116,6 +116,23 @@ class QuoteRequestsControllerTest < ActionDispatch::IntegrationTest
     get document_quote_request_url(quote_requests(:one))
     assert_response :success
     assert_match quote_requests(:one).quote_number, @response.body
+    assert_no_match(/>Tracks</, @response.body)
+    assert_no_match(/>Length</, @response.body)
+    assert_no_match(/Style \(S Wave \/ Pinch Pleat\)/, @response.body)
+    assert_match(/>Style</, @response.body)
+    assert_match(/>Opening Code</, @response.body)
+  end
+
+  test "renders legacy track columns in quote document html when historical track details exist" do
+    quote_requests(:one).quote_items.first.update!(track_selected: "M", track_price: 130, track_metres_required: 4)
+    sign_in users(:customer)
+
+    get document_quote_request_url(quote_requests(:one))
+    assert_response :success
+    assert_match(/>Tracks</, @response.body)
+    assert_match(/>Length</, @response.body)
+    assert_match(/Style \(S Wave \/ Pinch Pleat\)/, @response.body)
+    assert_match(/>OW or C\/O</, @response.body)
   end
 
   test "renders styled pdf document for owner" do
