@@ -1,4 +1,4 @@
-# Curtain B2B Quote Portal
+# Curtain B2B Quote Portal 
 
 Rails app for B2B curtain quote requests with:
 
